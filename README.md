@@ -1,2 +1,2 @@
-# bican_nextflow
-Nextflow workflows for BICAN scRNA processing
+# mccarroll_nextflow
+Nextflow workflows for McCarroll lab scRNA processing
