@@ -6,3 +6,5 @@ nextflow.config
 .nextflow
 results
 work
+report-*.html
+
