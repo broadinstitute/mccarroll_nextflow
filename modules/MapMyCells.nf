@@ -2,6 +2,8 @@ process mapMyCells_fromSpecifiedMarkers {
     publishDir 'results', mode: 'copy'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
     memory '16 GB'
+    scratch true // use local disk for input files because sqlite is slow over gcsfuse
+    stageInMode 'copy' // ensure files are copied to local scratch, rather than symlinked
 
     input:
         path query_markers_json
