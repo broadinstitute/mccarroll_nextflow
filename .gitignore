@@ -4,7 +4,7 @@ lib
 nextflow.config
 .nextflow.log*
 .nextflow
-results
+results*
 work
 report-*.html
 
