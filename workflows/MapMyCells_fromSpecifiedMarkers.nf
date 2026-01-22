@@ -16,7 +16,25 @@ include { mapMyCells_fromSpecifiedMarkers } from '../modules/MapMyCells_fromSpec
 include { dge_to_h5ad } from '../modules/dge_to_h5ad.nf'
 include { mtx_to_h5ad } from '../modules/mtx_to_h5ad.nf'
 
-workflow  {
+workflow MapMyCells_fromSpecifiedMarkers_workflow  {
+    take:
+        query_markers_json
+        precomputed_stats_h5ad
+        dge_h5ad
+        dge_matrix
+        reduced_gtf
+        matrix_mtx
+        features_tsv
+        barcodes_tsv
+        mmc_args
+        gene_mapping
+        analysis_identifier
+
+    emit:
+    extended_result_path = "${analysis_identifier}.json"
+    csv_result_path = "${analysis_identifier}.csv"
+    converted_h5ad = (params.dge_h5ad == '' ? "${params.analysis_identifier}.h5ad": '')
+
     main:
     if (params.dge_h5ad == '') {
         if (params.dge_matrix != '' && params.reduced_gtf != '') {
@@ -46,8 +64,24 @@ workflow  {
             params.mmc_args,
             params.analysis_identifier)
 
+}
+
+workflow {
+    main:
+    MapMyCells_fromSpecifiedMarkers_workflow(
+        params.query_markers_json,
+        params.precomputed_stats_h5ad,
+        params.dge_h5ad,
+        params.dge_matrix,
+        params.reduced_gtf,
+        params.matrix_mtx,
+        params.features_tsv,
+        params.barcodes_tsv,
+        params.mmc_args,
+        params.gene_mapping,
+        params.analysis_identifier)
     publish:
-    converted_h5ad = converted_h5ad
+    converted_h5ad = MapMyCells_fromSpecifiedMarkers_workflow.out.converted_h5ad
 }
 
 output {
