@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
+  "title": " pipeline parameters",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "query_markers_json": {
+      "type": "string",
+      "description": "classification model json file"
+    },
+    "precomputed_stats_h5ad": {
+      "type": "string",
+      "description": "classification model h5ad file"
+    },
+    "dge_h5ad": {
+      "type": "string",
+      "description": "input DGE file"
+    },
+    "dge_matrix": {
+      "type": "string",
+      "description": "input DGE in dense tabular format"
+    },
+    "reduced_gtf": {
+      "type": "string",
+      "description": "Drop-seq-style reduced GTF.  Required if dge_matrix"
+    },
+    "matrix_mtx": {
+      "type": "string",
+      "description": "10X-style MatrixMarket DGE"
+    },
+    "features_tsv": {
+      "type": "string",
+      "description": "10X-style gene names, required if matrix_mtx"
+    },
+    "barcodes_tsv": {
+      "type": "string",
+      "description": "10X-style CBC names, required if matrix_mtx"
+    },
+    "mmc_args": {
+      "type": "string",
+      "description": "Addtional arguments passed to MapMyCells_fromSpecifiedMarkers.nf"
+    },
+    "gene_mapping": {
+      "type": "string",
+      "description": "sqlite file used by MapMyCells MapMyCells_fromSpecifiedMarkers.nf"
+    },
+    "analysis_identifier": {
+      "type": "string",
+      "default": "mapmycells_analysis",
+      "description": "Used to name output files"
+    }
+  },
+  "required": ["query_markers_json", "precomputed_stats_h5ad"]
+}
