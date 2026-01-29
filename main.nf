@@ -1,4 +1,4 @@
-include { MapMyCells_fromSpecifiedMarkers_workflow } from './MapMyCells_fromSpecifiedMarkers.nf'
+include { MapMyCells_fromSpecifiedMarkers_workflow } from './workflows/MapMyCells_fromSpecifiedMarkers.nf'
 
 
 params.query_markers_json = ''
