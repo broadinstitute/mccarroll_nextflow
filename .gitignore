@@ -1,7 +1,6 @@
 .idea
 mccarroll_nextflow.iml
 lib
-nextflow.config
 .nextflow.log*
 .nextflow
 results*
