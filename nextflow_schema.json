@@ -47,8 +47,10 @@
     },
     "analysis_identifier": {
       "type": "string",
-      "default": "mapmycells_analysis",
       "description": "Used to name output files"
+    },
+    "outdir": {
+      "type": "string"
     }
   },
   "required": ["query_markers_json", "precomputed_stats_h5ad"]
