@@ -12,6 +12,7 @@ params.barcodes_tsv = ''
 params.mmc_args = ''
 params.gene_mapping = ''
 params.analysis_identifier = 'mapmycells_analysis'
+params.outdir = 'results'  // Default output directory
 
 workflow {
     main:
@@ -33,6 +34,6 @@ workflow {
 
 output {
     converted_h5ad {
-        path: 'converted_h5ad'
+        path params.outdir
     }
 }
