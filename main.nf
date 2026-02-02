@@ -42,19 +42,6 @@ def validateInputs() {
     }
 }
 
-// Output publication definition
-output {
-    json_report {
-        path params.outdir
-    }
-    csv_report {
-        path params.outdir
-    }
-    converted_h5ad {
-        path params.outdir
-    }
-}
-
 // Main workflow
 workflow {
     main:
@@ -94,3 +81,17 @@ workflow {
     csv_report = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
     converted_h5ad = MapMyCells_fromSpecifiedMarkers_workflow.out.converted_h5ad
 }
+
+// Output publication definition
+output {
+    json_report {
+        path params.outdir
+    }
+    csv_report {
+        path params.outdir
+    }
+    converted_h5ad {
+        path params.outdir
+    }
+}
+
