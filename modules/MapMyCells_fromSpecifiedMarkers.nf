@@ -1,4 +1,7 @@
 process mapMyCells_fromSpecifiedMarkers {
+    label 'process_high'
+    label 'mapmycells'
+    
     publishDir params.outdir, mode: 'copy'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
     memory '16 GB'
@@ -14,8 +17,8 @@ process mapMyCells_fromSpecifiedMarkers {
         val analysis_identifier
 
     output:
-    path "${analysis_identifier}.json"
-    path "${analysis_identifier}.csv"
+    path "${analysis_identifier}.json", emit: json_report
+    path "${analysis_identifier}.csv", emit: csv_report
 
     script:
     """

@@ -1,17 +1,19 @@
 workflow ScRnaStandardAnalysis {
     take:
-    alignedBams: Path
-    rawDge: Path
-    cbrbDge: Path
-    library: String
-    selectedCells: Path
-    locusFunction: String
-    cbrbSelectedCellsReport: Path
-    discoverMetaGenes: Boolean
-    markChimericReads: Boolean
-    ambientCells: Path
-    donor: String
-    metageneDgeFunctionalStrategy: String
+    alignedBams
+    rawDge
+    cbrbDge
+    library
+    selectedCells
+    locusFunction
+    cbrbSelectedCellsReport
+    discoverMetaGenes
+    markChimericReads
+    ambientCells
+    donor
+    metageneDgeFunctionalStrategy
 
+    main:
+    // TODO: Implement workflow logic
 
 }

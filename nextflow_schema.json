@@ -1,57 +1,60 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
-  "title": " pipeline parameters",
-  "description": "",
+  "title": "MapMyCells Pipeline Parameters",
+  "description": "Pipeline for cell type classification using MapMyCells with support for multiple input formats",
   "type": "object",
   "properties": {
     "query_markers_json": {
       "type": "string",
-      "description": "classification model json file"
+      "description": "Path to the classification model JSON file containing query markers"
     },
     "precomputed_stats_h5ad": {
       "type": "string",
-      "description": "classification model h5ad file"
+      "description": "Path to the classification model H5AD file with precomputed statistics"
     },
     "dge_h5ad": {
       "type": "string",
-      "description": "input DGE file"
+      "description": "Path to input DGE file in H5AD format (Option 1 - preferred)"
     },
     "dge_matrix": {
       "type": "string",
-      "description": "input DGE in dense tabular format"
+      "description": "Path to input DGE in dense tabular format (Option 2 - requires reduced_gtf)"
     },
     "reduced_gtf": {
       "type": "string",
-      "description": "Drop-seq-style reduced GTF.  Required if dge_matrix"
+      "description": "Path to Drop-seq-style reduced GTF file. Required when using dge_matrix"
     },
     "matrix_mtx": {
       "type": "string",
-      "description": "10X-style MatrixMarket DGE"
+      "description": "Path to 10X-style MatrixMarket DGE file (Option 3 - requires features_tsv and barcodes_tsv)"
     },
     "features_tsv": {
       "type": "string",
-      "description": "10X-style gene names, required if matrix_mtx"
+      "description": "Path to 10X-style gene names TSV file. Required when using matrix_mtx"
     },
     "barcodes_tsv": {
       "type": "string",
-      "description": "10X-style CBC names, required if matrix_mtx"
+      "description": "Path to 10X-style cell barcode names TSV file. Required when using matrix_mtx"
     },
     "mmc_args": {
       "type": "string",
-      "description": "Addtional arguments passed to MapMyCells_fromSpecifiedMarkers.nf"
+      "description": "Additional command-line arguments passed to MapMyCells_fromSpecifiedMarkers"
     },
     "gene_mapping": {
       "type": "string",
-      "description": "sqlite file used by MapMyCells MapMyCells_fromSpecifiedMarkers.nf"
+      "description": "Path to SQLite database file used by MapMyCells for gene mapping"
     },
     "analysis_identifier": {
       "type": "string",
-      "description": "Used to name output files"
+      "description": "Identifier used to name output files (default: mapmycells_analysis)",
+      "default": "mapmycells_analysis"
     },
     "outdir": {
-      "type": "string"
+      "type": "string",
+      "description": "Output directory where analysis results will be published (default: results)",
+      "default": "results"
     }
   },
-  "required": ["query_markers_json", "precomputed_stats_h5ad"]
+  "required": ["query_markers_json", "precomputed_stats_h5ad", "gene_mapping"]
 }

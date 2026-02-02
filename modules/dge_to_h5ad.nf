@@ -1,4 +1,7 @@
 process dge_to_h5ad {
+    label 'process_medium'
+    label 'conversion'
+    
     publishDir params.outdir, mode: 'copy'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_python:current'
     memory '8 GB'
@@ -9,7 +12,7 @@ process dge_to_h5ad {
         val output_file
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: h5ad
 
     script:
     """
