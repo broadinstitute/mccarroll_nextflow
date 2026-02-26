@@ -2,7 +2,6 @@ process mapMyCells_fromSpecifiedMarkers {
     label 'process_high'
     label 'mapmycells'
     
-    publishDir params.outdir, mode: 'copy'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
     memory '16 GB'
     scratch true // use local disk for input files because sqlite is slow over gcsfuse
