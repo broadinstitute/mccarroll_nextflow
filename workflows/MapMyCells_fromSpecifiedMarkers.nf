@@ -1,8 +1,8 @@
 
 
-include { mapMyCells_fromSpecifiedMarkers } from '../modules/MapMyCells_fromSpecifiedMarkers.nf'
-include { dge_to_h5ad } from '../modules/dge_to_h5ad.nf'
-include { mtx_to_h5ad } from '../modules/mtx_to_h5ad.nf'
+include { MAPMYCELLS_FROMSPECIFIEDMARKERS } from '../modules/local/MapMyCells_fromSpecifiedMarkers.nf'
+include { DGE_TO_H5AD                     } from '../modules/local/dge_to_h5ad.nf'
+include { MTX_TO_H5AD                     } from '../modules/local/mtx_to_h5ad.nf'
 
 workflow MapMyCells_fromSpecifiedMarkers_workflow  {
     take:
@@ -28,13 +28,13 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow  {
         h5ad_ch = dge_h5ad
         converted_h5ad_ch = channel.empty() // No conversion needed
     } else if (dge_matrix && reduced_gtf) {
-        h5ad_ch = dge_to_h5ad(
+        h5ad_ch = DGE_TO_H5AD(
                 dge_matrix,
                 reduced_gtf,
                 "${analysis_identifier}.h5ad")
         converted_h5ad_ch = h5ad_ch
     } else if (matrix_mtx && features_tsv && barcodes_tsv) {
-        h5ad_ch = mtx_to_h5ad(
+        h5ad_ch = MTX_TO_H5AD(
                 matrix_mtx,
                 features_tsv,
                 barcodes_tsv,
@@ -45,7 +45,7 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow  {
                 "or (matrix_mtx, features_tsv, barcodes_tsv)."
     }
     
-    def mmc_results = mapMyCells_fromSpecifiedMarkers(
+    MAPMYCELLS_FROMSPECIFIEDMARKERS(
             query_markers_json,
             precomputed_stats_h5ad,
             h5ad_ch,
@@ -54,8 +54,8 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow  {
             analysis_identifier)
 
     emit:
-    json_report = mmc_results.json_report
-    csv_report = mmc_results.csv_report
+    json_report = MAPMYCELLS_FROMSPECIFIEDMARKERS.out.json_report
+    csv_report = MAPMYCELLS_FROMSPECIFIEDMARKERS.out.csv_report
     converted_h5ad = converted_h5ad_ch
 
 }

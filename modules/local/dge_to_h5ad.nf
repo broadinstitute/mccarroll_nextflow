@@ -1,4 +1,4 @@
-process dge_to_h5ad {
+process DGE_TO_H5AD {
     label 'process_medium'
     label 'conversion'
     

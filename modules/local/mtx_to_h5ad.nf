@@ -1,4 +1,4 @@
-process mtx_to_h5ad {
+process MTX_TO_H5AD {
     label 'process_medium'
     label 'conversion'
     
