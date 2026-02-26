@@ -1,18 +1,18 @@
 include { MapMyCells_fromSpecifiedMarkers_workflow } from './workflows/MapMyCells_fromSpecifiedMarkers.nf'
 
-// Parameter declarations
-params.query_markers_json = ''
-params.precomputed_stats_h5ad = ''
-params.dge_h5ad = ''
-params.dge_matrix = ''
-params.reduced_gtf = ''
-params.matrix_mtx = ''
-params.features_tsv = ''
-params.barcodes_tsv = ''
-params.mmc_args = ''
-params.gene_mapping = ''
-params.analysis_identifier = 'mapmycells_analysis'
-params.outdir = 'results'
+params {
+    query_markers_json: Path
+    precomputed_stats_h5ad: Path
+    dge_h5ad: Path
+    dge_matrix: Path
+    reduced_gtf: Path
+    matrix_mtx: Path
+    features_tsv: Path
+    barcodes_tsv: Path
+    mmc_args: String
+    gene_mapping: Path
+    analysis_identifier: String
+}
 
 // Validation helper function
 def validateInputs() {
@@ -82,16 +82,14 @@ workflow {
     converted_h5ad = MapMyCells_fromSpecifiedMarkers_workflow.out.converted_h5ad
 }
 
-// Output publication definition
 output {
-    json_report {
-        path params.outdir
+    json_report{
+        mode 'copy'
     }
-    csv_report {
-        path params.outdir
+    csv_report{
+        mode 'copy'
     }
-    converted_h5ad {
-        path params.outdir
+    converted_h5ad{
+        mode 'copy'
     }
 }
-
