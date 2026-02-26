@@ -2,23 +2,6 @@
 
 nextflow.enable.dsl = 2
 
-/*
-========================================================================================
-    Standard Analysis Pipeline - Nextflow DSL2
-========================================================================================
-    Converted from WDL standard_analysis.wdl
-    
-    This pipeline performs comprehensive single-cell RNA-seq analysis including:
-    - Digital expression subsetting
-    - Molecular barcode gathering
-    - Chimeric transcript collapsing
-    - Transcript downsampling
-    - Meta-gene discovery
-    - Cell-to-sample assignment
-    - Doublet detection
-    - Sex genotyping
-----------------------------------------------------------------------------------------
-*/
 
 // Include modules
 include { SUBSET_DIGITAL_EXPRESSION } from './modules/local/subset_digital_expression'
