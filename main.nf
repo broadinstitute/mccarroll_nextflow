@@ -84,12 +84,9 @@ workflow {
 
 output {
     json_report{
-        mode 'copy'
     }
     csv_report{
-        mode 'copy'
     }
     converted_h5ad{
-        mode 'copy'
     }
 }
