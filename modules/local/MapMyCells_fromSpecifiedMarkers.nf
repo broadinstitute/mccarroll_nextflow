@@ -1,4 +1,4 @@
-process mapMyCells_fromSpecifiedMarkers {
+process MAPMYCELLS_FROMSPECIFIEDMARKERS {
     label 'process_high'
     label 'mapmycells'
     
