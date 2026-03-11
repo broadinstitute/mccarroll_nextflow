@@ -28,7 +28,6 @@ workflow PIPELINE_INITIALISATION {
     take:
     version           // boolean: Display version and exit
     validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs   // boolean: Do not use coloured log outputs
     nextflow_cli_args //   array: List of positional nextflow CLI args
     outdir            //  string: The output directory where the results will be saved
     help              // boolean: Display help message and exit
@@ -92,7 +91,6 @@ workflow PIPELINE_COMPLETION {
     email_on_fail   //  string: email address sent on pipeline failure
     plaintext_email // boolean: Send plain-text email instead of HTML
     outdir          //    path: Path to output directory where results will be published
-    monochrome_logs // boolean: Disable ANSI colour codes in log output
 
     main:
     summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
@@ -108,12 +106,12 @@ workflow PIPELINE_COMPLETION {
                 email_on_fail,
                 plaintext_email,
                 outdir,
-                monochrome_logs,
+                false, // monochrome logs
                 []
             )
         }
 
-        completionSummary(monochrome_logs)
+        completionSummary(false)
     }
 
     workflow.onError {
