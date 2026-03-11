@@ -53,7 +53,6 @@ workflow {
     PIPELINE_INITIALISATION (
             params.version,
             params.validate_params,
-            params.monochrome_logs,
             args,
             params.outdir,
             params.help,
@@ -98,7 +97,6 @@ workflow {
             params.email_on_fail,
             params.plaintext_email,
             params.outdir,
-            params.monochrome_logs,
     )
     publish:
     json_report = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
