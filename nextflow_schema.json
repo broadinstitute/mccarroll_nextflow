@@ -7,35 +7,43 @@
   "properties": {
     "query_markers_json": {
       "type": "string",
-      "description": "Path to the classification model JSON file containing query markers"
+      "description": "Path to the classification model JSON file containing query markers",
+      "format": "file-path"
     },
     "precomputed_stats_h5ad": {
       "type": "string",
-      "description": "Path to the classification model H5AD file with precomputed statistics"
+      "description": "Path to the classification model H5AD file with precomputed statistics",
+      "format": "file-path"
     },
     "dge_h5ad": {
       "type": "string",
-      "description": "Path to input DGE file in H5AD format (Option 1 - preferred)"
+      "description": "Path to input DGE file in H5AD format (Option 1 - preferred)",
+      "format": "file-path"
     },
     "dge_matrix": {
       "type": "string",
-      "description": "Path to input DGE in dense tabular format (Option 2 - requires reduced_gtf)"
+      "description": "Path to input DGE in dense tabular format (Option 2 - requires reduced_gtf)",
+      "format": "file-path"
     },
     "reduced_gtf": {
       "type": "string",
-      "description": "Path to Drop-seq-style reduced GTF file. Required when using dge_matrix"
+      "description": "Path to Drop-seq-style reduced GTF file. Required when using dge_matrix",
+      "format": "file-path"
     },
     "matrix_mtx": {
       "type": "string",
-      "description": "Path to 10X-style MatrixMarket DGE file (Option 3 - requires features_tsv and barcodes_tsv)"
+      "description": "Path to 10X-style MatrixMarket DGE file (Option 3 - requires features_tsv and barcodes_tsv)",
+      "format": "file-path"
     },
     "features_tsv": {
       "type": "string",
-      "description": "Path to 10X-style gene names TSV file. Required when using matrix_mtx"
+      "description": "Path to 10X-style gene names TSV file. Required when using matrix_mtx",
+      "format": "file-path"
     },
     "barcodes_tsv": {
       "type": "string",
-      "description": "Path to 10X-style cell barcode names TSV file. Required when using matrix_mtx"
+      "description": "Path to 10X-style cell barcode names TSV file. Required when using matrix_mtx",
+      "format": "file-path"
     },
     "mmc_args": {
       "type": "string",
@@ -43,7 +51,8 @@
     },
     "gene_mapping": {
       "type": "string",
-      "description": "Path to SQLite database file used by MapMyCells for gene mapping"
+      "description": "Path to SQLite database file used by MapMyCells for gene mapping",
+      "format": "file-path"
     },
     "analysis_identifier": {
       "type": "string",
@@ -53,7 +62,25 @@
     "outdir": {
       "type": "string",
       "description": "Output directory where analysis results will be published (default: results)",
-      "default": "results"
+      "default": "results",
+      "format": "directory-path"
+    },
+    "email": {
+      "type": "string",
+      "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$"
+    },
+    "help_full": {
+      "type": "boolean"
+    },
+    "show_hidden": {
+      "type": "boolean"
+    },
+    "version": {
+      "type": "boolean"
+    },
+    "validate_params": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": ["query_markers_json", "precomputed_stats_h5ad", "gene_mapping"]

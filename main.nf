@@ -1,4 +1,6 @@
 include { MapMyCells_fromSpecifiedMarkers_workflow } from './workflows/MapMyCells_fromSpecifiedMarkers.nf'
+include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_scrna_pipeline'
+include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_scrna_pipeline'
 
 params {
     query_markers_json: Path
@@ -45,6 +47,19 @@ def validateInputs() {
 // Main workflow
 workflow {
     main:
+    //
+    // SUBWORKFLOW: Run initialisation tasks
+    //
+    PIPELINE_INITIALISATION (
+            params.version,
+            params.validate_params,
+            params.monochrome_logs,
+            args,
+            params.outdir,
+            params.help,
+            params.help_full,
+            params.show_hidden
+    )
     // Validate inputs
     validateInputs()
     
@@ -75,7 +90,16 @@ workflow {
         gene_mapping_ch,
         params.analysis_identifier
     )
-    
+
+    // SUBWORKFLOW: Run completion tasks
+    //
+    PIPELINE_COMPLETION (
+            params.email,
+            params.email_on_fail,
+            params.plaintext_email,
+            params.outdir,
+            params.monochrome_logs,
+    )
     publish:
     json_report = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
     csv_report = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
