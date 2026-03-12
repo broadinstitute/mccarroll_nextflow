@@ -14,6 +14,13 @@ params {
     mmc_args: String
     gene_mapping: Path
     analysis_identifier: String
+
+    email: String
+    help: Boolean
+    help_full: Boolean
+    show_hidden: Boolean
+    version: Boolean
+    validate_params: Boolean
 }
 
 // Validation helper function
