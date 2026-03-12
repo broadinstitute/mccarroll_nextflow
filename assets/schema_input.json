@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/broadinstitute/mccarroll_nextflow/master/assets/schema_input.json",
-    "title": "broadinstitute/mccarroll_nextflow pipeline - params.input schema",
+    "$id": "https://raw.githubusercontent.com/mccarroll/nextflow/master/assets/schema_input.json",
+    "title": "mccarroll/nextflow pipeline - params.input schema",
     "description": "Schema for the file provided with params.input",
     "type": "array",
     "items": {
