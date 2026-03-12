@@ -1,20 +1,20 @@
-# mccarroll_nextflow
-Nextflow workflows for McCarroll lab scRNA processing
+# mccarroll/nextflow
 
-[![GitHub Actions CI Status](https://github.com/broadinstitute/mccarroll_nextflow/actions/workflows/nf-test.yml/badge.svg)](https://github.com/broadinstitute/mccarroll_nextflow/actions/workflows/nf-test.yml)
-[![GitHub Actions Linting Status](https://github.com/broadinstitute/mccarroll_nextflow/actions/workflows/linting.yml/badge.svg)](https://github.com/broadinstitute/mccarroll_nextflow/actions/workflows/linting.yml)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
+
+[![GitHub Actions CI Status](https://github.com/mccarroll/nextflow/actions/workflows/nf-test.yml/badge.svg)](https://github.com/mccarroll/nextflow/actions/workflows/nf-test.yml)
+[![GitHub Actions Linting Status](https://github.com/mccarroll/nextflow/actions/workflows/linting.yml/badge.svg)](https://github.com/mccarroll/nextflow/actions/workflows/linting.yml)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
 
 [![Nextflow](https://img.shields.io/badge/version-%E2%89%A525.04.0-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)
-[![nf-core template version](https://img.shields.io/badge/nf--core_template-3.5.1-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/3.5.1)
+[![nf-core template version](https://img.shields.io/badge/nf--core_template-3.5.2-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/3.5.2)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
-[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/broadinstitute/mccarroll_nextflow)
+[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/mccarroll/nextflow)
 
 ## Introduction
 
-**broadinstitute/mccarroll_nextflow** is a bioinformatics pipeline that ...
+**mccarroll/nextflow** is a bioinformatics pipeline that ...
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
@@ -24,7 +24,7 @@ Nextflow workflows for McCarroll lab scRNA processing
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 
 ## Usage
 
@@ -52,7 +52,7 @@ Now, you can run the pipeline using:
 <!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
 ```bash
-nextflow run broadinstitute/mccarroll_nextflow \
+nextflow run mccarroll/nextflow \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
    --outdir <OUTDIR>
@@ -63,7 +63,7 @@ nextflow run broadinstitute/mccarroll_nextflow \
 
 ## Credits
 
-broadinstitute/mccarroll_nextflow was originally written by Alec Wysoker.
+mccarroll/nextflow was originally written by Alec Wysoker.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
@@ -76,7 +76,7 @@ If you would like to contribute to this pipeline, please see the [contributing g
 ## Citations
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use broadinstitute/mccarroll_nextflow for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+<!-- If you use mccarroll/nextflow for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 

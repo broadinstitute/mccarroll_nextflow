@@ -1,5 +1,5 @@
 process MAPMYCELLS_FROMSPECIFIEDMARKERS {
-    label 'process_high'
+    label 'process_medium'
     label 'mapmycells'
     
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
