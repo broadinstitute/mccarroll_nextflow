@@ -16,7 +16,8 @@
           "type": "string",
           "format": "directory-path",
           "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-          "fa_icon": "fas fa-folder-open"
+          "fa_icon": "fas fa-folder-open",
+          "default": "results"
         },
         "email": {
           "type": "string",
@@ -127,7 +128,6 @@
         "validate_params": {
           "type": "boolean",
           "description": "Boolean whether to validate parameters against the schema at runtime",
-          "default": true,
           "fa_icon": "fas fa-check-square",
           "hidden": true
         },
@@ -171,49 +171,10 @@
     }
   ],
   "properties": {
-    "dge_h5ad": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "dge_matrix": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "reduced_gtf": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "matrix_mtx": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "features_tsv": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "barcodes_tsv": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "mmc_args": {
-      "type": "string"
-    },
-    "gene_mapping": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "analysis_identifier": {
-      "type": "string",
-      "default": "mapmycells_analysis"
-    },
-    "query_markers_json": {
-      "type": "string",
-      "format": "file-path"
-    },
-    "precomputed_stats_h5ad": {
+    "manifest": {
       "type": "string",
       "format": "file-path"
     }
   },
-  "required": ["gene_mapping", "query_markers_json", "precomputed_stats_h5ad"]
+  "required": ["manifest"]
 }
