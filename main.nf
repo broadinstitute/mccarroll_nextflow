@@ -22,17 +22,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_next
 */
 
 params {
-    query_markers_json: Path
-    precomputed_stats_h5ad: Path
-    dge_h5ad: Path
-    dge_matrix: Path
-    reduced_gtf: Path
-    matrix_mtx: Path
-    features_tsv: Path
-    barcodes_tsv: Path
-    mmc_args: String
-    gene_mapping: Path
-    analysis_identifier: String
+    manifest: Path
 
     email: String
     help: Boolean
@@ -61,7 +51,7 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.input,
+        params.manifest,
         params.help,
         params.help_full,
         params.show_hidden
