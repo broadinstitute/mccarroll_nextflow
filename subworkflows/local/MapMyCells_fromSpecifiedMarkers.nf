@@ -1,8 +1,8 @@
 
 
-include { MAPMYCELLS_FROMSPECIFIEDMARKERS } from '../modules/local/MapMyCells_fromSpecifiedMarkers.nf'
-include { DGE_TO_H5AD                     } from '../modules/local/dge_to_h5ad.nf'
-include { MTX_TO_H5AD                     } from '../modules/local/mtx_to_h5ad.nf'
+include { MAPMYCELLS_FROMSPECIFIEDMARKERS } from '../../modules/local/MapMyCells_fromSpecifiedMarkers.nf'
+include { DGE_TO_H5AD                     } from '../../modules/local/dge_to_h5ad.nf'
+include { MTX_TO_H5AD                     } from '../../modules/local/mtx_to_h5ad.nf'
 
 workflow MapMyCells_fromSpecifiedMarkers_workflow  {
     take:
