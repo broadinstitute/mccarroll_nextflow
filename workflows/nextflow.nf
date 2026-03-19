@@ -21,11 +21,13 @@ workflow NEXTFLOW {
     manifest = manifest.val
     // Validate inputs
     validateInputs(manifest)
-    tag_and_split_bam_workflow(manifest)
+    // TODO: decide how to handle allowedBarcodes - should it be a separate input or part of the manifest?
+    tag_and_split_bam_workflow(manifest, manifest['allowedBarcodes'])
     
     print("Input manifest: ${manifest}")
     emit:
     manifest = manifest
     rawBam = tag_and_split_bam_workflow.out.rawBam
+    barcodeCounts = tag_and_split_bam_workflow.out.barcodeCounts
 }
 
