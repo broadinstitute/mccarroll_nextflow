@@ -1,8 +1,10 @@
 include {FASTQ_TO_SAM} from '../../modules/local/fastqToSam.nf'
+include {COUNT_BARCODE_SEQUENCES} from '../../modules/local/countBarcodeSequences.nf'
 
 workflow tag_and_split_bam_workflow {
     take:
         manifest
+        allowedBarcodes
 
     main:
     if (manifest.containsKey('fastq')) {
@@ -30,8 +32,20 @@ workflow tag_and_split_bam_workflow {
         FASTQ_TO_SAM(
                 fastqChannel,
                 manifest['library'])
+        rawBam = FASTQ_TO_SAM.out.rawBam
+    } else if (manifest.containsKey('rawBam')) {
+        rawBam = channel.fromPath(manifest['rawBam'])
+    } else {
+        error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
+    COUNT_BARCODE_SEQUENCES(
+            manifest['baseRange'],
+            manifest['barcodedRead'],
+            manifest['library'],
+            rawBam.collect(),
+            allowedBarcodes)
 
     emit:
     rawBam = FASTQ_TO_SAM.out.rawBam
+    barcodeCounts = COUNT_BARCODE_SEQUENCES.out.barcodeCounts
 }
