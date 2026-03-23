@@ -27,7 +27,6 @@ workflow NEXTFLOW {
     print("Input manifest: ${manifest}")
     emit:
     manifest = manifest
-    rawBam = tag_and_split_bam_workflow.out.rawBam
-    barcodeCounts = tag_and_split_bam_workflow.out.barcodeCounts
+    splitBams = tag_and_split_bam_workflow.out.splitBams
 }
 

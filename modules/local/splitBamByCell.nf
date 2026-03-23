@@ -9,7 +9,7 @@ process SPLIT_BAM_BY_CELL {
         path taggedBams
 
     output:
-    path "${libraryName}.unmapped.[0-9]*.bam", emit: splitBams
+    path "${libraryName}.[0-9]*.unmapped.bam", emit: splitBams
     path "${report}", emit: splitBamReport
     path "${manifest}", emit: splitBamManifest
     path "${bam_list}", emit: bamList
@@ -20,7 +20,7 @@ process SPLIT_BAM_BY_CELL {
     bam_list = "${libraryName}.unmapped.bam_list"
     """
     SplitBamByCell --VALIDATION_STRINGENCY SILENT \
-        --OUTPUT ${libraryName}.unmapped.__SPLITNUM__.bam --INPUT ${taggedBams.join(' --INPUT ')} \
+        --OUTPUT ${libraryName}.__SPLITNUM__.unmapped.bam --INPUT ${taggedBams.join(' --INPUT ')} \
         --TARGET_BAM_SIZE ${params.targetBamSizeBytes} --REPORT ${report} --OUTPUT_MANIFEST ${manifest} \
         --OUTPUT_LIST ${bam_list}
     """

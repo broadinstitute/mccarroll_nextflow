@@ -29,7 +29,7 @@ process CORRECT_SCRNA_READ_PAIRS {
     script:
     if (!output_file.any()) {
         def firstBam = bams.getAt(0)
-        output_file = firstBam.getName().replace(".bam", ".cbc_corrected.bam")
+        output_file = firstBam.getName().replace(".raw.bam", ".cbc_corrected.bam")
     }
     metrics_file = output_file.replace(".cbc_corrected.bam", "corrected_barcode_metrics")
     //          "METRICS" -> outputMetrics,
