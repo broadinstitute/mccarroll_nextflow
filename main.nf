@@ -27,6 +27,7 @@ params {
     // defaults
     cellBarcodeTag: String
     molecularBarcodeTag: String
+    targetBamSizeBytes: String
 
     // infrastructure parameters
     email: String
