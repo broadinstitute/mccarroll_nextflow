@@ -24,6 +24,11 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_next
 params {
     manifest: Path
 
+    // defaults
+    cellBarcodeTag: String
+    molecularBarcodeTag: String
+
+    // infrastructure parameters
     email: String
     help: Boolean
     help_full: Boolean

@@ -1,5 +1,6 @@
 include {FASTQ_TO_SAM} from '../../modules/local/fastqToSam.nf'
 include {COUNT_BARCODE_SEQUENCES} from '../../modules/local/countBarcodeSequences.nf'
+include {CORRECT_SCRNA_READ_PAIRS} from '../../modules/local/correctScrnaReadPairs.nf'
 
 workflow tag_and_split_bam_workflow {
     take:
@@ -44,8 +45,19 @@ workflow tag_and_split_bam_workflow {
             manifest['library'],
             rawBam.collect(),
             allowedBarcodes)
-
+    CORRECT_SCRNA_READ_PAIRS(
+            rawBam,
+            manifest['baseRange'],
+            manifest['barcodedRead'],
+            manifest['library'],
+            COUNT_BARCODE_SEQUENCES.out.barcodeCounts,
+            [], // Default output BAM naming strategy
+            true // Tag both reads
+    )
+    // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
+    // but no one really cares about that output.
     emit:
     rawBam = FASTQ_TO_SAM.out.rawBam
     barcodeCounts = COUNT_BARCODE_SEQUENCES.out.barcodeCounts
+    cbcCorrectedBam = CORRECT_SCRNA_READ_PAIRS.out.correctedBam
 }
