@@ -83,7 +83,9 @@ workflow {
     // TODO: Need to determine overall publishing strategy for the pipeline.  Currently rawBam is being double-published,
     // once in the main workflow and once in subdirectory because of modules.config.publishDir in the config file.
     publish:
-    rawBam = NEXTFLOW.out.rawBam
+    // suppressing publication of splitBams for now because they would duplicate the command-specific output directories.
+    // We need to decide on a strategy for publishing these files.
+    splitBams = null // NEXTFLOW.out.splitBams
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -98,7 +100,7 @@ output {
     }
     converted_h5ad{
     }
-    rawBam{
+    splitBams{
     }
 }
 
