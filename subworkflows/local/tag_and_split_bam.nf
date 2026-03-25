@@ -5,27 +5,25 @@ include {SPLIT_BAM_BY_CELL} from '../../modules/local/splitBamByCell.nf'
 
 workflow tag_and_split_bam_workflow {
     take:
-        manifest
+        fastq_read1
+        fastq_read2
+        rawBam
+        library
+        baseRange
+        barcodedRead
         allowedBarcodes
 
     main:
-    if (manifest.containsKey('fastq')) {
-        fastqLists = manifest['fastq']
-        if (fastqLists['read1'] instanceof String) {
-            fastqLists['read1'] = [fastqLists['read1']]
-        }
-        if (fastqLists['read2'] instanceof String) {
-            fastqLists['read2'] = [fastqLists['read2']]
-        }
-        print ("Read1 files: ${fastqLists['read1']}")
-        print ("Read2 files: ${fastqLists['read2']}")
+    if (fastq_read1.size() > 0) {
+        print ("Read1 files: ${fastq_read1}")
+        print ("Read2 files: ${fastq_read2}")
         // Check that read1 and read2 lists have the same length
-        if (fastqLists['read1'].size() != fastqLists['read2'].size()) {
+        if (fastq_read1.size() != fastq_read2.size()) {
             error "The number of read1 and read2 files must be the same: " +
-                    "found ${fastqLists['read1'].size()} read1 files and ${fastqLists['read2'].size()} read2 files."
+                    "found ${fastq_read1.size()} read1 files and ${fastq_read2.size()} read2 files."
         }
-        fastqTuples = fastqLists['read1'].withIndex().collect { read1, idx ->
-            def read2 = fastqLists['read2'][idx]
+        fastqTuples = fastq_read1.withIndex().collect { read1, idx ->
+            def read2 = fastq_read2[idx]
             return [idx, read1, read2]
         }
         print ("Fastq tuples: ${fastqTuples}")
@@ -33,30 +31,30 @@ workflow tag_and_split_bam_workflow {
         fastqChannel.view()
         FASTQ_TO_SAM(
                 fastqChannel,
-                manifest['library'])
+                library)
         rawBam = FASTQ_TO_SAM.out.rawBam
-    } else if (manifest.containsKey('rawBam')) {
-        rawBam = channel.fromPath(manifest['rawBam'])
+    } else if (rawBam.size() > 0) {
+        rawBam = channel.fromPath(rawBam)
     } else {
         error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
     COUNT_BARCODE_SEQUENCES(
-            manifest['baseRange'],
-            manifest['barcodedRead'],
-            manifest['library'],
+            baseRange,
+            barcodedRead,
+            library,
             rawBam.collect(),
             allowedBarcodes)
     CORRECT_SCRNA_READ_PAIRS(
             rawBam,
-            manifest['baseRange'],
-            manifest['barcodedRead'],
-            manifest['library'],
+            baseRange,
+            barcodedRead,
+            library,
             COUNT_BARCODE_SEQUENCES.out.barcodeCounts,
             [], // Default output BAM naming strategy
             true // Tag both reads
     )
     SPLIT_BAM_BY_CELL(
-            manifest['library'],
+            library,
             CORRECT_SCRNA_READ_PAIRS.out.correctedBam.collect()
     )
     // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
