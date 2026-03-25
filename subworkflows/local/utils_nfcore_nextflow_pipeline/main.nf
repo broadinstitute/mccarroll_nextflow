@@ -31,7 +31,6 @@ workflow PIPELINE_INITIALISATION {
     _monochrome_logs   // boolean: Do not use coloured log outputs.  lint complained about this so prefix with underscore -- AW 
     nextflow_cli_args //   array: List of positional nextflow CLI args
     outdir            //  string: The output directory where the results will be saved
-    manifest_path             //  string: Path to input manifest.
     help              // boolean: Display help message and exit
     help_full         // boolean: Show the full help message
     show_hidden       // boolean: Show hidden parameters in the help message
@@ -71,9 +70,6 @@ workflow PIPELINE_INITIALISATION {
     UTILS_NFCORE_PIPELINE (
         nextflow_cli_args
     )
-    manifest = loadManifest(manifest_path)
-    emit:
-    manifest = manifest
 }
 
 /*
@@ -123,12 +119,6 @@ workflow PIPELINE_COMPLETION {
     FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
-def loadManifest(manifest_path) {
-    def manifest = new groovy.yaml.YamlSlurper().parse(manifest_path)
-    // TODO: add validation of manifest content here.
-    return manifest
-}
 
 //
 // Generate methods description for MultiQC

@@ -171,10 +171,64 @@
     }
   ],
   "properties": {
-    "manifest": {
+    "cellBarcodeTag": {
+      "type": "string",
+      "default": "XC"
+    },
+    "molecularBarcodeTag": {
+      "type": "string",
+      "default": "XM"
+    },
+    "targetBamSizeBytes": {
+      "type": "integer",
+      "default": 2147483648
+    },
+    "allowedBarcodes": {
       "type": "string",
       "format": "file-path"
+    },
+    "project": {
+      "type": "string"
+    },
+    "library": {
+      "type": "string"
+    },
+    "experimentDate": {
+      "type": "string",
+      "pattern": "[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "reference": {
+      "type": "string",
+      "format": "file-path"
+    },
+    "fastq_read1": {
+      "type": "string",
+      "default": "[]",
+      "format": "file-path"
+    },
+    "fastq_read2": {
+      "type": "string",
+      "default": "[]",
+      "format": "file-path"
+    },
+    "rawBam": {
+      "type": "string",
+      "default": "[]",
+      "format": "file-path"
+    },
+    "version10X": {
+      "type": "string"
+    },
+    "sampleType": {
+      "type": "string",
+      "enum": ["nuclei", "whole_cell"]
+    },
+    "barcodedRead": {
+      "type": "integer"
+    },
+    "baseRange": {
+      "type": "string"
     }
   },
-  "required": ["manifest"]
+  "required": ["manifest", "project", "library", "sampleType"]
 }

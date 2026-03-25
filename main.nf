@@ -22,7 +22,19 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_next
 */
 
 params {
-    manifest: Path
+    allowedBarcodes: Path
+    project: String
+    library: String
+    experimentDate: String
+    reference: Path
+    fastq_read1: List
+    fastq_read2: List
+    rawBam: List
+    version10X: String
+    sampleType: String
+    barcodedRead: Integer
+    baseRange: String
+
 
     // defaults
     cellBarcodeTag: String
@@ -57,7 +69,6 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.manifest,
         params.help,
         params.help_full,
         params.show_hidden
@@ -66,9 +77,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NEXTFLOW (
-            PIPELINE_INITIALISATION.out.manifest
-    )
+    NEXTFLOW ()
     //
     // SUBWORKFLOW: Run completion tasks
     //
