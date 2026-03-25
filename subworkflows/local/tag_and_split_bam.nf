@@ -15,8 +15,6 @@ workflow tag_and_split_bam_workflow {
 
     main:
     if (fastq_read1.size() > 0) {
-        print ("Read1 files: ${fastq_read1}")
-        print ("Read2 files: ${fastq_read2}")
         // Check that read1 and read2 lists have the same length
         if (fastq_read1.size() != fastq_read2.size()) {
             error "The number of read1 and read2 files must be the same: " +
@@ -26,15 +24,16 @@ workflow tag_and_split_bam_workflow {
             def read2 = fastq_read2[idx]
             return [idx, read1, read2]
         }
-        print ("Fastq tuples: ${fastqTuples}")
         fastqChannel = channel.fromList(fastqTuples)
         fastqChannel.view()
         FASTQ_TO_SAM(
                 fastqChannel,
                 library)
-        rawBam = FASTQ_TO_SAM.out.rawBam
+        localRawBam = FASTQ_TO_SAM.out.rawBam
     } else if (rawBam.size() > 0) {
-        rawBam = channel.fromPath(rawBam)
+        // TODO: This doesn't work.  COUNT_BARCODE_SEQUENCES create a command line without the directory,
+        //  which causes the process to fail because it can't find the BAM file.
+        localRawBam = rawBam
     } else {
         error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
@@ -42,10 +41,10 @@ workflow tag_and_split_bam_workflow {
             baseRange,
             barcodedRead,
             library,
-            rawBam.collect(),
+            localRawBam.collect(),
             allowedBarcodes)
     CORRECT_SCRNA_READ_PAIRS(
-            rawBam,
+            localRawBam,
             baseRange,
             barcodedRead,
             library,
@@ -60,7 +59,7 @@ workflow tag_and_split_bam_workflow {
     // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
     // but no one really cares about that output.
     emit:
-    rawBam = FASTQ_TO_SAM.out.rawBam
+    rawBam = localRawBam
     barcodeCounts = COUNT_BARCODE_SEQUENCES.out.barcodeCounts
     cbcCorrectedBam = CORRECT_SCRNA_READ_PAIRS.out.correctedBam
     splitBams = SPLIT_BAM_BY_CELL.out.splitBams
