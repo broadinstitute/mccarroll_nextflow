@@ -7,7 +7,7 @@ process CORRECT_SCRNA_READ_PAIRS {
     memory {
         // TODO: It looks like this value is not being used based on looking at .command.run
         // 7e-8 is the MemoryReservationMbPerByte used by Zamboni
-        long totalInputSizeBytes = bams.collect { it.size() }.sum()
+        long totalInputSizeBytes = bams.collect { bam -> bam.size() }.sum()
         long memoryMb = (long) (totalInputSizeBytes * 7e-8)
         // Set a minimum memory requirement to avoid issues with very small input files.
         1.MB * Math.max(memoryMb, 16000)
