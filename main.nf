@@ -35,12 +35,14 @@ params {
     sampleType: String
     barcodedRead: Integer
     baseRange: String
+    beadStructure: String
 
 
     // defaults
     cellBarcodeTag: String
     molecularBarcodeTag: String
     targetBamSizeBytes: String
+    fivePrimeAdapter: String
 
     // infrastructure parameters
     email: String
