@@ -1,7 +1,6 @@
 process MAPMYCELLS_FROMSPECIFIEDMARKERS {
     label 'process_medium'
-    label 'mapmycells'
-    
+
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
     memory '16 GB'
     scratch true // use local disk for input files because sqlite is slow over gcsfuse
