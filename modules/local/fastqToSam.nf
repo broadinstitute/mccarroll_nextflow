@@ -4,7 +4,6 @@
 
 process FASTQ_TO_SAM {
     label 'process_single'
-    label 'conversion'
 
     container 'docker.io/broadinstitute/picard:latest'
 

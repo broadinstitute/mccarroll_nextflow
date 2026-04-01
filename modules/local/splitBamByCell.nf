@@ -1,6 +1,5 @@
 process SPLIT_BAM_BY_CELL {
     label 'process_single'
-    label 'conversion'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

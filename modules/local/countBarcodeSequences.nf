@@ -1,6 +1,5 @@
 process COUNT_BARCODE_SEQUENCES {
     label 'process_single'
-    label 'count_barcode_sequences'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

@@ -1,6 +1,5 @@
 process CORRECT_SCRNA_READ_PAIRS {
     label 'process_single'
-    label 'correction'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
