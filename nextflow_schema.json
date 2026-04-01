@@ -228,6 +228,13 @@
     },
     "baseRange": {
       "type": "string"
+    },
+    "beadStructure": {
+      "type": "string"
+    },
+    "fivePrimeAdapter": {
+      "type": "string",
+      "default": "AAGCAGTGGTATCAACGCAGAGTACATGGG"
     }
   },
   "required": ["manifest", "project", "library", "sampleType"]
