@@ -41,7 +41,7 @@ params {
     // defaults
     cellBarcodeTag: String
     molecularBarcodeTag: String
-    targetBamSizeBytes: String
+    targetBamSizeMBytes: Integer
     fivePrimeAdapter: String
 
     // infrastructure parameters

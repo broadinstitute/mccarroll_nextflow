@@ -179,10 +179,6 @@
       "type": "string",
       "default": "XM"
     },
-    "targetBamSizeBytes": {
-      "type": "integer",
-      "default": 2147483648
-    },
     "allowedBarcodes": {
       "type": "string",
       "format": "file-path"
@@ -235,6 +231,10 @@
     "fivePrimeAdapter": {
       "type": "string",
       "default": "AAGCAGTGGTATCAACGCAGAGTACATGGG"
+    },
+    "targetBamSizeMBytes": {
+      "type": "integer",
+      "default": 2048
     }
   },
   "required": ["manifest", "project", "library", "sampleType"]
