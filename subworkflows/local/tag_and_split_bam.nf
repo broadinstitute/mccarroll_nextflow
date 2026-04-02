@@ -25,7 +25,6 @@ workflow tag_and_split_bam_workflow {
             return [idx, read1, read2]
         }
         fastqChannel = channel.fromList(fastqTuples)
-        fastqChannel.view()
         FASTQ_TO_SAM(
                 fastqChannel,
                 library)
