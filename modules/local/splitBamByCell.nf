@@ -20,7 +20,7 @@ process SPLIT_BAM_BY_CELL {
     """
     SplitBamByCell --VALIDATION_STRINGENCY SILENT \
         --OUTPUT ${libraryName}.__SPLITNUM__.unmapped.bam --INPUT ${taggedBams.join(' --INPUT ')} \
-        --TARGET_BAM_SIZE ${params.targetBamSizeBytes} --REPORT ${report} --OUTPUT_MANIFEST ${manifest} \
+        --TARGET_BAM_SIZE ${params.targetBamSizeMBytes}M --REPORT ${report} --OUTPUT_MANIFEST ${manifest} \
         --OUTPUT_LIST ${bam_list}
     """
 }
