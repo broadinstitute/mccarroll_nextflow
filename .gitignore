@@ -1,6 +1,6 @@
 .idea
 mccarroll_nextflow.iml
-lib
+lib/*.jar
 .nextflow.log*
 .nextflow
 results*
