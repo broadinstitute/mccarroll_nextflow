@@ -237,5 +237,5 @@
       "default": 2048
     }
   },
-  "required": ["manifest", "project", "library", "sampleType"]
+  "required": ["project", "library", "sampleType"]
 }
