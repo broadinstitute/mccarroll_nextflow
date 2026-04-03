@@ -198,22 +198,37 @@
       "format": "file-path"
     },
     "fastq_read1": {
-      "type": "string",
+      "type": ["string", "array"],
+      "items": {
+        "type": "string",
+        "format": "file-path",
+        "exists": true
+      } ,
       "default": "[]",
       "format": "file-path"
     },
     "fastq_read2": {
-      "type": "string",
+      "type": ["string", "array"],
+      "items": {
+        "type": "string",
+        "format": "file-path",
+        "exists": true
+      },
       "default": "[]",
       "format": "file-path"
     },
     "rawBam": {
-      "type": "string",
+      "type": ["string", "array"],
+      "items": {
+        "type": "string",
+        "format": "file-path",
+        "exists": true
+      },
       "default": "[]",
       "format": "file-path"
     },
     "version10X": {
-      "type": "string"
+      "type": ["number", "string"]
     },
     "sampleType": {
       "type": "string",
