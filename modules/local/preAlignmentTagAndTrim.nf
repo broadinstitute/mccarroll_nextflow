@@ -20,6 +20,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
     script:
     parsedBeadStructure = new BeadStructure(beadStructure)
     print("Bead structure: ${parsedBeadStructure}")
+    // TODO: This doesn't seem like the right way to do this, but it works.
     output_file = inputBams.collect({it.getName().replace(inputExtension, outputExtension)} ).head()
     """
     echo $output_file > $output_file
