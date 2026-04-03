@@ -57,11 +57,15 @@ workflow tag_and_split_bam_workflow {
     )
     // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
     // but no one really cares about that output.
+
+    // Because SPLIT_BAM_BY_CELL.out.splitBams is a glob, it produces a channel containing a single item which is a
+    // list of all the split BAMs.  We want to flatten that so that the output channel contains one item per split BAM.
+    splitBams = SPLIT_BAM_BY_CELL.out.splitBams.flatten()
     emit:
     rawBam = localRawBam
     barcodeCounts = COUNT_BARCODE_SEQUENCES.out.barcodeCounts
     cbcCorrectedBam = CORRECT_SCRNA_READ_PAIRS.out.correctedBam
-    splitBams = SPLIT_BAM_BY_CELL.out.splitBams
+    splitBams = splitBams
     splitBamReport = SPLIT_BAM_BY_CELL.out.splitBamReport
     splitBamManifest = SPLIT_BAM_BY_CELL.out.splitBamManifest
     bamList = SPLIT_BAM_BY_CELL.out.bamList
