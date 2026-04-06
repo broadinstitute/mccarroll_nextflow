@@ -9,7 +9,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
         val libraryName
         path inputBams
         val fivePrimeAdapter
-        val parsedBeadStructure
+        val beadStructure
         val cellularBarcodeTag
         val molecularBarcodeTag
         path allowedBarcodes
@@ -22,6 +22,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
     script:
     // TODO: This doesn't seem like the right way to do this, but it works.
     output_file = inputBams.collect({it.getName().replace(inputExtension, outputExtension)} ).head()
+    def parsedBeadStructure = new BeadStructure(beadStructure)
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Molecular)
     // Convert from zero-based to one-based indexing for Java command line argument
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Molecular) + 1
