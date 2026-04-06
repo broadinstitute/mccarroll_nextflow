@@ -4,7 +4,7 @@ process COUNT_BARCODE_SEQUENCES {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        val parsedBeadStructure
+        val beadStructure
         val libraryName
         path bams
         path allowedBarcodes
@@ -14,6 +14,7 @@ process COUNT_BARCODE_SEQUENCES {
 
     script:
     output_file = "${libraryName}.expected_barcode_metrics.gz"
+    def parsedBeadStructure = new BeadStructure(beadStructure)
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Cellular)
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1 // Convert from zero-based to one-based indexing for Java command line argument
     """

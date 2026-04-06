@@ -9,7 +9,9 @@ process PREALIGNMENT_TAG_AND_TRIM {
         val libraryName
         path inputBams
         val fivePrimeAdapter
-        val beadStructure
+        val parsedBeadStructure
+        val cellularBarcodeTag
+        val molecularBarcodeTag
         path allowedBarcodes
         val inputExtension
         val outputExtension
@@ -18,23 +20,20 @@ process PREALIGNMENT_TAG_AND_TRIM {
     // TODO: emit metrics
 
     script:
-    parsedBeadStructure = new BeadStructure(beadStructure)
-    print("Bead structure: ${parsedBeadStructure}")
     // TODO: This doesn't seem like the right way to do this, but it works.
     output_file = inputBams.collect({it.getName().replace(inputExtension, outputExtension)} ).head()
+    def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Molecular)
+    // Convert from zero-based to one-based indexing for Java command line argument
+    def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Molecular) + 1
+    def templateRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Template) + 1
     """
-    echo $output_file > $output_file
-    """
-}
-
-/*
-"TagBamWithReadSequenceExtended \
+    TagBamWithReadSequenceExtended \
           --I ${inputBams} \
           --O /dev/stdout \
           --SUMMARY ${output_file}.${molecularBarcodeTag}_bam_summary.txt \
-          --BASE_RANGE TODO \
+          --BASE_RANGE ${baseRange} \
           --BASE_QUALITY 10 \
-          --BARCODED_READ {barcodedRead} \
+          --BARCODED_READ ${barcodedRead} \
           --DISCARD_READ true \
           --TAG_BOTH_READS false \
           --TAG_NAME ${molecularBarcodeTag} \
@@ -42,11 +41,43 @@ process PREALIGNMENT_TAG_AND_TRIM {
           --COMPRESSION_LEVEL 0 \
           --VALIDATION_STRINGENCY SILENT | \
     FilterBam \
-            --I/dev/stdin \
+            --I /dev/stdin \
             --O /dev/stdout \
             --TAG_REJECT XQ \
             --PASSING_READ_THRESHOLD 0.1 \
           --COMPRESSION_LEVEL 0 \
           --VALIDATION_STRINGENCY SILENT | \
-    FilterBamByTag" \
- */
+    FilterBamByTag \
+            --I /dev/stdin \
+            --O /dev/stdout \
+            --TAG_VALUES_FILE ${allowedBarcodes} \
+            --TAG ${cellularBarcodeTag} \
+            --ACCEPT_TAG true \
+            --SUMMARY ${output_file}.${cellularBarcodeTag}_bam_summary.txt \
+            --PASSING_READ_THRESHOLD 0.1 \
+          --COMPRESSION_LEVEL 0 \
+          --VALIDATION_STRINGENCY SILENT | \
+    TrimStartingSequence \
+            --I /dev/stdin \
+            --O /dev/stdout \
+          --OUTPUT_SUMMARY ${output_file}.adapter_trimming_report.txt \
+          --SEQUENCE ${fivePrimeAdapter} \
+          --MISMATCH_RATE 0.1 \
+          --NUM_BASES 5 \
+          --LENGTH_TAG Zl \
+          --WHICH_READ ${templateRead} \
+          --COMPRESSION_LEVEL 0 \
+          --VALIDATION_STRINGENCY SILENT | \
+          PolyATrimmer \
+            --I /dev/stdin \
+            --O ${output_file} \
+          --OUTPUT_SUMMARY ${output_file}.polyA_trimming_report.txt \
+          --MISMATCHES 0 \
+          --NUM_BASES 6 \
+          --LENGTH_TAG ZL \
+          --ADAPTER_TAG ZA \
+          --WHICH_READ ${templateRead} \
+          --NEW true \
+          --VALIDATION_STRINGENCY SILENT
+    """
+}

@@ -246,7 +246,7 @@ class BeadStructure {
         def ret = new LinkedHashMap<ElementType, List<Element>>()
 
         elements.each { e ->
-            if (e.elementType.tag != null && !ret.containsKey(e.elementType)) {
+            if (!ret.containsKey(e.elementType)) {
                 ret[e.elementType] = grouped[e.elementType]
             }
         }
