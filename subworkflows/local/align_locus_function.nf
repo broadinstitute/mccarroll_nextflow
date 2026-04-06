@@ -6,12 +6,11 @@ workflow align_locus_function_workflow {
         beadStructure
 
     main:
-    parsedBeadStructure = new BeadStructure(beadStructure)
     PREALIGNMENT_TAG_AND_TRIM(
             params.library,
             unmappedBams,
             params.fivePrimeAdapter,
-            parsedBeadStructure,
+            params.beadStructure,
             params.cellBarcodeTag,
             params.molecularBarcodeTag,
             params.allowedBarcodes,
