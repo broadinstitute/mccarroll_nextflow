@@ -11,8 +11,7 @@ workflow NEXTFLOW {
         params.fastq_read2,
         params.rawBam,
         params.library,
-        params.baseRange,
-        params.barcodedRead,
+        params.beadStructure,
         params.allowedBarcodes
     )
     align_locus_function_workflow(

@@ -9,8 +9,7 @@ workflow tag_and_split_bam_workflow {
         fastq_read2
         rawBam
         library
-        baseRange
-        barcodedRead
+        beadStructure
         allowedBarcodes
 
     main:
@@ -36,16 +35,15 @@ workflow tag_and_split_bam_workflow {
     } else {
         error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
+    parsedBeadStructure = new BeadStructure(beadStructure)
     COUNT_BARCODE_SEQUENCES(
-            baseRange,
-            barcodedRead,
+            parsedBeadStructure,
             library,
             localRawBam.collect(),
             allowedBarcodes)
     CORRECT_SCRNA_READ_PAIRS(
             localRawBam,
-            baseRange,
-            barcodedRead,
+            parsedBeadStructure,
             params.cellBarcodeTag,
             library,
             COUNT_BARCODE_SEQUENCES.out.barcodeCounts,
