@@ -31,13 +31,13 @@ process PREALIGNMENT_TAG_AND_TRIM {
 "TagBamWithReadSequenceExtended \
           --I ${inputBams} \
           --O /dev/stdout \
-          --SUMMARY ${output_file}.${params.molecularBarcodeTag}_bam_summary.txt \
+          --SUMMARY ${output_file}.${molecularBarcodeTag}_bam_summary.txt \
           --BASE_RANGE TODO \
           --BASE_QUALITY 10 \
-          --BARCODED_READ {params.barcodedRead} \
+          --BARCODED_READ {barcodedRead} \
           --DISCARD_READ true \
           --TAG_BOTH_READS false \
-          --TAG_NAME ${params.molecularBarcodeTag} \
+          --TAG_NAME ${molecularBarcodeTag} \
           --NUM_BASES_BELOW_QUALITY 1 \
           --COMPRESSION_LEVEL 0 \
           --VALIDATION_STRINGENCY SILENT | \

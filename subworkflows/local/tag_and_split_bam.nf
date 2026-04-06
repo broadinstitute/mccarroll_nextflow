@@ -46,6 +46,7 @@ workflow tag_and_split_bam_workflow {
             localRawBam,
             baseRange,
             barcodedRead,
+            params.cellBarcodeTag,
             library,
             COUNT_BARCODE_SEQUENCES.out.barcodeCounts,
             [], // Default output BAM naming strategy
@@ -53,7 +54,8 @@ workflow tag_and_split_bam_workflow {
     )
     SPLIT_BAM_BY_CELL(
             library,
-            CORRECT_SCRNA_READ_PAIRS.out.correctedBam.collect()
+            CORRECT_SCRNA_READ_PAIRS.out.correctedBam.collect(),
+            params.targetBamSizeMBytes
     )
     // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
     // but no one really cares about that output.
