@@ -215,17 +215,29 @@ class BeadStructure {
         }.join("|")
     }
 
-    String getBaseRangeForElementType(ElementType elementType) {
+    private List<Element> getElementsForType(ElementType elementType) {
         def elems = groupedElements[elementType]
-        if (!elems) return ""
-
-        if (elems.collect { it.readIndex }.toSet().size() != 1) {
+        if (elems == null) {
             throw new RuntimeException(
-                    "Cannot get base range for ${elementType} because that type is on more than one read in ${structureString}"
+                    "Element type ${elementType} not found in ${structureString}"
             )
         }
+        if (elems.collect { it.readIndex }.toSet().size() != 1) {
+            throw new RuntimeException(
+                    "Element ${elementType} is on more than one read in ${structureString}"
+            )
+        }
+        return elems
+    }
 
-        elems.collect { it.asBaseRange }.join(":")
+    String getBaseRangeForElementType(ElementType elementType) {
+        getElementsForType(elementType).stream().map { it.getAsBaseRange() }.toList().join(":")
+    }
+
+    int getReadIndexForElementType(ElementType elementType) {
+        getElementsForType(elementType).head().readIndex
+
+
     }
 
     // Preserve insertion order

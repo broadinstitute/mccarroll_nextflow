@@ -14,8 +14,7 @@ process CORRECT_SCRNA_READ_PAIRS {
 
     input:
         path bams
-        val baseRange
-        val barcodedRead
+        val parsedBeadStructure
         val cellBarcodeTag
         val libraryName
         path allowedBarcodeCounts
@@ -32,7 +31,8 @@ process CORRECT_SCRNA_READ_PAIRS {
         output_file = firstBam.getName().replace(".raw.bam", ".cbc_corrected.bam")
     }
     metrics_file = output_file.replace(".cbc_corrected.bam", "corrected_barcode_metrics")
-    //          "METRICS" -> outputMetrics,
+    def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Cellular)
+    def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1 // Convert from zero-based to one-based indexing for Java command line argument
     """
     CorrectScrnaReadPairs --INPUT ${bams.join(' --INPUT ')}  --BASE_RANGE '${baseRange}' \
         --BARCODED_READ '${barcodedRead}' \

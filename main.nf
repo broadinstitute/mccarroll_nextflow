@@ -33,8 +33,6 @@ params {
     rawBam: List
     version10X: String
     sampleType: String
-    barcodedRead: Integer
-    baseRange: String
     beadStructure: String
 
 
