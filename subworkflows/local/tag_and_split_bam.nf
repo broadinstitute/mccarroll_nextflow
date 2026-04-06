@@ -37,7 +37,7 @@ workflow tag_and_split_bam_workflow {
     }
     parsedBeadStructure = new BeadStructure(beadStructure)
     COUNT_BARCODE_SEQUENCES(
-            parsedBeadStructure,
+            beadStructure,
             library,
             localRawBam.collect(),
             allowedBarcodes)

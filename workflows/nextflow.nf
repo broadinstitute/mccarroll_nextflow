@@ -15,7 +15,8 @@ workflow NEXTFLOW {
         params.allowedBarcodes
     )
     align_locus_function_workflow(
-            tag_and_split_bam_workflow.out.splitBams
+            tag_and_split_bam_workflow.out.splitBams,
+            params.beadStructure
     )
 
     

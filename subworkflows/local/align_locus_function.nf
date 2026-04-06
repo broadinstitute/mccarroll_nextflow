@@ -3,13 +3,17 @@ include {PREALIGNMENT_TAG_AND_TRIM} from '../../modules/local/preAlignmentTagAnd
 workflow align_locus_function_workflow {
     take:
         unmappedBams
+        beadStructure
 
     main:
+    parsedBeadStructure = new BeadStructure(beadStructure)
     PREALIGNMENT_TAG_AND_TRIM(
             params.library,
             unmappedBams,
             params.fivePrimeAdapter,
-            params.beadStructure,
+            parsedBeadStructure,
+            params.cellBarcodeTag,
+            params.molecularBarcodeTag,
             params.allowedBarcodes,
             "unmapped.bam",
             "unmapped_tagged_trimmed_filtered.bam"
