@@ -16,6 +16,7 @@ process CORRECT_SCRNA_READ_PAIRS {
         path bams
         val baseRange
         val barcodedRead
+        val cellBarcodeTag
         val libraryName
         path allowedBarcodeCounts
         val output_file
@@ -37,7 +38,7 @@ process CORRECT_SCRNA_READ_PAIRS {
         --BARCODED_READ '${barcodedRead}' \
         --ALLOWED_BARCODE_COUNTS '${allowedBarcodeCounts}' \
         --OUTPUT '${output_file}' \
-        --BARCODE_TAG '${params.cellBarcodeTag}' \
+        --BARCODE_TAG '${cellBarcodeTag}' \
         --TAG_BOTH_READS ${tagBothReads} \
         --METRICS '${metrics_file}'
     """
