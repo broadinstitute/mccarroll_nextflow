@@ -5,6 +5,11 @@
     "https://github.com/nf-core/modules.git": {
       "modules": {
         "nf-core": {
+          "picard/sortsam": {
+            "branch": "master",
+            "git_sha": "a631e12055f6c23ba2c942d3902b3ed1b9eed859",
+            "installed_by": ["modules"]
+          },
           "star/align": {
             "branch": "master",
             "git_sha": "cebe21bbd158c15c8fab172e37cfe97a239f4b77",

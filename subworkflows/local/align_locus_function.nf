@@ -1,5 +1,6 @@
 include {PREALIGNMENT_TAG_AND_TRIM} from '../../modules/local/preAlignmentTagAndTrim.nf'
 include { STAR_ALIGN } from '../../modules/nf-core/star/align/main'
+include { PICARD_SORTSAM } from '../modules/nf-core/picard/sortsam/main'
 
 workflow align_locus_function_workflow {
     take:
@@ -22,6 +23,11 @@ workflow align_locus_function_workflow {
     ch_star_input = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { bam ->
         tuple([id: bam.baseName.replaceFirst(/\.bam$/, ''), single_end: true], bam)
     }
+
+    // Zamboni alignment workflow streams STAR output into SortSam, but I don't think this can be done using nf-core
+    // STAR_ALIGN.  Instead, I'll have STAR_ALIGN write BAM files to disk and then invoke SortSam.  It is possible
+    // that sorting is unnecessary, because perhaps single-threaded STAR produces BAM that is in the same order
+    // as input BAM.
     // TODO: Figure out how to get the STAR version in order to get the correct genome index directory.  For now, just hardcode the version.
     // TODO: Why do I need to use file() here?  params.reference is defined as a Path.
     genome_index_dir = file(params.reference).parent + "/STAR_indices/2.7.11a"
