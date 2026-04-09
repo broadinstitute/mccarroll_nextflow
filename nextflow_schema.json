@@ -129,7 +129,8 @@
           "type": "boolean",
           "description": "Boolean whether to validate parameters against the schema at runtime",
           "fa_icon": "fas fa-check-square",
-          "hidden": true
+          "hidden": true,
+          "default": true
         },
         "pipelines_testdata_base_path": {
           "type": "string",
@@ -203,7 +204,7 @@
         "type": "string",
         "format": "file-path",
         "exists": true
-      } ,
+      },
       "default": "[]",
       "format": "file-path"
     },
@@ -234,12 +235,6 @@
       "type": "string",
       "enum": ["nuclei", "whole_cell"]
     },
-    "barcodedRead": {
-      "type": "integer"
-    },
-    "baseRange": {
-      "type": "string"
-    },
     "beadStructure": {
       "type": "string"
     },
@@ -250,6 +245,10 @@
     "targetBamSizeMBytes": {
       "type": "integer",
       "default": 2048
+    },
+    "cloudReference": {
+      "type": "string",
+      "format": "file-path"
     }
   },
   "required": ["project", "library", "sampleType"]
