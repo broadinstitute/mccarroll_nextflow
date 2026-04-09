@@ -8,19 +8,21 @@ workflow align_locus_function_workflow {
         beadStructure
 
     main:
+    ch_unmapped_bams = unmappedBams.map { bam ->
+        tuple([id: bam.name.replaceFirst(/\.unmapped\.bam$/, '')], bam)
+    }
     PREALIGNMENT_TAG_AND_TRIM(
             params.library,
-            unmappedBams,
+            ch_unmapped_bams,
             params.fivePrimeAdapter,
-            params.beadStructure,
+            beadStructure,
             params.cellBarcodeTag,
             params.molecularBarcodeTag,
             params.allowedBarcodes,
-            "unmapped.bam",
             "unmapped_tagged_trimmed_filtered.bam"
     )
-    ch_star_input = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { bam ->
-        tuple([id: bam.name.replaceFirst(/\.unmapped_tagged_trimmed_filtered\.bam$/, ''), single_end: true], bam)
+    ch_star_input = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, bam ->
+        tuple(meta + [single_end: true], bam)
     }
     // Zamboni alignment workflow streams STAR output into SortSam, but I don't think this can be done using nf-core
     // STAR_ALIGN.  Instead, I'll have STAR_ALIGN write BAM files to disk and then invoke SortSam.  It is possible
@@ -37,10 +39,10 @@ workflow align_locus_function_workflow {
     )
 
     PICARD_SORTSAM(
-        STAR_ALIGN.out.bam.map { meta, file -> tuple([id: meta.id + ".aligned_sorted"], file) },
+        STAR_ALIGN.out.bam.map { meta, file -> tuple([id: meta.id + ".aligned_sorted", bamBase: meta.id], file) },
         'queryname'
     )
-    ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> file }
+    ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { _meta, file -> file }
 
     emit:
     taggedAndTrimmedBam = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams
