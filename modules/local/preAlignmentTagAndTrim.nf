@@ -7,21 +7,19 @@ process PREALIGNMENT_TAG_AND_TRIM {
 
     input:
         val libraryName
-        path inputBams
+        tuple val(meta), path(inputBams)
         val fivePrimeAdapter
         val beadStructure
         val cellularBarcodeTag
         val molecularBarcodeTag
         path allowedBarcodes
-        val inputExtension
         val outputExtension
     output:
-    path "${output_file}", emit: taggedAndTrimmedBams
+    tuple val(meta), path("${output_file}"), emit: taggedAndTrimmedBams
     // TODO: emit metrics
 
     script:
-    // TODO: This doesn't seem like the right way to do this, but it works.
-    output_file = inputBams.collect({it.getName().replace(inputExtension, outputExtension)} ).head()
+    output_file = meta.id + "." + outputExtension
     def parsedBeadStructure = new BeadStructure(beadStructure)
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Molecular)
     // Convert from zero-based to one-based indexing for Java command line argument
