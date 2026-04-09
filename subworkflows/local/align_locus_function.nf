@@ -1,6 +1,8 @@
 include {PREALIGNMENT_TAG_AND_TRIM} from '../../modules/local/preAlignmentTagAndTrim.nf'
 include { STAR_ALIGN } from '../../modules/nf-core/star/align/main'
 include { PICARD_SORTSAM } from '../../modules/nf-core/picard/sortsam/main'
+include { GATK4_MERGEBAMALIGNMENT } from '../../modules/nf-core/gatk4/mergebamalignment/main'
+include { buildReferenceMetadataLocator } from '../../modules/local/ReferenceMetadataLocator.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -8,8 +10,9 @@ workflow align_locus_function_workflow {
         beadStructure
 
     main:
-    ch_unmapped_bams = unmappedBams.map { bam ->
-        tuple([id: bam.name.replaceFirst(/\.unmapped\.bam$/, '')], bam)
+    ch_unmapped_bams = unmappedBams.map { bam -> 
+        def bamBase = bam.getName().replaceFirst(/\.unmapped\.bam$/, '')
+        tuple([id: bamBase, bamBase: bamBase], bam)
     }
     PREALIGNMENT_TAG_AND_TRIM(
             params.library,
@@ -34,20 +37,36 @@ workflow align_locus_function_workflow {
     reference = params.cloudReference ?: params.reference
     // TODO: Why do I need to use file() here?  params.reference is defined as a Path.
     genome_index_dir = file(reference).parent + "/STAR_indices/2.7.11a"
+    null_file = tuple([], file("/dev/null"))
     STAR_ALIGN(
             ch_star_input,
             tuple([], genome_index_dir),
-            tuple([], file("/dev/null")), // no GTF
+            null_file, // no GTF
             true // ignore junctions
     )
 
     PICARD_SORTSAM(
-        STAR_ALIGN.out.bam.map { meta, file -> tuple([id: meta.id + ".aligned_sorted", bamBase: meta.id], file) },
+        STAR_ALIGN.out.bam.map { meta, file -> tuple(meta + [id: meta.id + ".aligned_sorted"], file) },
         'queryname'
     )
-    ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { _meta, file -> file }
+    // This magic is needed to make sure the right BAM files get merged together by GATK4_MERGEBAMALIGNMENT.  Join on bamBase.
+    ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> tuple(meta.bamBase, file) }
+    ch_prealigned_bams = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, file -> tuple(meta.bamBase, file) }
+    ch_aligned_sorted_bams.combine(ch_prealigned_bams, by:0).map { bamBase, alignedSortedBam, prealignedBam ->
+        tuple([id: bamBase  + ".merged", bamBase: bamBase], alignedSortedBam, prealignedBam)
+    }.set { ch_merge_input }
+
+    // Although GATK4_MERGEBAMALIGNMENT process code doesn't use the sequence dictionary explicitly, it is found
+    // relative to the reference FASTA file and is required to be present in order for the process to run successfully.  
+    // Thus we need to build a locator for it and pass it in as an argument so that it is localized into the execution environment.
+    referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
+    GATK4_MERGEBAMALIGNMENT(
+        ch_merge_input,
+        tuple([], params.reference),
+        tuple([], referenceMetadataLocator.sequenceDictionary)
+    )
 
     emit:
     taggedAndTrimmedBam = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams
-    alignedSortedBam = ch_aligned_sorted_bams
+    mergeBam = GATK4_MERGEBAMALIGNMENT.out.bam
 }
