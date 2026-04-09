@@ -1,6 +1,6 @@
 include {PREALIGNMENT_TAG_AND_TRIM} from '../../modules/local/preAlignmentTagAndTrim.nf'
 include { STAR_ALIGN } from '../../modules/nf-core/star/align/main'
-include { PICARD_SORTSAM } from '../modules/nf-core/picard/sortsam/main'
+include { PICARD_SORTSAM } from '../../modules/nf-core/picard/sortsam/main'
 
 workflow align_locus_function_workflow {
     take:
@@ -19,11 +19,9 @@ workflow align_locus_function_workflow {
             "unmapped.bam",
             "unmapped_tagged_trimmed_filtered.bam"
     )
-
     ch_star_input = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { bam ->
-        tuple([id: bam.baseName.replaceFirst(/\.bam$/, ''), single_end: true], bam)
+        tuple([id: bam.name.replaceFirst(/\.unmapped_tagged_trimmed_filtered\.bam$/, ''), single_end: true], bam)
     }
-
     // Zamboni alignment workflow streams STAR output into SortSam, but I don't think this can be done using nf-core
     // STAR_ALIGN.  Instead, I'll have STAR_ALIGN write BAM files to disk and then invoke SortSam.  It is possible
     // that sorting is unnecessary, because perhaps single-threaded STAR produces BAM that is in the same order
@@ -37,8 +35,14 @@ workflow align_locus_function_workflow {
             tuple([], file("/dev/null")), // no GTF
             true // ignore junctions
     )
-    ch_star_output = STAR_ALIGN.out.bam.map { meta, file -> file }
+
+    PICARD_SORTSAM(
+        STAR_ALIGN.out.bam.map { meta, file -> tuple([id: meta.id + ".aligned_sorted"], file) },
+        'queryname'
+    )
+    ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> file }
+
     emit:
     taggedAndTrimmedBam = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams
-    alignedBam = ch_star_output
+    alignedSortedBam = ch_aligned_sorted_bams
 }
