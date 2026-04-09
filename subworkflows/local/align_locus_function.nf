@@ -29,8 +29,11 @@ workflow align_locus_function_workflow {
     // that sorting is unnecessary, because perhaps single-threaded STAR produces BAM that is in the same order
     // as input BAM.
     // TODO: Figure out how to get the STAR version in order to get the correct genome index directory.  For now, just hardcode the version.
+
+    // STAR is configured to alway run in the cloud, so use cloud reference if provided, for speed.
+    reference = params.cloudReference ?: params.reference
     // TODO: Why do I need to use file() here?  params.reference is defined as a Path.
-    genome_index_dir = file(params.reference).parent + "/STAR_indices/2.7.11a"
+    genome_index_dir = file(reference).parent + "/STAR_indices/2.7.11a"
     STAR_ALIGN(
             ch_star_input,
             tuple([], genome_index_dir),

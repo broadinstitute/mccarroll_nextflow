@@ -28,6 +28,7 @@ params {
     library: String
     experimentDate: String
     reference: Path
+    cloudReference: Path
     fastq_read1: List
     fastq_read2: List
     rawBam: List
