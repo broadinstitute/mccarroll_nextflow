@@ -42,6 +42,8 @@ params {
     molecularBarcodeTag: String
     targetBamSizeMBytes: Integer
     fivePrimeAdapter: String
+    strandStrategy: String
+    locusFunction: String
 
     // infrastructure parameters
     email: String
