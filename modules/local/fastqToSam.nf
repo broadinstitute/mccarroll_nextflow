@@ -21,6 +21,7 @@ process FASTQ_TO_SAM {
     java -jar /usr/picard/picard.jar FastqToSam --F1 '${fastq_r1}' \
         --F2 '${fastq_r2}' --SAMPLE_NAME '${libraryName}' \
         --LIBRARY_NAME '${libraryName}' \
+        --PLATFORM ILLUMINA \
         --OUTPUT '${output_file}'
     """
 }

@@ -6,8 +6,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
     memory '8 GB'
 
     input:
-        val libraryName
-        tuple val(meta), path(inputBams)
+        tuple val(meta), path(inputBam)
         val fivePrimeAdapter
         val beadStructure
         val cellularBarcodeTag
@@ -27,7 +26,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
     def templateRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Template) + 1
     """
     TagBamWithReadSequenceExtended \
-          --I ${inputBams} \
+          --I ${inputBam} \
           --O /dev/stdout \
           --SUMMARY ${output_file}.${molecularBarcodeTag}_bam_summary.txt \
           --BASE_RANGE ${baseRange} \

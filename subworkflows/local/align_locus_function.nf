@@ -3,6 +3,7 @@ include { STAR_ALIGN } from '../../modules/nf-core/star/align/main'
 include { PICARD_SORTSAM } from '../../modules/nf-core/picard/sortsam/main'
 include { GATK4_MERGEBAMALIGNMENT } from '../../modules/nf-core/gatk4/mergebamalignment/main'
 include { buildReferenceMetadataLocator } from '../../modules/local/ReferenceMetadataLocator.nf'
+include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneFunction.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -15,7 +16,6 @@ workflow align_locus_function_workflow {
         tuple([id: bamBase, bamBase: bamBase], bam)
     }
     PREALIGNMENT_TAG_AND_TRIM(
-            params.library,
             ch_unmapped_bams,
             params.fivePrimeAdapter,
             beadStructure,
@@ -65,8 +65,12 @@ workflow align_locus_function_workflow {
         tuple([], params.reference),
         tuple([], referenceMetadataLocator.sequenceDictionary)
     )
-
+    TAG_READ_WITH_GENE_FUNCTION(
+        GATK4_MERGEBAMALIGNMENT.out.bam.map { meta, file -> tuple(meta + [id: meta.bamBase], file) },
+        referenceMetadataLocator.gtf
+    )
     emit:
     taggedAndTrimmedBam = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams
     mergeBam = GATK4_MERGEBAMALIGNMENT.out.bam
+    mappedTaggedBam = TAG_READ_WITH_GENE_FUNCTION.out.taggedBam
 }
