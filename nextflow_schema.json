@@ -249,6 +249,16 @@
     "cloudReference": {
       "type": "string",
       "format": "file-path"
+    },
+    "strandStrategy": {
+      "type": "string",
+      "default": "SENSE",
+      "enum": ["SENSE", "ANTISENSE", "BOTH"]
+    },
+    "locusFunction": {
+      "type": "string",
+      "default": "EXONIC_INTRONIC",
+      "enum": ["EXONIC", "INTRONIC", "EXONIC_INTRONIC"]
     }
   },
   "required": ["project", "library", "sampleType"]

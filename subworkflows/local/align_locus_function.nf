@@ -4,6 +4,7 @@ include { PICARD_SORTSAM } from '../../modules/nf-core/picard/sortsam/main'
 include { GATK4_MERGEBAMALIGNMENT } from '../../modules/nf-core/gatk4/mergebamalignment/main'
 include { buildReferenceMetadataLocator } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneFunction.nf'
+include {MARK_CHIMERIC_READS} from '../../modules/local/markChimericReads.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -69,8 +70,15 @@ workflow align_locus_function_workflow {
         GATK4_MERGEBAMALIGNMENT.out.bam.map { meta, file -> tuple(meta + [id: meta.bamBase], file) },
         referenceMetadataLocator.gtf
     )
+    MARK_CHIMERIC_READS(
+        TAG_READ_WITH_GENE_FUNCTION.out.taggedBam,
+        params.strandStrategy,
+        params.locusFunction)
     emit:
     taggedAndTrimmedBam = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams
     mergeBam = GATK4_MERGEBAMALIGNMENT.out.bam
     mappedTaggedBam = TAG_READ_WITH_GENE_FUNCTION.out.taggedBam
+    chimericMarkedBam = MARK_CHIMERIC_READS.out.chimericMarkedBam
+    chimericReadMetrics = MARK_CHIMERIC_READS.out.chimericReadMetrics
+    chimericTranscripts = MARK_CHIMERIC_READS.out.chimericTranscripts
 }
