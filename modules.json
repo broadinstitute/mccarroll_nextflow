@@ -5,6 +5,21 @@
     "https://github.com/nf-core/modules.git": {
       "modules": {
         "nf-core": {
+          "gatk4/applybqsr": {
+            "branch": "master",
+            "git_sha": "69723e41ae619a00f0333b8063b2dc6d16f28517",
+            "installed_by": ["modules"]
+          },
+          "gatk4/baserecalibrator": {
+            "branch": "master",
+            "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+            "installed_by": ["modules"]
+          },
+          "gatk4/gatherbqsrreports": {
+            "branch": "master",
+            "git_sha": "86308d628760125908c5c77540517effe0f8880f",
+            "installed_by": ["modules"]
+          },
           "gatk4/mergebamalignment": {
             "branch": "master",
             "git_sha": "52b7843bd92ccf833cc12e71cd84aeccf2583852",

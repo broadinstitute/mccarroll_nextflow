@@ -1,4 +1,5 @@
 include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf'
+include { replaceExtension } from '../../modules/local/FileUtil.nf'
 
 process MARK_CHIMERIC_READS {
     label 'process_low'
@@ -10,13 +11,20 @@ process MARK_CHIMERIC_READS {
         tuple val(meta), path(inputBam)
         val strandStrategy
         val locusFunction
+        val createIndex
     output:
     tuple val(meta), path("${output_file}"), emit: chimericMarkedBam
+    tuple val(meta), path("${output_index}"), emit: bai, optional: true
     tuple val(meta), path("${output_metrics}"), emit: chimericReadMetrics    
     tuple val(meta), path("${output_chimeric_transcripts}"), emit: chimericTranscripts    
 
     script:
     output_file = meta.id + ".chimeric_marked.bam"
+    if (createIndex) {
+        output_index = replaceExtension(output_file, "bam", "bai")
+    } else {
+        output_index = []
+    }
     output_metrics = meta.id + ".chimeric_read_metrics"
     output_chimeric_transcripts = meta.id + ".chimeric_transcripts.txt.gz"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
@@ -29,6 +37,7 @@ process MARK_CHIMERIC_READS {
           --STRAND_STRATEGY ${strandStrategy} \
           ${locusFunctionArgs} \
           --COMPRESSION_LEVEL 0 \
+          --CREATE_INDEX ${createIndex} \
           --VALIDATION_STRINGENCY SILENT
     """
 }

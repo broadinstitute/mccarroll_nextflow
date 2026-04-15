@@ -98,7 +98,9 @@ workflow {
     publish:
     // suppressing publication of splitBams for now because they would duplicate the command-specific output directories.
     // We need to decide on a strategy for publishing these files.
-    splitBams = null // NEXTFLOW.out.splitBams
+    unmappedBam = NEXTFLOW.out.unmappedBam
+    alignedBam = NEXTFLOW.out.alignedBam
+    alignedBai = NEXTFLOW.out.alignedBai
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -113,7 +115,13 @@ output {
     }
     converted_h5ad{
     }
-    splitBams{
+    unmappedBam{
+    }
+    alignedBam{
+        path 'alignment'
+    }
+    alignedBai{
+        path 'alignment'
     }
 }
 

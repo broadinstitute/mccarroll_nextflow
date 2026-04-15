@@ -29,7 +29,9 @@ def buildReferenceMetadataLocator(referenceFasta) {
     def REFFLAT = "refFlat"
     def ORGANISMS = "organisms"
     def FAI = "fai"
+    def GZI = "gzi"
     def DBSNP = "dbsnp.vcf"
+    def DBSNP_INDEX = "dbsnp.vcf.idx"
     def DBSNP_INTERVALS = "dbsnp.intervals"
     def CONTIG_GROUPS = "contig_groups.yaml"
     def XIPHER_CONFIG = "xipher.yaml"
@@ -94,7 +96,9 @@ def buildReferenceMetadataLocator(referenceFasta) {
 
         // index + variant files
         fai: withExtension(referenceFasta, FAI),
+        gzi: withExtension(referenceFasta, GZI),
         dbSnp: withExtension(fastaBase, DBSNP),
+        dbSnpIndex: withExtension(fastaBase, DBSNP_INDEX),
         dbSnpIntervals: withExtension(fastaBase, DBSNP_INTERVALS),
         contigGroups: withExtension(fastaBase, CONTIG_GROUPS),
 
