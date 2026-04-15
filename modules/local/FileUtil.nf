@@ -41,6 +41,10 @@ def withExtension(path, String ext) {
     }
 }
 
+def replaceExtension(path, String oldExt, String newExt) {
+    return withExtension(withoutExtension(path, oldExt), newExt)
+}
+
 def subpath(dir, String child) {
     if (dir instanceof java.nio.file.Path) {
         return dir.resolve(child)

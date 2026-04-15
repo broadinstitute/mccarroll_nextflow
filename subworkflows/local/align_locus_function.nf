@@ -2,6 +2,9 @@ include {PREALIGNMENT_TAG_AND_TRIM} from '../../modules/local/preAlignmentTagAnd
 include { STAR_ALIGN } from '../../modules/nf-core/star/align/main'
 include { PICARD_SORTSAM } from '../../modules/nf-core/picard/sortsam/main'
 include { GATK4_MERGEBAMALIGNMENT } from '../../modules/nf-core/gatk4/mergebamalignment/main'
+include { GATK4_BASERECALIBRATOR } from '../../modules/nf-core/gatk4/baserecalibrator/main'
+include { GATK4_GATHERBQSRREPORTS } from '../../modules/nf-core/gatk4/gatherbqsrreports/main'
+include { GATK4_APPLYBQSR } from '../../modules/nf-core/gatk4/applybqsr/main'     
 include { buildReferenceMetadataLocator } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneFunction.nf'
 include {MARK_CHIMERIC_READS} from '../../modules/local/markChimericReads.nf'
@@ -38,7 +41,7 @@ workflow align_locus_function_workflow {
     reference = params.cloudReference ?: params.reference
     // TODO: Why do I need to use file() here?  params.reference is defined as a Path.
     genome_index_dir = file(reference).parent + "/STAR_indices/2.7.11a"
-    null_file = tuple([], file("/dev/null"))
+    null_file = tuple([], [])
     STAR_ALIGN(
             ch_star_input,
             tuple([], genome_index_dir),
@@ -70,15 +73,49 @@ workflow align_locus_function_workflow {
         GATK4_MERGEBAMALIGNMENT.out.bam.map { meta, file -> tuple(meta + [id: meta.bamBase], file) },
         referenceMetadataLocator.gtf
     )
+    doBQSR = referenceMetadataLocator.dbSnp.exists()
     MARK_CHIMERIC_READS(
         TAG_READ_WITH_GENE_FUNCTION.out.taggedBam,
         params.strandStrategy,
-        params.locusFunction)
+        params.locusFunction,
+        !doBQSR)
+    if (doBQSR) {
+        dbsnpIntervals = referenceMetadataLocator.dbSnpIntervals.exists() ? referenceMetadataLocator.dbSnpIntervals : []
+        GATK4_BASERECALIBRATOR(
+            TAG_READ_WITH_GENE_FUNCTION.out.taggedBam.map({ meta, file -> 
+            tuple(meta, file, [], dbsnpIntervals) }), // no index, no intervals
+            tuple([], params.reference),
+            tuple([], [referenceMetadataLocator.gzi, referenceMetadataLocator.fai]), // Apparently GATK4_BASERECALIBRATOR needs both the fai and gzi
+            tuple([], referenceMetadataLocator.sequenceDictionary),
+            tuple([], referenceMetadataLocator.dbSnp),
+            tuple([], referenceMetadataLocator.dbSnpIndex)
+        )
+        // TODO: There has to be a simpler way to do this.  I just want to gather all the tables emitted by GATK4_BASERECALIBRATOR and then pass them as a list to 
+        // GATK4_GATHERBQSRREPORTS.  groupTuple shouldn't be necessary.
+        gatherMeta = [id: params.library]
+        GATK4_GATHERBQSRREPORTS(GATK4_BASERECALIBRATOR.out.table.map({ _meta, file -> tuple(gatherMeta, file) }).groupTuple())
+        
+        // TODO: There has to be a simpler way, given that there is a single output table from GATK4_GATHERBQSRREPORTS.
+        ch_apply_bqsr = MARK_CHIMERIC_READS.out.chimericMarkedBam.combine(GATK4_GATHERBQSRREPORTS.out.table)
+        .map { meta, bam, _meta, table ->
+            tuple(tuple(meta, bam, [], table, []))
+        }
+        GATK4_APPLYBQSR(
+            ch_apply_bqsr,
+            params.reference,
+            [referenceMetadataLocator.gzi, referenceMetadataLocator.fai],
+            referenceMetadataLocator.sequenceDictionary
+        )
+        alignedBams = GATK4_APPLYBQSR.out.bam
+        alignedBais = GATK4_APPLYBQSR.out.bai
+    } else {
+        alignedBams = MARK_CHIMERIC_READS.out.chimericMarkedBam
+        alignedBais = MARK_CHIMERIC_READS.out.bai
+    }
     emit:
-    taggedAndTrimmedBam = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams
-    mergeBam = GATK4_MERGEBAMALIGNMENT.out.bam
-    mappedTaggedBam = TAG_READ_WITH_GENE_FUNCTION.out.taggedBam
-    chimericMarkedBam = MARK_CHIMERIC_READS.out.chimericMarkedBam
+    alignedBam = alignedBams
+    alignedBai = alignedBais
+    // TODO: These should be merged.
     chimericReadMetrics = MARK_CHIMERIC_READS.out.chimericReadMetrics
     chimericTranscripts = MARK_CHIMERIC_READS.out.chimericTranscripts
 }

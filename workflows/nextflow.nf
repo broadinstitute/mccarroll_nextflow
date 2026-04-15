@@ -21,7 +21,8 @@ workflow NEXTFLOW {
 
     
     emit:
-    splitBams = tag_and_split_bam_workflow.out.splitBams
-    taggedAndTrimmedBams = align_locus_function_workflow.out.taggedAndTrimmedBam
+    unmappedBam = tag_and_split_bam_workflow.out.splitBams
+    alignedBam = align_locus_function_workflow.out.alignedBam
+    alignedBai = align_locus_function_workflow.out.alignedBai
 }
 
