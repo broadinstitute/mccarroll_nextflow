@@ -99,6 +99,7 @@ workflow {
     // suppressing publication of splitBams for now because they would duplicate the command-specific output directories.
     // We need to decide on a strategy for publishing these files.
     unmappedBam = NEXTFLOW.out.unmappedBam
+    splitBamManifest = NEXTFLOW.out.splitBamManifest
     alignedBam = NEXTFLOW.out.alignedBam
     alignedBai = NEXTFLOW.out.alignedBai
 
@@ -122,6 +123,8 @@ output {
     }
     alignedBai{
         path 'alignment'
+    }
+    splitBamManifest{
     }
 }
 

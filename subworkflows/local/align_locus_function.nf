@@ -8,7 +8,8 @@ include { GATK4_APPLYBQSR } from '../../modules/nf-core/gatk4/applybqsr/main'
 include { buildReferenceMetadataLocator } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneFunction.nf'
 include {MARK_CHIMERIC_READS} from '../../modules/local/markChimericReads.nf'
-
+include {VALIDATE_ALIGNED_SAM} from '../../modules/local/validateAlignedSam.nf'
+include {VALIDATE_SAM_FILE} from '../../modules/local/validateSamFile.nf'
 workflow align_locus_function_workflow {
     take:
         unmappedBams
@@ -112,6 +113,8 @@ workflow align_locus_function_workflow {
         alignedBams = MARK_CHIMERIC_READS.out.chimericMarkedBam
         alignedBais = MARK_CHIMERIC_READS.out.bai
     }
+    VALIDATE_ALIGNED_SAM(alignedBams)
+    VALIDATE_SAM_FILE(alignedBams)
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
