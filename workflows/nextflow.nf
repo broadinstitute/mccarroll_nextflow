@@ -22,6 +22,7 @@ workflow NEXTFLOW {
     
     emit:
     unmappedBam = tag_and_split_bam_workflow.out.splitBams
+    splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
     alignedBam = align_locus_function_workflow.out.alignedBam
     alignedBai = align_locus_function_workflow.out.alignedBai
 }
