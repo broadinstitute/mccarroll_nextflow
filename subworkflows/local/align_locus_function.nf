@@ -70,8 +70,9 @@ workflow align_locus_function_workflow {
         tuple([], params.reference),
         tuple([], referenceMetadataLocator.sequenceDictionary)
     )
+    // Stick the reference name into the metadata so that it can be used downstream for naming output subdirectory.
     TAG_READ_WITH_GENE_FUNCTION(
-        GATK4_MERGEBAMALIGNMENT.out.bam.map { meta, file -> tuple(meta + [id: meta.bamBase], file) },
+        GATK4_MERGEBAMALIGNMENT.out.bam.map { meta, file -> tuple(meta + [id: meta.bamBase, referenceName: referenceMetadataLocator.referenceName], file) },
         referenceMetadataLocator.gtf
     )
     doBQSR = referenceMetadataLocator.dbSnp.exists()
@@ -114,7 +115,7 @@ workflow align_locus_function_workflow {
         alignedBais = MARK_CHIMERIC_READS.out.bai
     }
     VALIDATE_ALIGNED_SAM(alignedBams)
-    VALIDATE_SAM_FILE(alignedBams)
+    VALIDATE_SAM_FILE(alignedBams, params.reference)
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
