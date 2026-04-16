@@ -119,10 +119,10 @@ output {
     unmappedBam{
     }
     alignedBam{
-        path 'alignment'
+        path {meta, _file -> meta.referenceName}
     }
     alignedBai{
-        path 'alignment'
+        path {meta, _file -> meta.referenceName}
     }
     splitBamManifest{
     }

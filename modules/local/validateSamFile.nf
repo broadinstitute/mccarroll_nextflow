@@ -9,6 +9,7 @@ process VALIDATE_SAM_FILE {
 
     input:
         tuple val(meta), path(inputBam)
+        path reference
 
     output:
     path "${output_file}"
@@ -18,7 +19,7 @@ process VALIDATE_SAM_FILE {
     output_file = meta.id + ".validate_sam"
     """
     java -jar /usr/picard/picard.jar ValidateSamFile --INPUT '${inputBam}' \
-        --OUTPUT '${output_file}'
+        --OUTPUT '${output_file}' --REFERENCE_SEQUENCE '${reference}'
     """
 }
 
