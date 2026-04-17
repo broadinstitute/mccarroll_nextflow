@@ -56,7 +56,7 @@ def buildReferenceMetadataLocator(referenceFasta) {
             withoutExtension(referenceFasta, "gz") :
             referenceFasta
 
-    def matchedExt = FASTA_EXTENSIONS.find { hasExtension(fastaNoGz, it) }
+    def matchedExt = FASTA_EXTENSIONS.find { ext -> hasExtension(fastaNoGz, ext) }
 
     if (!matchedExt) {
         throw new RuntimeException("${referenceFasta.absolutePath} does not have a standard fasta extension")
@@ -107,8 +107,8 @@ def buildReferenceMetadataLocator(referenceFasta) {
         xipherKnownVariants: withExtension(fastaBase, XIPHER_KNOWN),
 
         // collections
-        bwaFiles: BWA_EXTENSIONS.collect { withExtension(referenceFasta, it) },
-        starFiles: STAR_FILES.collect { subpath(subpath(dir, STAR_SUBDIR), it) }
+        bwaFiles: BWA_EXTENSIONS.collect {ext -> withExtension(referenceFasta, ext) },
+        starFiles: STAR_FILES.collect { ext -> subpath(subpath(dir, STAR_SUBDIR), ext) }
     ]
 
     // -----------------------------
