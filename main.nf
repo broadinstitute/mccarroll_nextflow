@@ -44,6 +44,9 @@ params {
     fivePrimeAdapter: String
     strandStrategy: String
     locusFunction: String
+    minimumTranscriptsPerCell: Integer
+    dgeMinReadMq: Integer
+    dgeFunctionalStrategy: String
 
     // infrastructure parameters
     email: String

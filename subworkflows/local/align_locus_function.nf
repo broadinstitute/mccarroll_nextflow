@@ -10,6 +10,9 @@ include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneF
 include {MARK_CHIMERIC_READS} from '../../modules/local/markChimericReads.nf'
 include {VALIDATE_ALIGNED_SAM} from '../../modules/local/validateAlignedSam.nf'
 include {VALIDATE_SAM_FILE} from '../../modules/local/validateSamFile.nf'
+include {SELECT_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/selectCellsByNumTranscripts.nf'
+include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
+
 workflow align_locus_function_workflow {
     take:
         unmappedBams
@@ -116,6 +119,28 @@ workflow align_locus_function_workflow {
     }
     VALIDATE_ALIGNED_SAM(alignedBams)
     VALIDATE_SAM_FILE(alignedBams, params.reference)
+
+    // BAMs complete! DGE below
+    SELECT_CELLS_BY_NUM_TRANSCRIPTS(
+        alignedBams,
+        params.locusFunction,
+        params.minimumTranscriptsPerCell,
+        params.dgeMinReadMq,
+        params.dgeFunctionalStrategy,
+        params.strandStrategy
+    )
+    SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells.view()
+    DIGITAL_EXPRESSION(
+        alignedBams.join(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells),
+        params.locusFunction,
+        params.library,
+        params.strandStrategy,
+        params.minimumTranscriptsPerCell,
+        params.dgeMinReadMq,
+        params.dgeFunctionalStrategy,
+        params.cellBarcodeTag,
+        params.molecularBarcodeTag
+    )
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
