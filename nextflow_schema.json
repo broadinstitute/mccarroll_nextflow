@@ -259,6 +259,19 @@
       "type": "string",
       "default": "EXONIC_INTRONIC",
       "enum": ["EXONIC", "INTRONIC", "EXONIC_INTRONIC"]
+    },
+    "minimumTranscriptsPerCell": {
+      "type": "integer",
+      "default": 20
+    },
+    "dgeMinReadMq": {
+      "type": "integer",
+      "default": 10
+    },
+    "dgeFunctionalStrategy": {
+      "type": "string",
+      "default": "DROPSEQ",
+      "enum": ["DROPSEQ", "STARSOLO"]
     }
   },
   "required": ["project", "library", "sampleType"]
