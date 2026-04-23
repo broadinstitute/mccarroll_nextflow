@@ -25,6 +25,11 @@
             "git_sha": "52b7843bd92ccf833cc12e71cd84aeccf2583852",
             "installed_by": ["modules"]
           },
+          "picard/fastqtosam": {
+            "branch": "master",
+            "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+            "installed_by": ["modules"]
+          },
           "picard/sortsam": {
             "branch": "master",
             "git_sha": "a631e12055f6c23ba2c942d3902b3ed1b9eed859",

@@ -1,4 +1,4 @@
-include {FASTQ_TO_SAM} from '../../modules/local/fastqToSam.nf'
+include { PICARD_FASTQTOSAM } from '../../modules/nf-core/picard/fastqtosam/main' 
 include {COUNT_BARCODE_SEQUENCES} from '../../modules/local/countBarcodeSequences.nf'
 include {CORRECT_SCRNA_READ_PAIRS} from '../../modules/local/correctScrnaReadPairs.nf'
 include {SPLIT_BAM_BY_CELL} from '../../modules/local/splitBamByCell.nf'
@@ -21,13 +21,12 @@ workflow tag_and_split_bam_workflow {
         }
         fastqTuples = fastq_read1.withIndex().collect { read1, idx ->
             def read2 = fastq_read2[idx]
-            return [idx, read1, read2]
+            // funky BAM file naming convention, plus passing meta.library so closuer in modules.config can set RG values
+            return [[id: library + "." + idx + ".raw", library: library], [read1, read2]]
         }
         fastqChannel = channel.fromList(fastqTuples)
-        FASTQ_TO_SAM(
-                fastqChannel,
-                library)
-        localRawBam = FASTQ_TO_SAM.out.rawBam
+        PICARD_FASTQTOSAM(fastqChannel)
+        localRawBam = PICARD_FASTQTOSAM.out.bam.map{_meta, bam -> bam }
     } else if (rawBam.size() > 0) {
         // TODO: This doesn't work.  COUNT_BARCODE_SEQUENCES create a command line without the directory,
         //  which causes the process to fail because it can't find the BAM file.
@@ -35,6 +34,7 @@ workflow tag_and_split_bam_workflow {
     } else {
         error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
+    // collect() because all the BAMs need to be processed together.
     COUNT_BARCODE_SEQUENCES(
             beadStructure,
             library,
