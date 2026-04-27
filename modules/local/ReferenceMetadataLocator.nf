@@ -121,3 +121,15 @@ def buildReferenceMetadataLocator(referenceFasta) {
 
     return meta
 }
+
+def loadMtSequences(contigGroupsFile) {
+    if (!contigGroupsFile.exists()) {
+        return []
+    }
+    def yaml = new org.yaml.snakeyaml.Yaml()
+    def contigGroups = yaml.load(contigGroupsFile.text)
+    def keys = contigGroups.findAll { _k, v ->
+            v == 'MT' || (v instanceof Collection && v.contains('MT'))
+        }.keySet() as List
+    return keys
+}
