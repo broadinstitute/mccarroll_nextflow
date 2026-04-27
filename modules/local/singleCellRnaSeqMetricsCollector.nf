@@ -18,7 +18,7 @@ output:
 script:
     output_file = "${meta.id}.fracIntronicExonicPerCell.txt.gz"
     mtSequencesArgs = mtSequences.collect{ seq -> "--MT_SEQUENCE ${seq}" }
-    //  There is much sloppiness in GTF.  Silent causes problematic genes to be ignored.
+    //  There is much sloppiness in GTF.  --VALIDATION_STRINGENCY SILENT causes problematic genes to be skipped.
     """
     SingleCellRnaSeqMetricsCollector \
         --INPUT ${inputBam} \

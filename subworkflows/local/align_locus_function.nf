@@ -13,6 +13,7 @@ include {VALIDATE_SAM_FILE} from '../../modules/local/validateSamFile.nf'
 include {SELECT_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/selectCellsByNumTranscripts.nf'
 include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
 include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
+include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -150,10 +151,28 @@ workflow align_locus_function_workflow {
         loadMtSequences(referenceMetadataLocator.contigGroups),
         params.cellBarcodeTag
     )
+
+    // Merging of split-bam 20-transcript DGE stuff
+    selectedCellsList = SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells.map {
+        _meta, file -> file}.collect()
+    selectedCellMetricsList = SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.metrics.map {
+        _meta, file -> file
+    }.collect()
+
+    MERGE_CELLS_BY_NUM_TRANSCRIPTS(
+        params.library,
+        selectedCellsList,
+        selectedCellMetricsList
+    )
+    finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
+    sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
+    sizeSelectedCellsMetrics = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics.map {f -> tuple(finalMeta, f) }
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
     // TODO: These should be merged.
     chimericReadMetrics = MARK_CHIMERIC_READS.out.chimericReadMetrics
     chimericTranscripts = MARK_CHIMERIC_READS.out.chimericTranscripts
+    sizeSelectedCells = sizeSelectedCells
+    sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
 }
