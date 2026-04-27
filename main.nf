@@ -13,7 +13,9 @@
 */
 nextflow.enable.strict = true
 
-include { NEXTFLOW  } from './workflows/nextflow'
+include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
+include { tag_and_split_bam_workflow } from './subworkflows/local/tag_and_split_bam.nf'
+include { align_locus_function_workflow } from './subworkflows/local/align_locus_function.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 /*
@@ -84,8 +86,19 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NEXTFLOW ()
-    //
+     tag_and_split_bam_workflow(
+        params.fastq_read1,
+        params.fastq_read2,
+        params.rawBam,
+        params.library,
+        params.beadStructure,
+        params.allowedBarcodes
+    )
+    align_locus_function_workflow(
+            tag_and_split_bam_workflow.out.splitBams,
+            params.beadStructure
+    )
+   //
     // SUBWORKFLOW: Run completion tasks
     //
     PIPELINE_COMPLETION (
@@ -101,12 +114,12 @@ workflow {
     publish:
     // suppressing publication of splitBams for now because they would duplicate the command-specific output directories.
     // We need to decide on a strategy for publishing these files.
-    unmappedBam = NEXTFLOW.out.unmappedBam
-    splitBamManifest = NEXTFLOW.out.splitBamManifest
-    alignedBam = NEXTFLOW.out.alignedBam
-    alignedBai = NEXTFLOW.out.alignedBai
-    sizeSelectedCells = NEXTFLOW.out.sizeSelectedCells
-    sizeSelectedCellsMetrics = NEXTFLOW.out.sizeSelectedCellsMetrics
+    unmappedBam = tag_and_split_bam_workflow.out.splitBams
+    splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
+    alignedBam = align_locus_function_workflow.out.alignedBam
+    alignedBai = align_locus_function_workflow.out.alignedBai
+    sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
+    sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
