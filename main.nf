@@ -105,6 +105,8 @@ workflow {
     splitBamManifest = NEXTFLOW.out.splitBamManifest
     alignedBam = NEXTFLOW.out.alignedBam
     alignedBai = NEXTFLOW.out.alignedBai
+    sizeSelectedCells = NEXTFLOW.out.sizeSelectedCells
+    sizeSelectedCellsMetrics = NEXTFLOW.out.sizeSelectedCellsMetrics
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -125,6 +127,12 @@ output {
         path {meta, _file -> meta.referenceName}
     }
     alignedBai{
+        path {meta, _file -> meta.referenceName}
+    }
+    sizeSelectedCells {
+        path {meta, _file -> meta.referenceName}
+    }
+    sizeSelectedCellsMetrics {
         path {meta, _file -> meta.referenceName}
     }
     splitBamManifest{
