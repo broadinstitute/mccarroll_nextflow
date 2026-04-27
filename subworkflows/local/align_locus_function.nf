@@ -5,13 +5,14 @@ include { GATK4_MERGEBAMALIGNMENT } from '../../modules/nf-core/gatk4/mergebamal
 include { GATK4_BASERECALIBRATOR } from '../../modules/nf-core/gatk4/baserecalibrator/main'
 include { GATK4_GATHERBQSRREPORTS } from '../../modules/nf-core/gatk4/gatherbqsrreports/main'
 include { GATK4_APPLYBQSR } from '../../modules/nf-core/gatk4/applybqsr/main'     
-include { buildReferenceMetadataLocator } from '../../modules/local/ReferenceMetadataLocator.nf'
+include { buildReferenceMetadataLocator; loadMtSequences } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneFunction.nf'
 include {MARK_CHIMERIC_READS} from '../../modules/local/markChimericReads.nf'
 include {VALIDATE_ALIGNED_SAM} from '../../modules/local/validateAlignedSam.nf'
 include {VALIDATE_SAM_FILE} from '../../modules/local/validateSamFile.nf'
 include {SELECT_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/selectCellsByNumTranscripts.nf'
 include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
+include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -129,7 +130,6 @@ workflow align_locus_function_workflow {
         params.dgeFunctionalStrategy,
         params.strandStrategy
     )
-    SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells.view()
     DIGITAL_EXPRESSION(
         alignedBams.join(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells),
         params.locusFunction,
@@ -140,6 +140,15 @@ workflow align_locus_function_workflow {
         params.dgeFunctionalStrategy,
         params.cellBarcodeTag,
         params.molecularBarcodeTag
+    )
+    SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR(
+        alignedBams.join(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells),
+        params.reference,
+        referenceMetadataLocator.gtf,
+        referenceMetadataLocator.ribosomalIntervals,
+        params.dgeMinReadMq,
+        loadMtSequences(referenceMetadataLocator.contigGroups),
+        params.cellBarcodeTag
     )
     emit:
     alignedBam = alignedBams
