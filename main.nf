@@ -120,6 +120,7 @@ workflow {
     alignedBai = align_locus_function_workflow.out.alignedBai
     sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
     sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
+    dgeSummary = align_locus_function_workflow.out.dgeSummary
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -146,6 +147,9 @@ output {
         path {meta, _file -> meta.referenceName}
     }
     sizeSelectedCellsMetrics {
+        path {meta, _file -> meta.referenceName}
+    }
+    dgeSummary {
         path {meta, _file -> meta.referenceName}
     }
     splitBamManifest{

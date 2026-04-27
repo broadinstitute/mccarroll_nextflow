@@ -14,6 +14,7 @@ include {SELECT_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/selectCellsB
 include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
 include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
 include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
+include {MERGE_DGE_SUMMARIES} from '../../modules/local/mergeDgeSummaries.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -164,9 +165,17 @@ workflow align_locus_function_workflow {
         selectedCellsList,
         selectedCellMetricsList
     )
+    MERGE_DGE_SUMMARIES(
+        params.library,
+        DIGITAL_EXPRESSION.out.dge_summary.map {
+        _meta, file -> file
+        }.collect()
+    )
+
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
     sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
     sizeSelectedCellsMetrics = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics.map {f -> tuple(finalMeta, f) }
+    dgeSummary = MERGE_DGE_SUMMARIES.out.map {f -> tuple(finalMeta, f) }
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
@@ -175,4 +184,5 @@ workflow align_locus_function_workflow {
     chimericTranscripts = MARK_CHIMERIC_READS.out.chimericTranscripts
     sizeSelectedCells = sizeSelectedCells
     sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
+    dgeSummary = dgeSummary
 }
