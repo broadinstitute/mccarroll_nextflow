@@ -13,7 +13,7 @@ process CORRECT_SCRNA_READ_PAIRS {
     }
 
     input:
-        path bams
+        tuple(val(meta), path (bams))
         val beadStructure
         val cellBarcodeTag
         val libraryName
@@ -22,8 +22,8 @@ process CORRECT_SCRNA_READ_PAIRS {
         val tagBothReads
 
     output:
-    path "${output_file}", emit: correctedBam
-    path "${metrics_file}", emit: correctedBarcodeMetrics
+    tuple(val(meta), path("${output_file}"), emit: correctedBam)
+    tuple(val(meta), path("${metrics_file}"), emit: correctedBarcodeMetrics)
 
     script:
     if (!output_file.any()) {

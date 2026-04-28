@@ -15,6 +15,7 @@ include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
 include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
 include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
 include {MERGE_DGE_SUMMARIES} from '../../modules/local/mergeDgeSummaries.nf'
+include {collectInOrder} from '../../modules/local/workflowUtil.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -24,7 +25,8 @@ workflow align_locus_function_workflow {
     main:
     ch_unmapped_bams = unmappedBams.map { bam -> 
         def bamBase = bam.getName().replaceFirst(/\.unmapped\.bam$/, '')
-        tuple([id: bamBase, bamBase: bamBase], bam)
+        def bamIndex = bamBase.replaceFirst(/.*\./, '') as Integer
+        tuple([id: bamBase, bamBase: bamBase, collectIndex: bamIndex], bam)
     }
     PREALIGNMENT_TAG_AND_TRIM(
             ch_unmapped_bams,
@@ -60,11 +62,12 @@ workflow align_locus_function_workflow {
         STAR_ALIGN.out.bam.map { meta, file -> tuple(meta + [id: meta.id + ".aligned_sorted"], file) },
         'queryname'
     )
+    // TODO: This isn't good.  It should retain most everything from the original meta rather than reconstructing.
     // This magic is needed to make sure the right BAM files get merged together by GATK4_MERGEBAMALIGNMENT.  Join on bamBase.
     ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> tuple(meta.bamBase, file) }
     ch_prealigned_bams = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, file -> tuple(meta.bamBase, file) }
     ch_aligned_sorted_bams.combine(ch_prealigned_bams, by:0).map { bamBase, alignedSortedBam, prealignedBam ->
-        tuple([id: bamBase  + ".merged", bamBase: bamBase], alignedSortedBam, prealignedBam)
+        tuple([id: bamBase  + ".merged", bamBase: bamBase, collectIndex: bamBase.replaceFirst(/.*\./, '') as Integer], alignedSortedBam, prealignedBam)
     }.set { ch_merge_input }
 
     // Although GATK4_MERGEBAMALIGNMENT process code doesn't use the sequence dictionary explicitly, it is found
@@ -98,10 +101,9 @@ workflow align_locus_function_workflow {
             tuple([], referenceMetadataLocator.dbSnp),
             tuple([], referenceMetadataLocator.dbSnpIndex)
         )
-        // TODO: There has to be a simpler way to do this.  I just want to gather all the tables emitted by GATK4_BASERECALIBRATOR and then pass them as a list to 
-        // GATK4_GATHERBQSRREPORTS.  groupTuple shouldn't be necessary.
+        // order the tables by collectIndex but give them all the same meta
         gatherMeta = [id: params.library]
-        GATK4_GATHERBQSRREPORTS(GATK4_BASERECALIBRATOR.out.table.map({ _meta, file -> tuple(gatherMeta, file) }).groupTuple())
+        GATK4_GATHERBQSRREPORTS(collectInOrder(GATK4_BASERECALIBRATOR.out.table).map({ file -> tuple(gatherMeta, file) }))
         
         // TODO: There has to be a simpler way, given that there is a single output table from GATK4_GATHERBQSRREPORTS.
         ch_apply_bqsr = MARK_CHIMERIC_READS.out.chimericMarkedBam.combine(GATK4_GATHERBQSRREPORTS.out.table)
@@ -154,12 +156,8 @@ workflow align_locus_function_workflow {
     )
 
     // Merging of split-bam 20-transcript DGE stuff
-    selectedCellsList = SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells.map {
-        _meta, file -> file}.collect()
-    selectedCellMetricsList = SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.metrics.map {
-        _meta, file -> file
-    }.collect()
-
+    selectedCellsList = collectInOrder(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells)
+    selectedCellMetricsList = collectInOrder(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.metrics)
     MERGE_CELLS_BY_NUM_TRANSCRIPTS(
         params.library,
         selectedCellsList,
@@ -167,10 +165,9 @@ workflow align_locus_function_workflow {
     )
     MERGE_DGE_SUMMARIES(
         params.library,
-        DIGITAL_EXPRESSION.out.dge_summary.map {
-        _meta, file -> file
-        }.collect()
+        collectInOrder(DIGITAL_EXPRESSION.out.dge_summary)
     )
+    
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
     sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
