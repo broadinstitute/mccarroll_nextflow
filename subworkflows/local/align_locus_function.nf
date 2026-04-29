@@ -16,6 +16,7 @@ include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/single
 include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
 include {MERGE_DGE_SUMMARIES} from '../../modules/local/mergeDgeSummaries.nf'
 include {collectInOrder} from '../../modules/local/workflowUtil.nf'
+include {MERGE_SPLIT_DGES} from '../../modules/local/mergeSplitDges.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -167,12 +168,17 @@ workflow align_locus_function_workflow {
         params.library,
         collectInOrder(DIGITAL_EXPRESSION.out.dge_summary)
     )
+    MERGE_SPLIT_DGES(
+        params.library,
+        collectInOrder(DIGITAL_EXPRESSION.out.dge)
+    )
     
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
     sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
     sizeSelectedCellsMetrics = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics.map {f -> tuple(finalMeta, f) }
     dgeSummary = MERGE_DGE_SUMMARIES.out.map {f -> tuple(finalMeta, f) }
+    dge = MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
@@ -182,4 +188,5 @@ workflow align_locus_function_workflow {
     sizeSelectedCells = sizeSelectedCells
     sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
     dgeSummary = dgeSummary
+    dge = dge
 }
