@@ -127,6 +127,7 @@ workflow {
     sparseDgeMatrix = align_locus_function_workflow.out.sparseDgeMatrix
     sparseDgeFeatures = align_locus_function_workflow.out.sparseDgeFeatures
     sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
+    cellFeatures = align_locus_function_workflow.out.cellFeatures
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -171,6 +172,9 @@ output {
         path {meta, _file -> meta.referenceName}
     }
     sparseDgeBarcodes {
+        path {meta, _file -> meta.referenceName}
+    }
+    cellFeatures {
         path {meta, _file -> meta.referenceName}
     }
     splitBamManifest{

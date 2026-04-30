@@ -21,7 +21,7 @@ include {MERGE_SINGLE_CELL_RNA_SEQ_METRICS} from '../../modules/local/mergeSingl
 include { MAKE_SPARSE_DGE } from '../../modules/local/makeSparseDge.nf'
 include { BAM_TAG_HISTOGRAM } from '../../modules/local/bamTagHistogram.nf'
 include { MERGE_BAM_TAG_HISTOGRAMS } from '../../modules/local/mergeBamTagHistograms.nf'
-
+include { BUILD_CELL_FEATURES_SIMPLE } from '../../modules/local/buildCellFeaturesSimple.nf'
 workflow align_locus_function_workflow {
     take:
         unmappedBams
@@ -197,13 +197,25 @@ workflow align_locus_function_workflow {
         MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
     )
     // TODO: Dropseq.cellselection::buildCellFeaturesSimple
+    // inputs: readsPerCell, dgeSummary, singleCellRnaSeqMetrics, 
 
 
+
+    BUILD_CELL_FEATURES_SIMPLE(
+        params.library,
+        params.minimumTranscriptsPerCell,
+        MERGE_DGE_SUMMARIES.out,
+        MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out,
+        MERGE_BAM_TAG_HISTOGRAMS.out
+    )
+
+    // Add meta for exporting
     sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
     sizeSelectedCellsMetrics = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics.map {f -> tuple(finalMeta, f) }
     dgeSummary = MERGE_DGE_SUMMARIES.out.map {f -> tuple(finalMeta, f) }
     dge = MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
     singleCellRnaSeqMetrics = MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out.map {f -> tuple(finalMeta, f) }
+    cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.map {f -> tuple(finalMeta, f) }
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
@@ -221,4 +233,5 @@ workflow align_locus_function_workflow {
     sparseDgeMatrix = sparseDgeMatrix
     sparseDgeFeatures = sparseDgeFeatures
     sparseDgeBarcodes = sparseDgeBarcodes
+    cellFeatures = cellFeatures
 }
