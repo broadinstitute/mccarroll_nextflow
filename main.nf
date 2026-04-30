@@ -122,6 +122,7 @@ workflow {
     sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
     dgeSummary = align_locus_function_workflow.out.dgeSummary
     dge = align_locus_function_workflow.out.dge
+    singleCellRnaSeqMetrics = align_locus_function_workflow.out.singleCellRnaSeqMetrics
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -154,6 +155,9 @@ output {
         path {meta, _file -> meta.referenceName}
     }
     dge {
+        path {meta, _file -> meta.referenceName}
+    }
+    singleCellRnaSeqMetrics {
         path {meta, _file -> meta.referenceName}
     }
     splitBamManifest{
