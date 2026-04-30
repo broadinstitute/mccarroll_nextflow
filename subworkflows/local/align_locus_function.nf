@@ -19,6 +19,8 @@ include {collectInOrder} from '../../modules/local/workflowUtil.nf'
 include {MERGE_SPLIT_DGES} from '../../modules/local/mergeSplitDges.nf'
 include {MERGE_SINGLE_CELL_RNA_SEQ_METRICS} from '../../modules/local/mergeSingleCellRnaSeqMetrics.nf'
 include { MAKE_SPARSE_DGE } from '../../modules/local/makeSparseDge.nf'
+include { BAM_TAG_HISTOGRAM } from '../../modules/local/bamTagHistogram.nf'
+include { MERGE_BAM_TAG_HISTOGRAMS } from '../../modules/local/mergeBamTagHistograms.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -127,7 +129,13 @@ workflow align_locus_function_workflow {
     }
     VALIDATE_ALIGNED_SAM(alignedBams)
     VALIDATE_SAM_FILE(alignedBams, params.reference)
-
+    numReadsPerCellExtension = "numReads_perCell.txt.gz"
+    BAM_TAG_HISTOGRAM(
+        alignedBams,
+        params.cellBarcodeTag,
+        params.dgeMinReadMq,
+        numReadsPerCellExtension
+    )
     // BAMs complete! DGE below
     SELECT_CELLS_BY_NUM_TRANSCRIPTS(
         alignedBams,
@@ -178,14 +186,18 @@ workflow align_locus_function_workflow {
         params.library,
         collectInOrder(SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR.out.metrics)
     )
+    MERGE_BAM_TAG_HISTOGRAMS(   
+        params.library,
+        collectInOrder(BAM_TAG_HISTOGRAM.out.histogram),
+        numReadsPerCellExtension
+    )
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
     MAKE_SPARSE_DGE(
         MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
     )
-    // Dropseq.cellselection::buildCellFeaturesSimple
+    // TODO: Dropseq.cellselection::buildCellFeaturesSimple
 
-    
 
     sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
     sizeSelectedCellsMetrics = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics.map {f -> tuple(finalMeta, f) }
