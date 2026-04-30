@@ -121,8 +121,12 @@ workflow {
     sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
     sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
     dgeSummary = align_locus_function_workflow.out.dgeSummary
-    dge = align_locus_function_workflow.out.dge
     singleCellRnaSeqMetrics = align_locus_function_workflow.out.singleCellRnaSeqMetrics
+    // 20-transcript DGE
+    dge = align_locus_function_workflow.out.dge
+    sparseDgeMatrix = align_locus_function_workflow.out.sparseDgeMatrix
+    sparseDgeFeatures = align_locus_function_workflow.out.sparseDgeFeatures
+    sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -158,6 +162,15 @@ output {
         path {meta, _file -> meta.referenceName}
     }
     singleCellRnaSeqMetrics {
+        path {meta, _file -> meta.referenceName}
+    }
+    sparseDgeMatrix {
+        path {meta, _file -> meta.referenceName}
+    }
+    sparseDgeFeatures {
+        path {meta, _file -> meta.referenceName}
+    }
+    sparseDgeBarcodes {
         path {meta, _file -> meta.referenceName}
     }
     splitBamManifest{
