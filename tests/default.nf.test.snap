@@ -1,0 +1,18 @@
+{
+    "-profile test": {
+        "content": [
+            null,
+            [
+                "pipeline_info"
+            ],
+            [
+                
+            ]
+        ],
+        "timestamp": "2026-05-06T11:27:00.985905",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    }
+}

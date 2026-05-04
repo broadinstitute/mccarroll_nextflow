@@ -1,0 +1,224 @@
+nextflow_function {
+
+    name "Test Functions"
+    script "modules/local/CbrbArgParser.nf"
+
+	
+
+
+	
+
+    test("Test Function parseArgString") {
+
+        function "parseArgString"
+
+        when {
+            function {
+                """
+                input[0] = "--foo=1000 --bar=frob --baz=null --frib"
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+	
+
+
+	
+
+    test("Test Function makeCbrbArgDict") {
+
+        function "makeCbrbArgDict"
+
+        when {
+            function {
+                """
+                input[0] = "--foo=1000 --bar=frob --frib --learning-rate=0.000005"
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function makeCbrbArgDict with null value") {
+
+        function "makeCbrbArgDict"
+
+        when {
+            function {
+                """
+                input[0] = "--foo=1000 --num-training-tries=4 --baz=null --frib --learning-rate=null"
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+	
+
+
+	
+
+
+
+	
+
+    test("Test Function parseCbrbYamlArgs") {
+
+        function "parseCbrbYamlArgs"
+
+        when {
+            function {
+                """
+                input[0] = "--foo=1000 --bar=frob --baz=null --frib --learning-rate=0.000005"
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function parseCbrbYamlArgs defaults only") {
+
+        function "parseCbrbYamlArgs"
+
+        when {
+            function {
+                """
+                input[0] = ""
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+	
+    test("Test Function parseCbrbYamlArgs expectedCells and totalDropletsIncluded only") {
+
+        function "parseCbrbYamlArgs"
+
+        when {
+            function {
+                """
+                input[0] = "--expected-cells=1000 --total-droplets-included=5000"
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+    test("Test Function parseCbrbYamlArgs removing default") {
+
+        function "parseCbrbYamlArgs"
+
+        when {
+            function {
+                """
+                input[0] = "--learning-rate=null"
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function addSvmEstimatedParameters") {
+
+        function "addSvmEstimatedParameters"
+
+        when {
+            function {
+                """
+                input[0] =  ["argDict": [
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.00000625"
+                ]]
+                input[1] = ["--total-droplets-included":6000, "--expected-cells":4000]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function addSvmEstimatedParameters with override") {
+
+        function "addSvmEstimatedParameters"
+
+        when {
+            function {
+                """
+                input[0] =  ["argDict": [
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.00000625",
+                    "--total-droplets-included":5000
+                ]]
+                input[1] = ["--total-droplets-included":6000, "--expected-cells":4000]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+test("Test Function loadSvmEstimatedParameters") {
+
+        function "loadSvmEstimatedParameters"
+
+        when {
+            function {
+                """
+                input[0] =  file("${projectDir}/test_data/test.cbrb_parameters.txt")
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+}

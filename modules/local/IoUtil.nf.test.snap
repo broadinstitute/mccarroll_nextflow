@@ -1,0 +1,15 @@
+{
+    "Test Function readSingleRowTsv": {
+        "content": [
+            {
+                "total_droplets_included": "6076",
+                "expected_cells": "4203"
+            }
+        ],
+        "timestamp": "2026-05-07T09:32:45.58394",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    }
+}

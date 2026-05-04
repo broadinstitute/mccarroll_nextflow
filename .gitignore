@@ -8,4 +8,5 @@ work
 report-*.html
 null
 .vscode
+.nf-test*
 

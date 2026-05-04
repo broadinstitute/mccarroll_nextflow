@@ -1,0 +1,251 @@
+{
+    "Test Function addSvmEstimatedParameters": {
+        "content": [
+            {
+                "argDict": {
+                    "--total-droplets-included": 6000,
+                    "--expected-cells": 4000,
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.00000625"
+                },
+                "argList": [
+                    "--total-droplets-included",
+                    "6000",
+                    "--expected-cells",
+                    "4000",
+                    "--num-training-tries",
+                    "3",
+                    "--final-elbo-fail-fraction",
+                    "0.1",
+                    "--learning-rate",
+                    "0.00000625"
+                ],
+                "expectedCells": 4000,
+                "totalDropletsIncluded": 6000
+            }
+        ],
+        "timestamp": "2026-05-07T09:57:39.871479",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function makeCbrbArgDict": {
+        "content": [
+            {
+                "--num-training-tries": 3,
+                "--final-elbo-fail-fraction": 0.1,
+                "--learning-rate": "0.000005",
+                "--foo": "1000",
+                "--bar": "frob",
+                "--frib": ""
+            }
+        ],
+        "timestamp": "2026-05-06T17:04:31.314178",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function parseCbrbYamlArgs defaults only": {
+        "content": [
+            {
+                "argDict": {
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.00000625"
+                },
+                "argList": [
+                    "--num-training-tries",
+                    "3",
+                    "--final-elbo-fail-fraction",
+                    "0.1",
+                    "--learning-rate",
+                    "0.00000625"
+                ],
+                "expectedCells": null,
+                "totalDropletsIncluded": null
+            }
+        ],
+        "timestamp": "2026-05-06T19:04:43.873888",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function parseCbrbYamlArgs removing default": {
+        "content": [
+            {
+                "argDict": {
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "null"
+                },
+                "argList": [
+                    "--num-training-tries",
+                    "3",
+                    "--final-elbo-fail-fraction",
+                    "0.1"
+                ],
+                "expectedCells": null,
+                "totalDropletsIncluded": null
+            }
+        ],
+        "timestamp": "2026-05-06T19:05:08.213432",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function addSvmEstimatedParameters with override": {
+        "content": [
+            {
+                "argDict": {
+                    "--total-droplets-included": 5000,
+                    "--expected-cells": 4000,
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.00000625"
+                },
+                "argList": [
+                    "--total-droplets-included",
+                    "5000",
+                    "--expected-cells",
+                    "4000",
+                    "--num-training-tries",
+                    "3",
+                    "--final-elbo-fail-fraction",
+                    "0.1",
+                    "--learning-rate",
+                    "0.00000625"
+                ],
+                "expectedCells": 4000,
+                "totalDropletsIncluded": 5000
+            }
+        ],
+        "timestamp": "2026-05-07T10:02:16.143926",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function loadSvmEstimatedParameters": {
+        "content": [
+            {
+                "--total-droplets-included": "6076",
+                "--expected-cells": "4203"
+            }
+        ],
+        "timestamp": "2026-05-07T15:19:23.9533",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function parseArgString": {
+        "content": [
+            [
+                {
+                    "--foo": "1000"
+                },
+                {
+                    "--bar": "frob"
+                },
+                {
+                    "--baz": "null"
+                },
+                "--frib"
+            ]
+        ],
+        "timestamp": "2026-05-06T11:35:01.864296",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function makeCbrbArgDict with null value": {
+        "content": [
+            {
+                "--num-training-tries": "4",
+                "--final-elbo-fail-fraction": 0.1,
+                "--learning-rate": "null",
+                "--foo": "1000",
+                "--baz": "null",
+                "--frib": ""
+            }
+        ],
+        "timestamp": "2026-05-06T17:29:59.41578",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function parseCbrbYamlArgs": {
+        "content": [
+            {
+                "argDict": {
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.000005",
+                    "--foo": "1000",
+                    "--bar": "frob",
+                    "--baz": "null",
+                    "--frib": ""
+                },
+                "argList": [
+                    "--num-training-tries",
+                    "3",
+                    "--final-elbo-fail-fraction",
+                    "0.1",
+                    "--learning-rate",
+                    "0.000005",
+                    "--foo",
+                    "1000",
+                    "--bar",
+                    "frob",
+                    "--frib"
+                ],
+                "expectedCells": null,
+                "totalDropletsIncluded": null
+            }
+        ],
+        "timestamp": "2026-05-06T19:04:31.279919",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    },
+    "Test Function parseCbrbYamlArgs expectedCells and totalDropletsIncluded only": {
+        "content": [
+            {
+                "argDict": {
+                    "--num-training-tries": 3,
+                    "--final-elbo-fail-fraction": 0.1,
+                    "--learning-rate": "0.00000625",
+                    "--expected-cells": "1000",
+                    "--total-droplets-included": "5000"
+                },
+                "argList": [
+                    "--num-training-tries",
+                    "3",
+                    "--final-elbo-fail-fraction",
+                    "0.1",
+                    "--learning-rate",
+                    "0.00000625",
+                    "--expected-cells",
+                    "1000",
+                    "--total-droplets-included",
+                    "5000"
+                ],
+                "expectedCells": 1000,
+                "totalDropletsIncluded": 5000
+            }
+        ],
+        "timestamp": "2026-05-06T19:04:56.066707",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.03.1"
+        }
+    }
+}
