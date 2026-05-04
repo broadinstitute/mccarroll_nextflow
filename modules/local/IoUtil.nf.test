@@ -1,0 +1,30 @@
+
+nextflow_function {
+
+    name "Test Functions"
+    script "modules/local/IoUtil.nf"
+
+	
+
+    test("Test Function readSingleRowTsv") {
+
+        function "readSingleRowTsv"
+
+        when {
+            function {
+                """
+                input[0] = file("${projectDir}/test_data/test.cbrb_parameters.txt")
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+	
+
+}
