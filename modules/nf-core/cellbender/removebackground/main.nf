@@ -29,7 +29,8 @@ process CELLBENDER_REMOVEBACKGROUND {
     script:
         prefix = task.ext.prefix ?: "${meta.id}"
         args = task.ext.args ?: ""
-        input = task.ext.input ?: ${h5ad}
+        use_gpu = task.ext.use_gpu ? "--cuda" : ""
+        input = task.ext.input ?: "${h5ad}"
         """
         TMPDIR=. cellbender remove-background \
             ${args} \

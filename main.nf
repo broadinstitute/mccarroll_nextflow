@@ -139,6 +139,17 @@ workflow {
     sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
     cellFeatures = align_locus_function_workflow.out.cellFeatures
 
+    // CBRB outputs that we care about
+    cbrbH5 = cbrb_workflow.out.h5
+    cbrbBarcodes = cbrb_workflow.out.barcodes
+    cbrbMetrics = cbrb_workflow.out.metrics
+    cbrbReport = cbrb_workflow.out.report
+    cbrbPdf = cbrb_workflow.out.pdf
+    cbrbLog = cbrb_workflow.out.cbrbLog
+    cbrbCheckpoint = cbrb_workflow.out.checkpoint
+    svmCbrbParameters = cbrb_workflow.out.svmCbrbParameters
+    svmCbrbParameterEstimationPdf = cbrb_workflow.out.svmCbrbParameterEstimationPdf
+
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
     csv_report = null //NEXTFLOW.out.csv_report
@@ -152,8 +163,12 @@ output {
     }
     converted_h5ad{
     }
+    // unmapped outputs
     unmappedBam{
     }
+    splitBamManifest{
+    }
+    // alignment, locus function outputs
     alignedBam{
         path {meta, _file -> meta.referenceName}
     }
@@ -187,7 +202,35 @@ output {
     cellFeatures {
         path {meta, _file -> meta.referenceName}
     }
-    splitBamManifest{
+
+    // CBRB outputs
+    // TODO: should these go into a subdirectory of <reference>/cbrb/ based on the CBRB options, like Zamboni workflow?
+    cbrbH5 {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbBarcodes {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbMetrics {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbReport {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbPdf {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbLog {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbCheckpoint {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    svmCbrbParameters {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    svmCbrbParameterEstimationPdf {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
     }
 }
 
