@@ -29,14 +29,14 @@ process CELLBENDER_REMOVEBACKGROUND {
     script:
         prefix = task.ext.prefix ?: "${meta.id}"
         args = task.ext.args ?: ""
-        use_gpu = task.ext.use_gpu ? "--cuda" : ""
+        input = task.ext.input ?: ${h5ad}
         """
         TMPDIR=. cellbender remove-background \
             ${args} \
             --cpu-threads ${task.cpus} \
             --estimator-multiple-cpu \
             ${use_gpu} \
-            --input ${h5ad} \
+            --input ${input} \
             --output ${prefix}.h5
         """
 
