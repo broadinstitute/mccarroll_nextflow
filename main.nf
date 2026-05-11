@@ -106,7 +106,8 @@ workflow {
         align_locus_function_workflow.out.sparseDgeMatrix,
         align_locus_function_workflow.out.sparseDgeFeatures,
         align_locus_function_workflow.out.sparseDgeBarcodes,
-        align_locus_function_workflow.out.cellFeatures
+        align_locus_function_workflow.out.cellFeatures,
+        align_locus_function_workflow.out.dge
     )
    //
     // SUBWORKFLOW: Run completion tasks
@@ -149,6 +150,8 @@ workflow {
     cbrbCheckpoint = cbrb_workflow.out.checkpoint
     svmCbrbParameters = cbrb_workflow.out.svmCbrbParameters
     svmCbrbParameterEstimationPdf = cbrb_workflow.out.svmCbrbParameterEstimationPdf
+    cbrbDge = cbrb_workflow.out.dge
+    cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -230,6 +233,12 @@ output {
         path {meta, _file -> meta.referenceName + "/cbrb/"}
     }
     svmCbrbParameterEstimationPdf {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbDge {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbNumTranscripts {
         path {meta, _file -> meta.referenceName + "/cbrb/"}
     }
 }
