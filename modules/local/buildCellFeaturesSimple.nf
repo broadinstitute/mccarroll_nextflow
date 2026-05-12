@@ -13,7 +13,7 @@ process BUILD_CELL_FEATURES_SIMPLE {
     path "${output_file}"
 
     script:
-    output_file = "${library}.cell_selection_report.txt"
+    output_file = "${library}.cell_features.txt"
 
     """
     Rscript -e 'message(date(), " Start ", "buildCellFeaturesSimple")' \
