@@ -152,6 +152,7 @@ workflow {
     svmCbrbParameterEstimationPdf = cbrb_workflow.out.svmCbrbParameterEstimationPdf
     cbrbDge = cbrb_workflow.out.dge
     cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
+    cbrbCellFeatures = cbrb_workflow.out.cellFeatures
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -239,6 +240,9 @@ output {
         path {meta, _file -> meta.referenceName + "/cbrb/"}
     }
     cbrbNumTranscripts {
+        path {meta, _file -> meta.referenceName + "/cbrb/"}
+    }
+    cbrbCellFeatures {
         path {meta, _file -> meta.referenceName + "/cbrb/"}
     }
 }

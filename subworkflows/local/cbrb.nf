@@ -2,7 +2,7 @@ include { parseCbrbYamlArgs; addSvmEstimatedParameters; loadSvmEstimatedParamete
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
 include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
-
+include { JOIN_CBRB_CELL_FEATURES } from '../../modules/local/joinCbrbCellFeatures.nf'
 workflow cbrb_workflow {
     take:
     sparseDgeMatrix
@@ -45,6 +45,11 @@ workflow cbrb_workflow {
         }
     CELLBENDER_REMOVEBACKGROUND(cbrbChannel)
     HDF5_10X_TO_TEXT(CELLBENDER_REMOVEBACKGROUND.out.h5, denseDgeMatrix.map { _meta, file -> file }, CELLBENDER_REMOVEBACKGROUND.out.log.map {_meta, file -> file})
+    JOIN_CBRB_CELL_FEATURES(
+        cellFeatures,
+        HDF5_10X_TO_TEXT.out.numTranscripts.map { _meta, file -> file },
+    )
+    
     emit:
     svmCbrbParameters = svmCbrbParameters
     svmCbrbParameterEstimationPdf = svmCbrbParameterEstimationPdf
@@ -57,5 +62,6 @@ workflow cbrb_workflow {
     checkpoint = CELLBENDER_REMOVEBACKGROUND.out.checkpoint
     dge = HDF5_10X_TO_TEXT.out.dge
     numTranscripts = HDF5_10X_TO_TEXT.out.numTranscripts
+    cellFeatures = JOIN_CBRB_CELL_FEATURES.out.cbrbCellFeatures
 
 }
