@@ -1,4 +1,5 @@
 include { parseCbrbYamlArgs; addSvmEstimatedParameters; loadSvmEstimatedParameters } from '../../modules/local/CbrbArgParser.nf'
+include {noMetaChannelHelper} from '../../modules/local/workflowUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
 include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
@@ -12,10 +13,10 @@ workflow cbrb_workflow {
     denseDgeMatrix
 
     main:
-    sparseDgeMatrixNoMeta = sparseDgeMatrix.map { _meta, file -> file }
-    sparseDgeFeaturesNoMeta = sparseDgeFeatures.map { _meta, file -> file }
-    sparseDgeBarcodesNoMeta = sparseDgeBarcodes.map { _meta, file -> file }
-    cellFeaturesNoMeta = cellFeatures.map { _meta, file -> file }
+    sparseDgeMatrixNoMeta = noMetaChannelHelper(sparseDgeMatrix)
+    sparseDgeFeaturesNoMeta = noMetaChannelHelper(sparseDgeFeatures)
+    sparseDgeBarcodesNoMeta = noMetaChannelHelper(sparseDgeBarcodes)
+    cellFeaturesNoMeta = noMetaChannelHelper(cellFeatures)
     meta = sparseDgeMatrix.map { meta, _file -> meta } // just take the meta from one of the inputs, they should all be the same
     parsedCbrbArgs = parseCbrbYamlArgs(params.cbrbArgs)
     useSvmParameterEstimation = params.useSvmParameterEstimation && 
@@ -44,10 +45,10 @@ workflow cbrb_workflow {
         m, mat, feat, barc -> tuple(m, [mat, feat, barc]) 
         }
     CELLBENDER_REMOVEBACKGROUND(cbrbChannel)
-    HDF5_10X_TO_TEXT(CELLBENDER_REMOVEBACKGROUND.out.h5, denseDgeMatrix.map { _meta, file -> file }, CELLBENDER_REMOVEBACKGROUND.out.log.map {_meta, file -> file})
+    HDF5_10X_TO_TEXT(CELLBENDER_REMOVEBACKGROUND.out.h5, noMetaChannelHelper(denseDgeMatrix), noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.log))
     JOIN_CBRB_CELL_FEATURES(
         cellFeatures,
-        HDF5_10X_TO_TEXT.out.numTranscripts.map { _meta, file -> file },
+        noMetaChannelHelper(HDF5_10X_TO_TEXT.out.numTranscripts),
     )
     
     emit:
