@@ -120,11 +120,7 @@ workflow {
         params.monochrome_logs,
     )
 
-    // TODO: Need to determine overall publishing strategy for the pipeline.  Currently rawBam is being double-published,
-    // once in the main workflow and once in subdirectory because of modules.config.publishDir in the config file.
     publish:
-    // suppressing publication of splitBams for now because they would duplicate the command-specific output directories.
-    // We need to decide on a strategy for publishing these files.
     unmappedBam = tag_and_split_bam_workflow.out.splitBams
     splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
     alignedBam = align_locus_function_workflow.out.alignedBam
