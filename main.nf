@@ -19,11 +19,17 @@ include { align_locus_function_workflow } from './subworkflows/local/align_locus
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    NAMED WORKFLOWS FOR PIPELINE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+
+// Centralize output subdirectory naming.
+def alignmentDir(tuple) {
+    def (meta, _file) = tuple
+    return meta.referenceName
+}
+
+def cbrbDir(tuple) {
+    def (meta, _file) = tuple
+    return meta.referenceName + "/cbrb/"
+}
 
 params {
     allowedBarcodes: Path
@@ -170,76 +176,76 @@ output {
     }
     // alignment, locus function outputs
     alignedBam{
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     alignedBai{
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     sizeSelectedCells {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     sizeSelectedCellsMetrics {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     dgeSummary {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     dge {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     singleCellRnaSeqMetrics {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     sparseDgeMatrix {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     sparseDgeFeatures {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     sparseDgeBarcodes {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
     cellFeatures {
-        path {meta, _file -> meta.referenceName}
+        path {x -> alignmentDir(x)}
     }
 
     // CBRB outputs
     // TODO: should these go into a subdirectory of <reference>/cbrb/ based on the CBRB options, like Zamboni workflow?
     cbrbH5 {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbBarcodes {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbMetrics {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbReport {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbPdf {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbLog {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbCheckpoint {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     svmCbrbParameters {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     svmCbrbParameterEstimationPdf {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbDge {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbNumTranscripts {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
     cbrbCellFeatures {
-        path {meta, _file -> meta.referenceName + "/cbrb/"}
+        path {x -> cbrbDir(x)}
     }
 }
 
