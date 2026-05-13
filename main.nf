@@ -17,18 +17,22 @@ include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/
 include { tag_and_split_bam_workflow } from './subworkflows/local/tag_and_split_bam.nf'
 include { align_locus_function_workflow } from './subworkflows/local/align_locus_function.nf'
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
+include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 
 // Centralize output subdirectory naming.
 def alignmentDir(tuple) {
     def (meta, _file) = tuple
-    return meta.referenceName
+    return meta.referenceName + "/"
 }
 
 def cbrbDir(tuple) {
-    def (meta, _file) = tuple
-    return meta.referenceName + "/cbrb/"
+    return alignmentDir(tuple) + "cbrb/"
+}
+
+def cellSelectionDir(tuple) {
+    return cbrbDir(tuple) + "cell_selection/"
 }
 
 params {
@@ -115,6 +119,15 @@ workflow {
         align_locus_function_workflow.out.cellFeatures,
         align_locus_function_workflow.out.dge
     )
+    cell_selection_workflow(
+        align_locus_function_workflow.out.sparseDgeMatrix,
+        align_locus_function_workflow.out.sparseDgeFeatures,
+        align_locus_function_workflow.out.sparseDgeBarcodes,
+        align_locus_function_workflow.out.cellFeatures,
+        cbrb_workflow.out.barcodes,
+        cbrb_workflow.out.numTranscripts
+    )
+
    //
     // SUBWORKFLOW: Run completion tasks
     //
@@ -155,6 +168,13 @@ workflow {
     cbrbDge = cbrb_workflow.out.dge
     cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
     cbrbCellFeatures = cbrb_workflow.out.cellFeatures
+
+    // cell selection outputs that we care about
+    selectedCellBarcodes = cell_selection_workflow.out.selectedCellBarcodes
+    ambientCellBarcodes = cell_selection_workflow.out.ambientCellBarcodes
+    cellSelectionAssignmentsPdf = cell_selection_workflow.out.cellSelectionAssignmentsPdf
+    cellSelectionAssignmentsSummary = cell_selection_workflow.out.cellSelectionAssignmentsSummary
+    droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -246,6 +266,21 @@ output {
     }
     cbrbCellFeatures {
         path {x -> cbrbDir(x)}
+    }
+    selectedCellBarcodes {
+        path {x -> cellSelectionDir(x)}
+    }
+    ambientCellBarcodes {
+        path {x -> cellSelectionDir(x)}
+    }
+    cellSelectionAssignmentsPdf {
+        path {x -> cellSelectionDir(x)}
+    }
+    cellSelectionAssignmentsSummary {
+        path {x -> cellSelectionDir(x)}
+    }
+    droppedNonEmpty {
+        path {x -> cellSelectionDir(x)}
     }
 }
 
