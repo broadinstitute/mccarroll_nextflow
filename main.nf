@@ -28,7 +28,8 @@ def alignmentDir(tuple) {
 }
 
 def cbrbDir(tuple) {
-    return alignmentDir(tuple) + "cbrb/"
+    def (meta, _file) = tuple
+    return alignmentDir(tuple) + "cbrb/" + meta.cbrb_label + "/"
 }
 
 def cellSelectionDir(tuple) {
@@ -48,10 +49,15 @@ params {
     version10X: String
     sampleType: String
     beadStructure: String
+    // cbrb parameters
     useSvmParameterEstimation: Boolean
     forceTwoClusterSolution: Boolean
     cbrbArgs: String
-
+    // cell selection parameters
+    minUmisPerCell: Integer
+    maxUmisPerCell: Integer
+    minIntronicPerCell: Float
+    maxIntronicPerCell: Float
 
     // defaults
     cellBarcodeTag: String

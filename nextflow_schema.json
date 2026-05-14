@@ -282,6 +282,22 @@
     },
     "cbrbArgs": {
       "type": "string"
+    },
+    "minUmisPerCell": {
+      "type": "integer",
+      "description": "For manual cell selection"
+    },
+    "maxUmisPerCell": {
+      "type": "integer",
+      "description": "For manual cell selection"
+    },
+    "minIntronicPerCell": {
+      "type": "number",
+      "description": "For manual cell selection"
+    },
+    "maxIntronicPerCell": {
+      "type": "number",
+      "description": "For manual cell selection"
     }
   },
   "required": ["project", "library", "sampleType"]
