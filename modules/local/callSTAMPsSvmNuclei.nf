@@ -4,10 +4,10 @@ process CALL_STAMPS_SVM_NUCLEI {
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_r:current'
 
     input:
-    tuple val(meta), path(sparseDge)
+    path sparseDge
     path cellFeatures
     path cbrbNonEmpties
-    path cbrbNumTranscripts
+    tuple val(meta), path(cbrbNumTranscripts) // CBRB output will have the most fulsome meta, so take it from there.
 
     output:
     tuple val(meta), path("${output_file}"), emit: selectedCellBarcodes

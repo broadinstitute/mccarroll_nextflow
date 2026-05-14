@@ -12,10 +12,10 @@ workflow cell_selection_workflow {
     cbrbNumTranscripts
 
     main:
-    CALL_STAMPS_SVM_NUCLEI(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes),
+    CALL_STAMPS_SVM_NUCLEI(noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
         noMetaChannelHelper(cellFeatures),
         noMetaChannelHelper(cbrbNonEmpties),
-        noMetaChannelHelper(cbrbNumTranscripts)
+        cbrbNumTranscripts
     )
 
     emit:

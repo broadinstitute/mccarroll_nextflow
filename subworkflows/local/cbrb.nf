@@ -17,7 +17,12 @@ workflow cbrb_workflow {
     sparseDgeFeaturesNoMeta = noMetaChannelHelper(sparseDgeFeatures)
     sparseDgeBarcodesNoMeta = noMetaChannelHelper(sparseDgeBarcodes)
     cellFeaturesNoMeta = noMetaChannelHelper(cellFeatures)
-    meta = sparseDgeMatrix.map { meta, _file -> meta } // just take the meta from one of the inputs, they should all be the same
+    if (params.useSvmParameterEstimation && params.cbrbArgs.isEmpty()) {
+        cbrb_label = "auto"
+    } else {
+        cbrb_label = String.format('%04x', params.cbrbArgs.hashCode())
+    }
+    meta = sparseDgeMatrix.map { meta, _file -> meta +[cbrb_label: cbrb_label] } // just take the meta from one of the inputs, they should all be the same
     parsedCbrbArgs = parseCbrbYamlArgs(params.cbrbArgs)
     useSvmParameterEstimation = params.useSvmParameterEstimation && 
         (!parsedCbrbArgs.expectedCells || !parsedCbrbArgs.totalDropletsIncluded)
@@ -47,7 +52,7 @@ workflow cbrb_workflow {
     CELLBENDER_REMOVEBACKGROUND(cbrbChannel)
     HDF5_10X_TO_TEXT(CELLBENDER_REMOVEBACKGROUND.out.h5, noMetaChannelHelper(denseDgeMatrix), noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.log))
     JOIN_CBRB_CELL_FEATURES(
-        cellFeatures,
+        cellFeatures.map {m, file -> tuple(m + [cbrb_label: cbrb_label], file)},
         noMetaChannelHelper(HDF5_10X_TO_TEXT.out.numTranscripts),
     )
     
