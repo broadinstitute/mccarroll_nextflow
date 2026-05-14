@@ -33,7 +33,8 @@ def cbrbDir(tuple) {
 }
 
 def cellSelectionDir(tuple) {
-    return cbrbDir(tuple) + "cell_selection/"
+    def (meta, _file) = tuple
+    return cbrbDir(tuple) + "cell_selection/" + meta.cell_selection_label + "/"
 }
 
 params {
@@ -54,8 +55,8 @@ params {
     forceTwoClusterSolution: Boolean
     cbrbArgs: String
     // cell selection parameters
-    minUmisPerCell: Integer
-    maxUmisPerCell: Integer
+    minUMIsPerCell: Integer
+    maxUMIsPerCell: Integer
     minIntronicPerCell: Float
     maxIntronicPerCell: Float
 

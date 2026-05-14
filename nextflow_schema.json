@@ -283,11 +283,11 @@
     "cbrbArgs": {
       "type": "string"
     },
-    "minUmisPerCell": {
+    "minUMIsPerCell": {
       "type": "integer",
       "description": "For manual cell selection"
     },
-    "maxUmisPerCell": {
+    "maxUMIsPerCell": {
       "type": "integer",
       "description": "For manual cell selection"
     },
