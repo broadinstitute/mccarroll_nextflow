@@ -59,6 +59,14 @@ params {
     maxUMIsPerCell: Integer
     minIntronicPerCell: Float
     maxIntronicPerCell: Float
+    // standard analysis parameters
+    vcf: Path
+    donorFile: Path
+    donor: String
+    assignCellsToSamplesOptions: List
+    detectDoubletsOptions: List
+    computeCBRBAdjustedLikelihoods: Boolean
+    metaGeneDgeFunctionalStrategy: String
 
     // defaults
     cellBarcodeTag: String
