@@ -298,6 +298,41 @@
     "maxIntronicPerCell": {
       "type": "number",
       "description": "For manual cell selection"
+    },
+    "vcf": {
+      "type": "string",
+      "format": "file-path",
+      "exists": true
+    },
+    "donorFile": {
+      "type": "string",
+      "format": "file-path",
+      "exists": true
+    },
+    "donor": {
+      "type": "string"
+    },
+    "assignCellsToSamplesOptions": {
+      "type": ["string", "array"],
+      "items": {
+        "type": "string"
+      },
+      "default": "[]"
+    },
+    "detectDoubletsOptions": {
+      "type": ["string", "array"],
+      "items": {
+        "type": "string"
+      },
+      "default": "[]"
+    },
+    "computeCBRBAdjustedLikelihoods": {
+      "type": "boolean",
+      "default": true
+    },
+    "metaGeneDgeFunctionalStrategy": {
+      "type": "string",
+      "enum": ["DROPSEQ", "STARSOLO"]
     }
   },
   "required": ["project", "library", "sampleType"]
