@@ -18,6 +18,7 @@ include { tag_and_split_bam_workflow } from './subworkflows/local/tag_and_split_
 include { align_locus_function_workflow } from './subworkflows/local/align_locus_function.nf'
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
 include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
+include { standard_analysis_workflow } from './subworkflows/local/standard_analysis.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 
@@ -35,6 +36,12 @@ def cbrbDir(tuple) {
 def cellSelectionDir(tuple) {
     def (meta, _file) = tuple
     return cbrbDir(tuple) + "cell_selection/" + meta.cell_selection_label + "/"
+}
+
+def standardAnalysisDir(tuple) {
+    // Since there should be no user choices for standard analysis, outputs could just go into cell_selection
+    // directory, but put them in a subdir to reduce clutter.
+    return cellSelectionDir(tuple) + "standard_analysis/"
 }
 
 params {
@@ -142,6 +149,11 @@ workflow {
         cbrb_workflow.out.barcodes,
         cbrb_workflow.out.numTranscripts
     )
+    standard_analysis_workflow(
+        cell_selection_workflow.out.selectedCellBarcodes,
+        cbrb_workflow.out.dge,
+        align_locus_function_workflow.out.dgeSummary
+    )
 
    //
     // SUBWORKFLOW: Run completion tasks
@@ -190,6 +202,10 @@ workflow {
     cellSelectionAssignmentsPdf = cell_selection_workflow.out.cellSelectionAssignmentsPdf
     cellSelectionAssignmentsSummary = cell_selection_workflow.out.cellSelectionAssignmentsSummary
     droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
+
+    // standrd analysis outputs that we care about
+    selectedDge = standard_analysis_workflow.out.dge
+    selectedDgeSummary = standard_analysis_workflow.out.dgeSummary
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -282,6 +298,8 @@ output {
     cbrbCellFeatures {
         path {x -> cbrbDir(x)}
     }
+
+    // cell selection outputs
     selectedCellBarcodes {
         path {x -> cellSelectionDir(x)}
     }
@@ -297,6 +315,15 @@ output {
     droppedNonEmpty {
         path {x -> cellSelectionDir(x)}
     }
+
+    // standard analysis outputs
+    selectedDge {
+        path {x -> standardAnalysisDir(x)}
+    }
+    selectedDgeSummary {
+        path {x -> standardAnalysisDir(x)}
+    }
+
 }
 
 /*
