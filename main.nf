@@ -206,6 +206,9 @@ workflow {
     // standrd analysis outputs that we care about
     selectedDge = standard_analysis_workflow.out.dge
     selectedDgeSummary = standard_analysis_workflow.out.dgeSummary
+    selectedSparseDgeMatrix = standard_analysis_workflow.out.sparseDgeMatrix
+    selectedSparseDgeFeatures = standard_analysis_workflow.out.sparseDgeFeatures
+    selectedSparseDgeBarcodes = standard_analysis_workflow.out.sparseDgeBarcodes
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -323,7 +326,15 @@ output {
     selectedDgeSummary {
         path {x -> standardAnalysisDir(x)}
     }
-
+    selectedSparseDgeMatrix {
+        path {x -> standardAnalysisDir(x)}
+    }
+    selectedSparseDgeFeatures {
+        path {x -> standardAnalysisDir(x)}  
+    }
+    selectedSparseDgeBarcodes {
+        path {x -> standardAnalysisDir(x)}
+    }
 }
 
 /*
