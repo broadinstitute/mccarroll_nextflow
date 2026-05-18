@@ -29,3 +29,7 @@ def sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarco
 def noMetaChannelHelper(channel) {
     return channel.map { _meta, file -> file }
 }
+
+def metaOnlyChannelHelper(channel) {
+    return channel.map { meta, _file -> meta }
+}
