@@ -153,7 +153,8 @@ workflow {
         cell_selection_workflow.out.selectedCellBarcodes,
         cbrb_workflow.out.dge,
         align_locus_function_workflow.out.dgeSummary,
-        align_locus_function_workflow.out.alignedBam
+        align_locus_function_workflow.out.alignedBam,
+        align_locus_function_workflow.out.chimericTranscripts
     )
 
    //
@@ -211,6 +212,7 @@ workflow {
     selectedSparseDgeFeatures = standard_analysis_workflow.out.sparseDgeFeatures
     selectedSparseDgeBarcodes = standard_analysis_workflow.out.sparseDgeBarcodes
     umiReadIntervals = standard_analysis_workflow.out.umiReadIntervals
+    molBc = standard_analysis_workflow.out.molBc
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -338,6 +340,9 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     umiReadIntervals {
+        path {x -> standardAnalysisDir(x)}
+    }
+    molBc {
         path {x -> standardAnalysisDir(x)}
     }
 }
