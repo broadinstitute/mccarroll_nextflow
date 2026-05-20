@@ -22,6 +22,7 @@ include { MAKE_SPARSE_DGE } from '../../modules/local/makeSparseDge.nf'
 include { BAM_TAG_HISTOGRAM } from '../../modules/local/bamTagHistogram.nf'
 include { MERGE_BAM_TAG_HISTOGRAMS } from '../../modules/local/mergeBamTagHistograms.nf'
 include { BUILD_CELL_FEATURES_SIMPLE } from '../../modules/local/buildCellFeaturesSimple.nf'
+include { MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE } from '../../modules/local/mergeMolecularBarcodeDistributionByGene.nf'
 workflow align_locus_function_workflow {
     take:
         unmappedBams
@@ -95,6 +96,10 @@ workflow align_locus_function_workflow {
         params.strandStrategy,
         params.locusFunction,
         !doBQSR)
+    MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE(
+        params.library,
+        collectInOrder(MARK_CHIMERIC_READS.out.chimericTranscripts)
+    )
     if (doBQSR) {
         dbsnpIntervals = referenceMetadataLocator.dbSnpIntervals.exists() ? referenceMetadataLocator.dbSnpIntervals : []
         GATK4_BASERECALIBRATOR(
@@ -219,12 +224,13 @@ workflow align_locus_function_workflow {
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
+    chimericTranscripts = MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts.map {f -> tuple(finalMeta, f) }
     emit:
     alignedBam = alignedBams
     alignedBai = alignedBais
     // TODO: These should be merged.
     chimericReadMetrics = MARK_CHIMERIC_READS.out.chimericReadMetrics
-    chimericTranscripts = MARK_CHIMERIC_READS.out.chimericTranscripts
+    chimericTranscripts = chimericTranscripts
     sizeSelectedCells = sizeSelectedCells
     sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
     dgeSummary = dgeSummary
