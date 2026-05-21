@@ -5,6 +5,7 @@ include {MAKE_TRIPLET_DGE} from '../../modules/local/makeTripletDge.nf'
 include { GATHER_UMI_READ_INTERVALS } from '../../modules/local/gatherUmiReadIntervals.nf'
 include { MERGE_UMI_READ_INTERVALS } from '../../modules/local/mergeUMIReadIntervals.nf'
 include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE } from '../../modules/local/chimericReportEditDistanceCollapse.nf'
+include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
 workflow standard_analysis_workflow {
     take:
     selectedCells
@@ -21,6 +22,7 @@ workflow standard_analysis_workflow {
     GATHER_UMI_READ_INTERVALS(bams, noMetaChannelHelper(selectedCells).collect(), params.locusFunction, params.strandStrategy, functionalStrategy)
     MERGE_UMI_READ_INTERVALS(metaOnlyChannelHelper(selectedCells), collectInOrder(GATHER_UMI_READ_INTERVALS.out.umiReadIntervals))
     CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE(selectedCells, noMetaChannelHelper(chimericTranscripts).collect())
+    DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES(selectedCells, noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect())
     emit:
     dge = FILTER_DGE.out.filteredDge
     dgeSummary = FILTER_DGE.out.filteredDgeSummary
@@ -29,4 +31,5 @@ workflow standard_analysis_workflow {
     sparseDgeBarcodes = MAKE_TRIPLET_DGE.out.barcodes
     umiReadIntervals = MERGE_UMI_READ_INTERVALS.out.umiReadIntervals
     molBc = CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc
+    umiSaturationHistogram = DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES.out.umiSaturationHistogram
 }

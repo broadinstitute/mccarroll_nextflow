@@ -213,6 +213,7 @@ workflow {
     selectedSparseDgeBarcodes = standard_analysis_workflow.out.sparseDgeBarcodes
     umiReadIntervals = standard_analysis_workflow.out.umiReadIntervals
     molBc = standard_analysis_workflow.out.molBc
+    umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -343,6 +344,9 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     molBc {
+        path {x -> standardAnalysisDir(x)}
+    }
+    umiSaturationHistogram {
         path {x -> standardAnalysisDir(x)}
     }
 }
