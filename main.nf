@@ -119,6 +119,19 @@ workflow {
         params.show_hidden
     )
 
+    if (params.vcf && !params.donorFile) {
+        log.error "If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings."
+        exit 1
+    }
+    if (!params.vcf && params.donorFile) {
+        log.error "If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes."
+        exit 1
+    }
+    if (params.donorFile && params.donor) {
+        log.error "It does not make sense to provide both a donor file and a donor."
+        exit 1
+    }
+
     //
     // WORKFLOW: Run main workflow
     //
@@ -214,6 +227,7 @@ workflow {
     umiReadIntervals = standard_analysis_workflow.out.umiReadIntervals
     molBc = standard_analysis_workflow.out.molBc
     umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
+    digitalAlleleFrequencies = standard_analysis_workflow.out.digitalAlleleFrequencies
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -347,6 +361,9 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     umiSaturationHistogram {
+        path {x -> standardAnalysisDir(x)}
+    }
+    digitalAlleleFrequencies {
         path {x -> standardAnalysisDir(x)}
     }
 }
