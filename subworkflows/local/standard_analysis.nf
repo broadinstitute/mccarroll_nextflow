@@ -1,4 +1,4 @@
-include {noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper} from '../../modules/local/workflowUtil.nf'
+include {noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
 include { buildReferenceMetadataLocator; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {FILTER_DGE} from '../../modules/local/filterDge.nf'
 include {MAKE_TRIPLET_DGE} from '../../modules/local/makeTripletDge.nf'
@@ -32,7 +32,7 @@ workflow standard_analysis_workflow {
         GATHER_DIGITAL_ALLELE_COUNTS(bams, noMetaChannelHelper(selectedCells).collect(), 
         params.donorFile, params.vcf, params.locusFunction, params.strandStrategy, loadNonAutosomes(referenceMetadataLocator.contigGroups))
         MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES(params.library, collectInOrder(GATHER_DIGITAL_ALLELE_COUNTS.out.digitalAlleleFrequencies))
-        digitalAlleleFrequencies = meta.combine(MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies).map { m, path -> tuple(m, path) }
+        digitalAlleleFrequencies = combineIntoTupleChannel(meta, MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies)
     } else {
         digitalAlleleFrequencies = channel.empty()
     }

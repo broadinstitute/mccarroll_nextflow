@@ -1,5 +1,5 @@
 include { parseCbrbYamlArgs; addSvmEstimatedParameters; loadSvmEstimatedParameters } from '../../modules/local/CbrbArgParser.nf'
-include {noMetaChannelHelper} from '../../modules/local/workflowUtil.nf'
+include {noMetaChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
 include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
@@ -36,8 +36,8 @@ workflow cbrb_workflow {
             params.forceTwoClusterSolution
         )
         parsedCbrbArgsChannel = SVM_ESTIMATE_CBRB_PARAMETERS.out.cbrbParameters.map{f -> addSvmEstimatedParameters(parsedCbrbArgs,loadSvmEstimatedParameters(f))}
-        svmCbrbParameters = meta.combine(SVM_ESTIMATE_CBRB_PARAMETERS.out.cbrbParameters).map { m, f -> tuple(m, f) }
-        svmCbrbParameterEstimationPdf = meta.combine(SVM_ESTIMATE_CBRB_PARAMETERS.out.cbrbParameterEstimationPdf).map { m, f -> tuple(m, f) }
+        svmCbrbParameters = combineIntoTupleChannel(meta, SVM_ESTIMATE_CBRB_PARAMETERS.out.cbrbParameters)
+        svmCbrbParameterEstimationPdf = combineIntoTupleChannel(meta, SVM_ESTIMATE_CBRB_PARAMETERS.out.cbrbParameterEstimationPdf)
     } else {
         parsedCbrbArgsChannel = channel.value(parsedCbrbArgs)
         svmCbrbParameters = []
