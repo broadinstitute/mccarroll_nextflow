@@ -30,6 +30,14 @@ def noMetaChannelHelper(channel) {
     return channel.map { _meta, file -> file }
 }
 
+// Take a channel of tuple(meta, file) and return a channel of just the meta.  Assumes file is not needed.
 def metaOnlyChannelHelper(channel) {
     return channel.map { meta, _file -> meta }
+}
+
+// Combines two channels (assumed to each contain a single item) into a channel of tuple(value1, value2)
+def combineIntoTupleChannel(channel1, channel2) {
+    return channel1.combine(channel2).map { v1, v2 ->
+        tuple(v1, v2)
+    }
 }
