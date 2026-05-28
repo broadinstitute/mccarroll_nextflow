@@ -333,6 +333,10 @@
     "metaGeneDgeFunctionalStrategy": {
       "type": "string",
       "enum": ["DROPSEQ", "STARSOLO"]
+    },
+    "cloudVcf": {
+      "type": "string",
+      "format": "file-path"
     }
   },
   "required": ["project", "library", "sampleType"]
