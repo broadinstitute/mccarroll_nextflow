@@ -8,7 +8,8 @@ include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE } from '../../modules/local/chi
 include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
 include { GATHER_DIGITAL_ALLELE_COUNTS } from '../../modules/local/gatherDigitalAlleleCounts.nf'
 include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
-
+include { ASSIGN_CELLS_TO_SAMPLES } from '../../modules/local/assignCellsToSamples.nf'
+include { withExtension } from '../../modules/local/FileUtil.nf'
 workflow standard_analysis_workflow {
     take:
     selectedCells
@@ -16,6 +17,7 @@ workflow standard_analysis_workflow {
     dgeSummary
     bams
     chimericTranscripts
+    cbrbCellFeatures
 
     main    :
     functionalStrategy = params.metaGeneDgeFunctionalStrategy ?: params.dgeFunctionalStrategy
@@ -29,10 +31,21 @@ workflow standard_analysis_workflow {
     DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES(selectedCells, noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect())
 
     if (params.vcf) {
+        nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
         GATHER_DIGITAL_ALLELE_COUNTS(bams, noMetaChannelHelper(selectedCells).collect(), 
-        params.donorFile, params.vcf, params.locusFunction, params.strandStrategy, loadNonAutosomes(referenceMetadataLocator.contigGroups))
+        params.donorFile, params.vcf, params.locusFunction, params.strandStrategy, nonAutosomes)
         MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES(params.library, collectInOrder(GATHER_DIGITAL_ALLELE_COUNTS.out.digitalAlleleFrequencies))
         digitalAlleleFrequencies = combineIntoTupleChannel(meta, MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies)
+        ASSIGN_CELLS_TO_SAMPLES(
+            bams, 
+            params.vcf, 
+            withExtension(params.vcf, 'idx'),
+            noMetaChannelHelper(selectedCells).collect(), 
+            noMetaChannelHelper(cbrbCellFeatures).collect(), 
+            MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
+            params.strandStrategy, functionalStrategy, params.cellBarcodeTag, params.molecularBarcodeTag, params.locusFunction, nonAutosomes
+        )
+
     } else {
         digitalAlleleFrequencies = channel.empty()
     }
