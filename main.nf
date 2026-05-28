@@ -167,7 +167,8 @@ workflow {
         cbrb_workflow.out.dge,
         align_locus_function_workflow.out.dgeSummary,
         align_locus_function_workflow.out.alignedBam,
-        align_locus_function_workflow.out.chimericTranscripts
+        align_locus_function_workflow.out.chimericTranscripts,
+        cbrb_workflow.out.cellFeatures
     )
 
    //
