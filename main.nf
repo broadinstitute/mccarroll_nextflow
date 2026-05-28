@@ -68,6 +68,7 @@ params {
     maxIntronicPerCell: Float
     // standard analysis parameters
     vcf: Path
+    cloudVcf: Path
     donorFile: Path
     donor: String
     assignCellsToSamplesOptions: List
@@ -229,6 +230,8 @@ workflow {
     molBc = standard_analysis_workflow.out.molBc
     umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
     digitalAlleleFrequencies = standard_analysis_workflow.out.digitalAlleleFrequencies
+    donorAssignments = standard_analysis_workflow.out.donorAssignments
+    doubletAssignments = standard_analysis_workflow.out.doubletAssignments
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -365,6 +368,12 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     digitalAlleleFrequencies {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorAssignments {
+        path {x -> standardAnalysisDir(x)}
+    }
+    doubletAssignments {
         path {x -> standardAnalysisDir(x)}
     }
 }

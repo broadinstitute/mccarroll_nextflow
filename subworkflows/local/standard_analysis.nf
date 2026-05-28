@@ -9,7 +9,10 @@ include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES } from '../../modules/local/downs
 include { GATHER_DIGITAL_ALLELE_COUNTS } from '../../modules/local/gatherDigitalAlleleCounts.nf'
 include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
 include { ASSIGN_CELLS_TO_SAMPLES } from '../../modules/local/assignCellsToSamples.nf'
+include { DETECT_DOUBLETS } from '../../modules/local/detectDoublets.nf'
 include { withExtension } from '../../modules/local/FileUtil.nf'
+include { MERGE_CELL_TO_SAMPLE_ASSIGNMENTS } from '../../modules/local/mergeCellToSampleAssignments.nf'
+include { MERGE_DOUBLET_ASSIGNMENTS } from '../../modules/local/mergeDoubletAssignments.nf'
 workflow standard_analysis_workflow {
     take:
     selectedCells
@@ -31,6 +34,7 @@ workflow standard_analysis_workflow {
     DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES(selectedCells, noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect())
 
     if (params.vcf) {
+        bcf = params.cloudVcf ?: params.vcf
         nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
         GATHER_DIGITAL_ALLELE_COUNTS(bams, noMetaChannelHelper(selectedCells).collect(), 
         params.donorFile, params.vcf, params.locusFunction, params.strandStrategy, nonAutosomes)
@@ -38,16 +42,31 @@ workflow standard_analysis_workflow {
         digitalAlleleFrequencies = combineIntoTupleChannel(meta, MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies)
         ASSIGN_CELLS_TO_SAMPLES(
             bams, 
-            params.vcf, 
-            withExtension(params.vcf, 'idx'),
+            bcf, 
+            withExtension(bcf, 'idx'),
             noMetaChannelHelper(selectedCells).collect(), 
             noMetaChannelHelper(cbrbCellFeatures).collect(), 
             MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
             params.strandStrategy, functionalStrategy, params.cellBarcodeTag, params.molecularBarcodeTag, params.locusFunction, nonAutosomes
         )
+        dd_channel = bams.join(ASSIGN_CELLS_TO_SAMPLES.out.vcf).join(ASSIGN_CELLS_TO_SAMPLES.out.vcfIndex).join(ASSIGN_CELLS_TO_SAMPLES.out.donorAssignments)
+        DETECT_DOUBLETS(
+            dd_channel, 
+            noMetaChannelHelper(selectedCells).collect(), 
+            params.donorFile, 
+            noMetaChannelHelper(cbrbCellFeatures).collect(), 
+            MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
+            params.strandStrategy, params.locusFunction, nonAutosomes
+        )
+        MERGE_CELL_TO_SAMPLE_ASSIGNMENTS(params.library, collectInOrder(ASSIGN_CELLS_TO_SAMPLES.out.donorAssignments))
+        donorAssignments = combineIntoTupleChannel(meta, MERGE_CELL_TO_SAMPLE_ASSIGNMENTS.out.donorAssignments)
+        MERGE_DOUBLET_ASSIGNMENTS(params.library, collectInOrder(DETECT_DOUBLETS.out.doublets))
+        doubletAssignments = combineIntoTupleChannel(meta, MERGE_DOUBLET_ASSIGNMENTS.out.doublets)
 
     } else {
         digitalAlleleFrequencies = channel.empty()
+        donorAssignments = channel.empty()
+        doubletAssignments = channel.empty()
     }
 
     emit:
@@ -60,4 +79,6 @@ workflow standard_analysis_workflow {
     molBc = CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc
     umiSaturationHistogram = DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES.out.umiSaturationHistogram
     digitalAlleleFrequencies = digitalAlleleFrequencies
+    donorAssignments = donorAssignments
+    doubletAssignments = doubletAssignments
 }
