@@ -169,7 +169,8 @@ workflow {
         align_locus_function_workflow.out.dgeSummary,
         align_locus_function_workflow.out.alignedBam,
         align_locus_function_workflow.out.chimericTranscripts,
-        cbrb_workflow.out.cellFeatures
+        cbrb_workflow.out.cellFeatures,
+        align_locus_function_workflow.out.readsPerCell
     )
 
    //
@@ -232,6 +233,12 @@ workflow {
     digitalAlleleFrequencies = standard_analysis_workflow.out.digitalAlleleFrequencies
     donorAssignments = standard_analysis_workflow.out.donorAssignments
     doubletAssignments = standard_analysis_workflow.out.doubletAssignments
+    donorList = standard_analysis_workflow.out.donorList
+    donorCellMap = standard_analysis_workflow.out.donorCellMap
+    donorAssignmentSummaryStats = standard_analysis_workflow.out.donorAssignmentSummaryStats    
+    donorAssignmentTearSheet = standard_analysis_workflow.out.donorAssignmentTearSheet
+    donorCellBarcodes = standard_analysis_workflow.out.donorCellBarcodes
+    donorAssignmentPdf = standard_analysis_workflow.out.donorAssignmentPdf
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -374,6 +381,24 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     doubletAssignments {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorList {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorCellMap {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorAssignmentSummaryStats {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorAssignmentTearSheet {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorCellBarcodes {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorAssignmentPdf {
         path {x -> standardAnalysisDir(x)}
     }
 }
