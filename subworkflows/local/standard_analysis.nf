@@ -14,6 +14,7 @@ include { withExtension } from '../../modules/local/FileUtil.nf'
 include { MERGE_CELL_TO_SAMPLE_ASSIGNMENTS } from '../../modules/local/mergeCellToSampleAssignments.nf'
 include { MERGE_DOUBLET_ASSIGNMENTS } from '../../modules/local/mergeDoubletAssignments.nf'
 include { DONOR_ASSIGNMENT_QC } from '../../modules/local/donorAssignmentQC.nf'
+include { CREATE_METACELLS } from '../../modules/local/createMetacells.nf'
 workflow standard_analysis_workflow {
     take:
     selectedCells
@@ -81,6 +82,9 @@ workflow standard_analysis_workflow {
         donorAssignmentPdf = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.pdf) 
         FILTER_DONOR_DGE(donorCellBarcodes.map{m, f -> tuple(m + [id: m.id + ".donors"], f)}, 
         noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(), noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
+        CREATE_METACELLS(donorAssignments.map{m, f -> tuple(m + [id: m.id + ".donors"], f)}, noMetaChannelHelper(FILTER_DONOR_DGE.out.filteredDge).collect())
+        donorMetacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
+        donorMetacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
 
     } else {
         digitalAlleleFrequencies = channel.empty()
@@ -108,4 +112,6 @@ workflow standard_analysis_workflow {
     donorAssignmentPdf = donorAssignmentPdf
     donorDge = FILTER_DONOR_DGE.out.filteredDge
     donorDgeSummary = FILTER_DONOR_DGE.out.filteredDgeSummary
+    donorMetacells = donorMetacells
+    donorMetacellMetrics = donorMetacellMetrics
 }
