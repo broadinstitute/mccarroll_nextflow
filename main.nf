@@ -239,6 +239,8 @@ workflow {
     donorAssignmentTearSheet = standard_analysis_workflow.out.donorAssignmentTearSheet
     donorCellBarcodes = standard_analysis_workflow.out.donorCellBarcodes
     donorAssignmentPdf = standard_analysis_workflow.out.donorAssignmentPdf
+    donorDge = standard_analysis_workflow.out.donorDge
+    donorDgeSummary = standard_analysis_workflow.out.donorDgeSummary
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -399,6 +401,12 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     donorAssignmentPdf {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorDge {
+        path {x -> standardAnalysisDir(x)}
+    }
+    donorDgeSummary {
         path {x -> standardAnalysisDir(x)}
     }
 }
