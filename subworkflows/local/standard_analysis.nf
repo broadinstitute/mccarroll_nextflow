@@ -1,6 +1,6 @@
 include {noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
 include { buildReferenceMetadataLocator; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
-include {FILTER_DGE} from '../../modules/local/filterDge.nf'
+include {FILTER_DGE; FILTER_DGE as FILTER_DONOR_DGE} from '../../modules/local/filterDge.nf'
 include {MAKE_TRIPLET_DGE} from '../../modules/local/makeTripletDge.nf'
 include { GATHER_UMI_READ_INTERVALS } from '../../modules/local/gatherUmiReadIntervals.nf'
 include { MERGE_UMI_READ_INTERVALS } from '../../modules/local/mergeUMIReadIntervals.nf'
@@ -26,7 +26,7 @@ workflow standard_analysis_workflow {
 
     main    :
     functionalStrategy = params.metaGeneDgeFunctionalStrategy ?: params.dgeFunctionalStrategy
-    FILTER_DGE(selectedCells, noMetaChannelHelper(dgeMatrix), noMetaChannelHelper(dgeSummary))
+    FILTER_DGE(selectedCells.map{m, f -> tuple(m + [id: m.id + ".selected"], f)}, noMetaChannelHelper(dgeMatrix), noMetaChannelHelper(dgeSummary))
     referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     MAKE_TRIPLET_DGE(FILTER_DGE.out.filteredDge, referenceMetadataLocator.reducedGtf)
     GATHER_UMI_READ_INTERVALS(bams, noMetaChannelHelper(selectedCells).collect(), params.locusFunction, params.strandStrategy, functionalStrategy)
@@ -79,6 +79,9 @@ workflow standard_analysis_workflow {
         donorAssignmentTearSheet = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.tearSheetPdf)
         donorCellBarcodes = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.cellBarcodes) 
         donorAssignmentPdf = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.pdf) 
+        FILTER_DONOR_DGE(donorCellBarcodes.map{m, f -> tuple(m + [id: m.id + ".donors"], f)}, 
+        noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(), noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
+
     } else {
         digitalAlleleFrequencies = channel.empty()
         donorAssignments = channel.empty()
@@ -103,4 +106,6 @@ workflow standard_analysis_workflow {
     donorAssignmentTearSheet = donorAssignmentTearSheet
     donorCellBarcodes = donorCellBarcodes
     donorAssignmentPdf = donorAssignmentPdf
+    donorDge = FILTER_DONOR_DGE.out.filteredDge
+    donorDgeSummary = FILTER_DONOR_DGE.out.filteredDgeSummary
 }

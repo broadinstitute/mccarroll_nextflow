@@ -14,8 +14,8 @@ process FILTER_DGE {
 
 
     script:
-    output_file = "${meta.id}.selected.digital_expression.txt.gz"
-    output_summary = "${meta.id}.selected.digital_expression_summary.txt"
+    output_file = "${meta.id}.digital_expression.txt.gz"
+    output_summary = "${meta.id}.digital_expression_summary.txt"
     """
     FilterDge \
         --INPUT ${dgeMatrix} \
