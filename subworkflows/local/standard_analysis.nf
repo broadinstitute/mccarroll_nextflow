@@ -13,6 +13,7 @@ include { DETECT_DOUBLETS } from '../../modules/local/detectDoublets.nf'
 include { withExtension } from '../../modules/local/FileUtil.nf'
 include { MERGE_CELL_TO_SAMPLE_ASSIGNMENTS } from '../../modules/local/mergeCellToSampleAssignments.nf'
 include { MERGE_DOUBLET_ASSIGNMENTS } from '../../modules/local/mergeDoubletAssignments.nf'
+include { DONOR_ASSIGNMENT_QC } from '../../modules/local/donorAssignmentQC.nf'
 workflow standard_analysis_workflow {
     take:
     selectedCells
@@ -21,6 +22,7 @@ workflow standard_analysis_workflow {
     bams
     chimericTranscripts
     cbrbCellFeatures
+    readsPerCell
 
     main    :
     functionalStrategy = params.metaGeneDgeFunctionalStrategy ?: params.dgeFunctionalStrategy
@@ -62,7 +64,21 @@ workflow standard_analysis_workflow {
         donorAssignments = combineIntoTupleChannel(meta, MERGE_CELL_TO_SAMPLE_ASSIGNMENTS.out.donorAssignments)
         MERGE_DOUBLET_ASSIGNMENTS(params.library, collectInOrder(DETECT_DOUBLETS.out.doublets))
         doubletAssignments = combineIntoTupleChannel(meta, MERGE_DOUBLET_ASSIGNMENTS.out.doublets)
-
+        DONOR_ASSIGNMENT_QC(
+            params.library, 
+            MERGE_CELL_TO_SAMPLE_ASSIGNMENTS.out.donorAssignments.collect(),
+            MERGE_DOUBLET_ASSIGNMENTS.out.doublets.collect(),
+            noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(), 
+            noMetaChannelHelper(dgeSummary).collect(), 
+            noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(), 
+            readsPerCell.collect(),
+            params.donorFile)
+        donorList = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.donorList)
+        donorCellMap = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.donorCellMap)
+        donorAssignmentSummaryStats = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.summaryStats)
+        donorAssignmentTearSheet = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.tearSheetPdf)
+        donorCellBarcodes = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.cellBarcodes) 
+        donorAssignmentPdf = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.pdf) 
     } else {
         digitalAlleleFrequencies = channel.empty()
         donorAssignments = channel.empty()
@@ -81,4 +97,10 @@ workflow standard_analysis_workflow {
     digitalAlleleFrequencies = digitalAlleleFrequencies
     donorAssignments = donorAssignments
     doubletAssignments = doubletAssignments
+    donorList = donorList
+    donorCellMap = donorCellMap
+    donorAssignmentSummaryStats = donorAssignmentSummaryStats
+    donorAssignmentTearSheet = donorAssignmentTearSheet
+    donorCellBarcodes = donorCellBarcodes
+    donorAssignmentPdf = donorAssignmentPdf
 }

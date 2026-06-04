@@ -240,4 +240,5 @@ workflow align_locus_function_workflow {
     sparseDgeFeatures = sparseDgeFeatures
     sparseDgeBarcodes = sparseDgeBarcodes
     cellFeatures = cellFeatures
+    readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out
 }
