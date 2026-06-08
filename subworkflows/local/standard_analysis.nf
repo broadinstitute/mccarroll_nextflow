@@ -82,14 +82,31 @@ workflow standard_analysis_workflow {
         donorAssignmentPdf = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.pdf) 
         FILTER_DONOR_DGE(donorCellBarcodes.map{m, f -> tuple(m + [id: m.id + ".donors"], f)}, 
         noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(), noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
-        CREATE_METACELLS(donorAssignments.map{m, f -> tuple(m + [id: m.id + ".donors"], f)}, noMetaChannelHelper(FILTER_DONOR_DGE.out.filteredDge).collect())
-        donorMetacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
-        donorMetacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
+        CREATE_METACELLS(donorAssignments.map{m, f -> tuple(m + [id: m.id + ".donors"], f, [])}, 
+                noMetaChannelHelper(FILTER_DONOR_DGE.out.filteredDge).collect())
+        metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
+        metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
 
+        donorDge = FILTER_DONOR_DGE.out.filteredDge
+        donorDgeSummary = FILTER_DONOR_DGE.out.filteredDgeSummary
     } else {
         digitalAlleleFrequencies = channel.empty()
         donorAssignments = channel.empty()
         doubletAssignments = channel.empty()
+        donorList = channel.empty()
+        donorCellMap = channel.empty()
+        donorAssignmentSummaryStats = channel.empty()
+        donorAssignmentTearSheet = channel.empty()
+        donorCellBarcodes = channel.empty()
+        donorAssignmentPdf = channel.empty()
+        donorDge = channel.empty()
+        donorDgeSummary = channel.empty()
+        if (params.donor) {
+           CREATE_METACELLS(meta.map { m -> tuple(m, [], params.donor) }, 
+                noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect())
+            metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
+            metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
+        }
     }
 
     emit:
@@ -110,8 +127,8 @@ workflow standard_analysis_workflow {
     donorAssignmentTearSheet = donorAssignmentTearSheet
     donorCellBarcodes = donorCellBarcodes
     donorAssignmentPdf = donorAssignmentPdf
-    donorDge = FILTER_DONOR_DGE.out.filteredDge
-    donorDgeSummary = FILTER_DONOR_DGE.out.filteredDgeSummary
-    donorMetacells = donorMetacells
-    donorMetacellMetrics = donorMetacellMetrics
+    donorDge = donorDge
+    donorDgeSummary = donorDgeSummary
+    metacells = metacells
+    metacellMetrics = metacellMetrics
 }
