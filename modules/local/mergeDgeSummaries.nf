@@ -5,6 +5,7 @@ process MERGE_DGE_SUMMARIES {
     input:
     val library
     path dgeSummaries
+    val otherArgs
 
     output:
     path "${output_file}"
@@ -14,6 +15,7 @@ process MERGE_DGE_SUMMARIES {
     """
     MergeDgeSummaries \
         --INPUT ${dgeSummaries.join(' --INPUT ')} \
-        --OUTPUT ${output_file}
+        --OUTPUT ${output_file} \
+        ${otherArgs ?: ''}
     """
 }

@@ -155,11 +155,11 @@ workflow align_locus_function_workflow {
         params.locusFunction,
         params.library,
         params.strandStrategy,
-        params.minimumTranscriptsPerCell,
         params.dgeMinReadMq,
         params.dgeFunctionalStrategy,
         params.cellBarcodeTag,
-        params.molecularBarcodeTag
+        params.molecularBarcodeTag,
+        false // doMetaGenes
     )
     SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR(
         alignedBams.join(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells),
@@ -181,7 +181,8 @@ workflow align_locus_function_workflow {
     )
     MERGE_DGE_SUMMARIES(
         params.library,
-        collectInOrder(DIGITAL_EXPRESSION.out.dge_summary)
+        collectInOrder(DIGITAL_EXPRESSION.out.dge_summary),
+        ""
     )
     MERGE_SPLIT_DGES(
         params.library,

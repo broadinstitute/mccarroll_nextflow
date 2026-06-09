@@ -425,6 +425,11 @@ workflow {
     donorDgeSummary = standard_analysis_workflow.out.donorDgeSummary
     metacells = standard_analysis_workflow.out.metacells
     metacellMetrics = standard_analysis_workflow.out.metacellMetrics
+    metageneReport = standard_analysis_workflow.out.metageneReport
+    metageneDge = standard_analysis_workflow.out.metageneDge
+    metageneDgeSummary = standard_analysis_workflow.out.metageneDgeSummary
+    gmgDge = standard_analysis_workflow.out.gmgDge
+    gmgDgeSummary = standard_analysis_workflow.out.gmgDgeSummary
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     json_report = null //NEXTFLOW.out.json_report
@@ -603,6 +608,21 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     metacellMetrics {
+        path {x -> standardAnalysisDir(x)}
+    }
+    metageneReport {
+        path {x -> standardAnalysisDir(x)}
+    }
+    metageneDge {
+        path {x -> standardAnalysisDir(x)}
+    }
+    metageneDgeSummary {
+        path {x -> standardAnalysisDir(x)}
+    }
+    gmgDge {
+        path {x -> standardAnalysisDir(x)}
+    }
+    gmgDgeSummary {
         path {x -> standardAnalysisDir(x)}
     }
 }
