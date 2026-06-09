@@ -43,8 +43,8 @@ workflow cbrb_workflow {
     // TODO: does it have to be this hard?
     cbrbArgsMeta = parsedCbrbArgsChannel.map { p -> [cbrb_args: p.argList]}
     metaWithArgs = meta.combine(cbrbArgsMeta).map { m, a -> m + a }
-    cbrbChannel = metaWithArgs.combine(sparseDgeMatrixNoMeta).combine(sparseDgeFeaturesNoMeta).combine(sparseDgeBarcodesNoMeta).map { 
-        m, mat, feat, barc -> tuple(m, [mat, feat, barc]) 
+    cbrbChannel = metaWithArgs.combine(sparseDgeMatrixNoMeta).map { 
+        m, mat -> tuple(m, [mat.parent]) 
         }
     CELLBENDER_REMOVEBACKGROUND(cbrbChannel)
     HDF5_10X_TO_TEXT(CELLBENDER_REMOVEBACKGROUND.out.h5, noMetaChannelHelper(denseDgeMatrix), noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.log))
