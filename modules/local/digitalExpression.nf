@@ -10,11 +10,11 @@ process DIGITAL_EXPRESSION {
     val locusFunction
     val library
     val strandStrategy
-    val minimumTranscriptsPerCell
     val readQuality
     val functionalStrategy
     val cellBarcodeTag
     val molecularBarcodeTag
+    val doMetaGenes
 
     output:
     tuple val(meta), path("${output_file}"), emit: dge
@@ -24,7 +24,11 @@ process DIGITAL_EXPRESSION {
     output_file = "${meta.id}.digital_expression.txt.gz"
     summary_file = "${meta.id}.digital_expression_summary.txt"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
-
+    if (doMetaGenes) {
+        metagene_args = "--GENE_NAME_TAG mn --GENE_STRAND_TAG ms --GENE_FUNCTION_TAG mf"
+    } else {
+        metagene_args = ""
+    }
     """
     DigitalExpression \
         --INPUT ${inputBam} \
@@ -34,12 +38,13 @@ process DIGITAL_EXPRESSION {
         --MIN_BC_READ_THRESHOLD 0 \
         --CELL_BC_FILE ${selectedCells} \
         --OUTPUT_HEADER true \
-        --OMIT_MISSING_CELLS false \
+        --OMIT_MISSING_CELLS true \
         --FUNCTIONAL_STRATEGY ${functionalStrategy} \
         --UEI ${library} \
         --CELL_BARCODE_TAG ${cellBarcodeTag} \
         --MOLECULAR_BARCODE_TAG ${molecularBarcodeTag} \
         --STRAND_STRATEGY ${strandStrategy} \
-        ${locusFunctionArgs}
+        ${locusFunctionArgs} \
+        ${metagene_args}
     """
 }

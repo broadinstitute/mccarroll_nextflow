@@ -15,6 +15,14 @@ include { MERGE_CELL_TO_SAMPLE_ASSIGNMENTS } from '../../modules/local/mergeCell
 include { MERGE_DOUBLET_ASSIGNMENTS } from '../../modules/local/mergeDoubletAssignments.nf'
 include { DONOR_ASSIGNMENT_QC } from '../../modules/local/donorAssignmentQC.nf'
 include { CREATE_METACELLS } from '../../modules/local/createMetacells.nf'
+include { DISCOVER_META_GENES } from '../../modules/local/discoverMetaGenes.nf'
+include { MERGE_META_GENE_REPORTS } from '../../modules/local/mergeMetaGeneReports.nf'
+include { CREATE_META_GENE_BAM } from '../../modules/local/createMetaGeneBam.nf'
+include { DIGITAL_EXPRESSION } from '../../modules/local/digitalExpression.nf'
+include { MERGE_SPLIT_DGES } from '../../modules/local/mergeSplitDges.nf'
+include { MERGE_DGE_SUMMARIES; MERGE_DGE_SUMMARIES as MERGE_GMG_DGE_SUMMARIES } from '../../modules/local/mergeDgeSummaries.nf'
+include { MERGE_DGE} from '../../modules/local/mergeDge.nf'
+
 workflow standard_analysis_workflow {
     take:
     selectedCells
@@ -30,16 +38,58 @@ workflow standard_analysis_workflow {
     FILTER_DGE(selectedCells.map{m, f -> tuple(m + [id: m.id + ".selected"], f)}, noMetaChannelHelper(dgeMatrix), noMetaChannelHelper(dgeSummary))
     referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     MAKE_TRIPLET_DGE(FILTER_DGE.out.filteredDge, referenceMetadataLocator.reducedGtf)
-    GATHER_UMI_READ_INTERVALS(bams, noMetaChannelHelper(selectedCells).collect(), params.locusFunction, params.strandStrategy, functionalStrategy)
+    noChannelSelectedCells = noMetaChannelHelper(selectedCells).collect()
+    GATHER_UMI_READ_INTERVALS(bams, noChannelSelectedCells, params.locusFunction, params.strandStrategy, functionalStrategy)
     meta = metaOnlyChannelHelper(selectedCells)
     MERGE_UMI_READ_INTERVALS(meta, collectInOrder(GATHER_UMI_READ_INTERVALS.out.umiReadIntervals))
     CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE(selectedCells, noMetaChannelHelper(chimericTranscripts).collect())
     DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES(selectedCells, noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect())
+    DISCOVER_META_GENES(
+        bams, 
+        noChannelSelectedCells,
+        params.locusFunction, 
+        functionalStrategy
+    )
+    MERGE_META_GENE_REPORTS(params.library, collectInOrder(DISCOVER_META_GENES.out.metaGeneReport))
+    CREATE_META_GENE_BAM(
+        bams, 
+        noChannelSelectedCells, 
+        MERGE_META_GENE_REPORTS.out.metaGeneReport.collect(), 
+        params.locusFunction, 
+        functionalStrategy
+    )
+    metagene_infix = ".metagene"
+    // Run DigitalExpression on all the metagene BAMs, but append ".metagene" to meta.id
+    DIGITAL_EXPRESSION(
+        CREATE_META_GENE_BAM.out.bam.map{m, f -> tuple(m + [id: m.id + metagene_infix], f)}.combine(noMetaChannelHelper(selectedCells)), 
+        params.locusFunction, 
+        params.library,
+        params.strandStrategy, 
+        0,
+        functionalStrategy,
+        params.cellBarcodeTag,
+        params.molecularBarcodeTag,
+        true // doMetaGenes
+    )
+    MERGE_SPLIT_DGES(params.library + metagene_infix, collectInOrder(DIGITAL_EXPRESSION.out.dge)) 
+    MERGE_DGE_SUMMARIES(params.library + metagene_infix, collectInOrder(DIGITAL_EXPRESSION.out.dge_summary), "")
+    metageneReport = combineIntoTupleChannel(meta, MERGE_META_GENE_REPORTS.out.metaGeneReport)
+    metageneDge = combineIntoTupleChannel(meta, MERGE_SPLIT_DGES.out.dge)
+    metageneDgeSummary = combineIntoTupleChannel(meta, MERGE_DGE_SUMMARIES.out)
+
+    gmg_infix = ".gmg"
+    MERGE_DGE(params.library + gmg_infix, noMetaChannelHelper(FILTER_DGE.out.filteredDge).combine(MERGE_SPLIT_DGES.out.dge).map{f1, f2 -> [f1, f2]})
+
+    MERGE_GMG_DGE_SUMMARIES(params.library + gmg_infix, 
+    noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).combine(MERGE_DGE_SUMMARIES.out).map{f1, f2 -> [f1, f2]},
+    "--ACCUMULATE_CELL_BARCODE_METRICS true")
+    gmgDge = combineIntoTupleChannel(meta, MERGE_DGE.out.dge)
+    gmgDgeSummary = combineIntoTupleChannel(meta, MERGE_GMG_DGE_SUMMARIES.out)
 
     if (params.vcf) {
         bcf = params.cloudVcf ?: params.vcf
         nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
-        GATHER_DIGITAL_ALLELE_COUNTS(bams, noMetaChannelHelper(selectedCells).collect(), 
+        GATHER_DIGITAL_ALLELE_COUNTS(bams, noChannelSelectedCells, 
         params.donorFile, params.vcf, params.locusFunction, params.strandStrategy, nonAutosomes)
         MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES(params.library, collectInOrder(GATHER_DIGITAL_ALLELE_COUNTS.out.digitalAlleleFrequencies))
         digitalAlleleFrequencies = combineIntoTupleChannel(meta, MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies)
@@ -47,7 +97,7 @@ workflow standard_analysis_workflow {
             bams, 
             bcf, 
             withExtension(bcf, 'idx'),
-            noMetaChannelHelper(selectedCells).collect(), 
+            noChannelSelectedCells, 
             noMetaChannelHelper(cbrbCellFeatures).collect(), 
             MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
             params.strandStrategy, functionalStrategy, params.cellBarcodeTag, params.molecularBarcodeTag, params.locusFunction, nonAutosomes
@@ -55,7 +105,7 @@ workflow standard_analysis_workflow {
         dd_channel = bams.join(ASSIGN_CELLS_TO_SAMPLES.out.vcf).join(ASSIGN_CELLS_TO_SAMPLES.out.vcfIndex).join(ASSIGN_CELLS_TO_SAMPLES.out.donorAssignments)
         DETECT_DOUBLETS(
             dd_channel, 
-            noMetaChannelHelper(selectedCells).collect(), 
+            noChannelSelectedCells, 
             params.donorFile, 
             noMetaChannelHelper(cbrbCellFeatures).collect(), 
             MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
@@ -106,6 +156,9 @@ workflow standard_analysis_workflow {
                 noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect())
             metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
             metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
+        } else {
+            metacells = channel.empty()
+            metacellMetrics = channel.empty()
         }
     }
 
@@ -131,4 +184,9 @@ workflow standard_analysis_workflow {
     donorDgeSummary = donorDgeSummary
     metacells = metacells
     metacellMetrics = metacellMetrics
+    metageneReport = metageneReport
+    metageneDge = metageneDge
+    metageneDgeSummary = metageneDgeSummary
+    gmgDge = gmgDge
+    gmgDgeSummary = gmgDgeSummary
 }
