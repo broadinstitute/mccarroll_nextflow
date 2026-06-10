@@ -4,7 +4,6 @@ process DETECT_DOUBLETS {
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
         tuple val(meta), path(inputBam), path(vcf), path(vcfIndex), path(donorAssignments)
