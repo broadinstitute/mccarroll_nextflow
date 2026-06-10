@@ -19,6 +19,8 @@ include { align_locus_function_workflow } from './subworkflows/local/align_locus
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
 include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
 include { standard_analysis_workflow } from './subworkflows/local/standard_analysis.nf'
+include { buildReferenceMetadataLocator } from './modules/local/ReferenceMetadataLocator.nf'
+include { buildRestartInputPaths; makeCellSelectionLabel; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 
@@ -42,6 +44,67 @@ def standardAnalysisDir(tuple) {
     // Since there should be no user choices for standard analysis, outputs could just go into cell_selection
     // directory, but put them in a subdir to reduce clutter.
     return cellSelectionDir(tuple) + "standard_analysis/"
+}
+
+def alignmentDirFromParams() {
+    return buildReferenceMetadataLocator(params.reference).referenceName + "/"
+}
+
+def validateDemultiplexingParams() {
+    if (params.vcf && !params.donorFile) {
+        log.error "If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings."
+        exit 1
+    }
+    if (!params.vcf && params.donorFile) {
+        log.error "If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes."
+        exit 1
+    }
+    if (params.donorFile && params.donor) {
+        log.error "It does not make sense to provide both a donor file and a donor."
+        exit 1
+    }
+}
+
+def validateStartAtParam() {
+    def validStages = validStartAtStages()
+
+    if (!validStages.contains(params.start_at)) {
+        log.error "--start_at must be one of: ${validStages.join(', ')}"
+        exit 1
+    }
+}
+
+def validStartAtStages() {
+    ['beginning', 'cell_selection', 'standard_analysis']
+}
+
+def stageRank(String stageName) {
+    validStartAtStages().indexOf(stageName)
+}
+
+// A stage should run when execution starts at that stage or any earlier stage.
+def shouldRunStage(String startAt, String stageName) {
+    stageRank(startAt) <= stageRank(stageName)
+}
+
+def restartTupleChannel(pathPattern, meta) {
+    channel.fromPath(pathPattern.toString(), checkIfExists: true)
+        .map { inputFile -> tuple(meta, inputFile) }
+}
+
+def restartPathChannel(pathPattern) {
+    channel.fromPath(pathPattern.toString(), checkIfExists: true)
+}
+
+def restartAlignedBamChannel(pathPattern, boolean doBQSR, String referenceName) {
+    channel.fromPath(pathPattern.toString(), checkIfExists: true)
+        .map { bam ->
+            def bamBase = doBQSR ?
+                bam.getName().replaceFirst(/\.bam$/, '') :
+                bam.getName().replaceFirst(/\.chimeric_marked\.bam$/, '')
+            def collectIndex = bamBase.replaceFirst(/.*\./, '') as Integer
+            tuple([id: bamBase, bamBase: bamBase, collectIndex: collectIndex, referenceName: referenceName], bam)
+        }
 }
 
 params {
@@ -75,6 +138,7 @@ params {
     detectDoubletsOptions: List
     computeCBRBAdjustedLikelihoods: Boolean
     metaGeneDgeFunctionalStrategy: String
+    start_at: String
 
     // defaults
     cellBarcodeTag: String
@@ -120,58 +184,187 @@ workflow {
         params.show_hidden
     )
 
-    if (params.vcf && !params.donorFile) {
-        log.error "If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings."
-        exit 1
-    }
-    if (!params.vcf && params.donorFile) {
-        log.error "If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes."
-        exit 1
-    }
-    if (params.donorFile && params.donor) {
-        log.error "It does not make sense to provide both a donor file and a donor."
-        exit 1
-    }
+    validateDemultiplexingParams()
+    validateStartAtParam()
+
+    def startAt = params.start_at
+    def referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
+    def referenceName = referenceMetadataLocator.referenceName
+    def cbrbLabel = makeCbrbLabel(params)
+    def cellSelectionLabel = makeCellSelectionLabel(params)
+    def doBQSR = referenceMetadataLocator.dbSnp.exists()
+    def finalMeta = [id: params.library, library: params.library, referenceName: referenceName]
+    def cbrbMeta = finalMeta + [cbrb_label: cbrbLabel]
+    def selectedCellsMeta = cbrbMeta + [cell_selection_label: cellSelectionLabel]
+    def restartInputs = startAt == 'beginning' ? null : buildRestartInputPaths(
+        params.outdir,
+        referenceName,
+        params.library,
+        cbrbLabel,
+        cellSelectionLabel,
+        doBQSR
+    )
+
+    unmappedBam = channel.empty()
+    splitBamManifest = channel.empty()
+    alignedBam = channel.empty()
+    alignedBai = channel.empty()
+    sizeSelectedCells = channel.empty()
+    sizeSelectedCellsMetrics = channel.empty()
+    dgeSummary = channel.empty()
+    chimericTranscripts = channel.empty()
+    readsPerCell = channel.empty()
+    singleCellRnaSeqMetrics = channel.empty()
+    dge = channel.empty()
+    sparseDgeMatrix = channel.empty()
+    sparseDgeFeatures = channel.empty()
+    sparseDgeBarcodes = channel.empty()
+    cellFeatures = channel.empty()
+    cbrbH5 = channel.empty()
+    cbrbBarcodes = channel.empty()
+    cbrbMetrics = channel.empty()
+    cbrbReport = channel.empty()
+    cbrbPdf = channel.empty()
+    cbrbLog = channel.empty()
+    cbrbCheckpoint = channel.empty()
+    svmCbrbParameters = channel.empty()
+    svmCbrbParameterEstimationPdf = channel.empty()
+    cbrbDge = channel.empty()
+    cbrbNumTranscripts = channel.empty()
+    cbrbCellFeatures = channel.empty()
+    selectedCellBarcodes = channel.empty()
+    ambientCellBarcodes = channel.empty()
+    cellSelectionAssignmentsPdf = channel.empty()
+    cellSelectionAssignmentsSummary = channel.empty()
+    droppedNonEmpty = channel.empty()
 
     //
     // WORKFLOW: Run main workflow
     //
-     tag_and_split_bam_workflow(
-        params.fastq_read1,
-        params.fastq_read2,
-        params.rawBam,
-        params.library,
-        params.beadStructure,
-        params.allowedBarcodes
-    )
-    align_locus_function_workflow(
+    if (startAt == 'beginning') {
+        tag_and_split_bam_workflow(
+            params.fastq_read1,
+            params.fastq_read2,
+            params.rawBam,
+            params.library,
+            params.beadStructure,
+            params.allowedBarcodes
+        )
+        align_locus_function_workflow(
             tag_and_split_bam_workflow.out.splitBams,
             params.beadStructure
-    )
-    cbrb_workflow(
-        align_locus_function_workflow.out.sparseDgeMatrix,
-        align_locus_function_workflow.out.sparseDgeFeatures,
-        align_locus_function_workflow.out.sparseDgeBarcodes,
-        align_locus_function_workflow.out.cellFeatures,
-        align_locus_function_workflow.out.dge
-    )
-    cell_selection_workflow(
-        align_locus_function_workflow.out.sparseDgeMatrix,
-        align_locus_function_workflow.out.sparseDgeFeatures,
-        align_locus_function_workflow.out.sparseDgeBarcodes,
-        align_locus_function_workflow.out.cellFeatures,
-        cbrb_workflow.out.barcodes,
-        cbrb_workflow.out.numTranscripts
-    )
-    standard_analysis_workflow(
-        cell_selection_workflow.out.selectedCellBarcodes,
-        cbrb_workflow.out.dge,
-        align_locus_function_workflow.out.dgeSummary,
-        align_locus_function_workflow.out.alignedBam,
-        align_locus_function_workflow.out.chimericTranscripts,
-        cbrb_workflow.out.cellFeatures,
-        align_locus_function_workflow.out.readsPerCell
-    )
+        )
+        cbrb_workflow(
+            align_locus_function_workflow.out.sparseDgeMatrix,
+            align_locus_function_workflow.out.sparseDgeFeatures,
+            align_locus_function_workflow.out.sparseDgeBarcodes,
+            align_locus_function_workflow.out.cellFeatures,
+            align_locus_function_workflow.out.dge
+        )
+
+        unmappedBam = tag_and_split_bam_workflow.out.splitBams
+        splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
+        alignedBam = align_locus_function_workflow.out.alignedBam
+        alignedBai = align_locus_function_workflow.out.alignedBai
+        sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
+        sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
+        dgeSummary = align_locus_function_workflow.out.dgeSummary
+        chimericTranscripts = align_locus_function_workflow.out.chimericTranscripts
+        readsPerCell = align_locus_function_workflow.out.readsPerCell
+        singleCellRnaSeqMetrics = align_locus_function_workflow.out.singleCellRnaSeqMetrics
+        dge = align_locus_function_workflow.out.dge
+        sparseDgeMatrix = align_locus_function_workflow.out.sparseDgeMatrix
+        sparseDgeFeatures = align_locus_function_workflow.out.sparseDgeFeatures
+        sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
+        cellFeatures = align_locus_function_workflow.out.cellFeatures
+
+        cbrbH5 = cbrb_workflow.out.h5
+        cbrbBarcodes = cbrb_workflow.out.barcodes
+        cbrbMetrics = cbrb_workflow.out.metrics
+        cbrbReport = cbrb_workflow.out.report
+        cbrbPdf = cbrb_workflow.out.pdf
+        cbrbLog = cbrb_workflow.out.cbrbLog
+        cbrbCheckpoint = cbrb_workflow.out.checkpoint
+        svmCbrbParameters = cbrb_workflow.out.svmCbrbParameters
+        svmCbrbParameterEstimationPdf = cbrb_workflow.out.svmCbrbParameterEstimationPdf
+        cbrbDge = cbrb_workflow.out.dge
+        cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
+        cbrbCellFeatures = cbrb_workflow.out.cellFeatures
+
+    }
+
+    // Stage boundary: prepare cell-selection inputs.
+    // Input source is either the canonical upstream channels or reconstructed files.
+    if (shouldRunStage(startAt, 'cell_selection')) {
+        if (startAt != 'cell_selection') {
+            // Input: canonical channels already assigned by upstream stages.
+            // Emits: the canonical cell-selection boundary channels.
+        } else {
+            sparseDgeMatrix = restartTupleChannel(restartInputs.sparseDgeMatrix, finalMeta)
+            sparseDgeFeatures = restartTupleChannel(restartInputs.sparseDgeFeatures, finalMeta)
+            sparseDgeBarcodes = restartTupleChannel(restartInputs.sparseDgeBarcodes, finalMeta)
+            cellFeatures = restartTupleChannel(restartInputs.cellFeatures, finalMeta)
+            cbrbBarcodes = restartTupleChannel(restartInputs.cbrbBarcodes, cbrbMeta)
+            cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
+            cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
+            cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
+            dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
+            chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
+            readsPerCell = restartPathChannel(restartInputs.readsPerCell)
+            alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
+        }
+    }
+
+    // Stage execution: run cell selection as soon as its inputs are wired.
+    if (shouldRunStage(startAt, 'cell_selection')) {
+        cell_selection_workflow(
+            sparseDgeMatrix,
+            sparseDgeFeatures,
+            sparseDgeBarcodes,
+            cellFeatures,
+            cbrbBarcodes,
+            cbrbNumTranscripts
+        )
+
+        selectedCellBarcodes = cell_selection_workflow.out.selectedCellBarcodes
+        ambientCellBarcodes = cell_selection_workflow.out.ambientCellBarcodes
+        cellSelectionAssignmentsPdf = cell_selection_workflow.out.cellSelectionAssignmentsPdf
+        cellSelectionAssignmentsSummary = cell_selection_workflow.out.cellSelectionAssignmentsSummary
+        droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
+
+        // The standard-analysis handoff stays on the canonical channels already assigned above.
+    }
+
+    // Stage boundary: prepare standard-analysis inputs.
+    // Input source is either the canonical handoff channels or reconstructed files.
+    if (shouldRunStage(startAt, 'standard_analysis')) {
+        if (startAt != 'standard_analysis') {
+            // Input: canonical handoff channels from the previous stage.
+            // Emits: the canonical standard-analysis boundary channels.
+        } else {
+            selectedCellBarcodes = restartTupleChannel(restartInputs.selectedCellBarcodes, selectedCellsMeta)
+            cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
+            cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
+            dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
+            chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
+            readsPerCell = restartPathChannel(restartInputs.readsPerCell)
+            alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
+        }
+    }
+
+    // Input: either post-cell-selection handoff channels or reconstructed restart files at the standard-analysis boundary.
+    // Emits: standard-analysis outputs and remains the single linear continuation point for later stages.
+    if (shouldRunStage(startAt, 'standard_analysis')) {
+        standard_analysis_workflow(
+            selectedCellBarcodes,
+            cbrbDge,
+            dgeSummary,
+            alignedBam,
+            chimericTranscripts,
+            cbrbCellFeatures,
+            readsPerCell
+        )
+    }
 
    //
     // SUBWORKFLOW: Run completion tasks
@@ -185,41 +378,40 @@ workflow {
     )
 
     publish:
-    unmappedBam = tag_and_split_bam_workflow.out.splitBams
-    splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
-    alignedBam = align_locus_function_workflow.out.alignedBam
-    alignedBai = align_locus_function_workflow.out.alignedBai
-    sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
-    sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
-    dgeSummary = align_locus_function_workflow.out.dgeSummary
-    singleCellRnaSeqMetrics = align_locus_function_workflow.out.singleCellRnaSeqMetrics
-    // 20-transcript DGE
-    dge = align_locus_function_workflow.out.dge
-    sparseDgeMatrix = align_locus_function_workflow.out.sparseDgeMatrix
-    sparseDgeFeatures = align_locus_function_workflow.out.sparseDgeFeatures
-    sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
-    cellFeatures = align_locus_function_workflow.out.cellFeatures
+    unmappedBam = unmappedBam
+    splitBamManifest = splitBamManifest
+    alignedBam = alignedBam
+    alignedBai = alignedBai
+    sizeSelectedCells = sizeSelectedCells
+    sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
+    dgeSummary = dgeSummary
+    chimericTranscripts = chimericTranscripts
+    readsPerCell = readsPerCell
+    singleCellRnaSeqMetrics = singleCellRnaSeqMetrics
+    dge = dge
+    sparseDgeMatrix = sparseDgeMatrix
+    sparseDgeFeatures = sparseDgeFeatures
+    sparseDgeBarcodes = sparseDgeBarcodes
+    cellFeatures = cellFeatures
 
-    // CBRB outputs that we care about
-    cbrbH5 = cbrb_workflow.out.h5
-    cbrbBarcodes = cbrb_workflow.out.barcodes
-    cbrbMetrics = cbrb_workflow.out.metrics
-    cbrbReport = cbrb_workflow.out.report
-    cbrbPdf = cbrb_workflow.out.pdf
-    cbrbLog = cbrb_workflow.out.cbrbLog
-    cbrbCheckpoint = cbrb_workflow.out.checkpoint
-    svmCbrbParameters = cbrb_workflow.out.svmCbrbParameters
-    svmCbrbParameterEstimationPdf = cbrb_workflow.out.svmCbrbParameterEstimationPdf
-    cbrbDge = cbrb_workflow.out.dge
-    cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
-    cbrbCellFeatures = cbrb_workflow.out.cellFeatures
+    cbrbH5 = cbrbH5
+    cbrbBarcodes = cbrbBarcodes
+    cbrbMetrics = cbrbMetrics
+    cbrbReport = cbrbReport
+    cbrbPdf = cbrbPdf
+    cbrbLog = cbrbLog
+    cbrbCheckpoint = cbrbCheckpoint
+    svmCbrbParameters = svmCbrbParameters
+    svmCbrbParameterEstimationPdf = svmCbrbParameterEstimationPdf
+    cbrbDge = cbrbDge
+    cbrbNumTranscripts = cbrbNumTranscripts
+    cbrbCellFeatures = cbrbCellFeatures
 
-    // cell selection outputs that we care about
-    selectedCellBarcodes = cell_selection_workflow.out.selectedCellBarcodes
-    ambientCellBarcodes = cell_selection_workflow.out.ambientCellBarcodes
-    cellSelectionAssignmentsPdf = cell_selection_workflow.out.cellSelectionAssignmentsPdf
-    cellSelectionAssignmentsSummary = cell_selection_workflow.out.cellSelectionAssignmentsSummary
-    droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
+    selectedCellBarcodes = selectedCellBarcodes
+    ambientCellBarcodes = ambientCellBarcodes
+    cellSelectionAssignmentsPdf = cellSelectionAssignmentsPdf
+    cellSelectionAssignmentsSummary = cellSelectionAssignmentsSummary
+    droppedNonEmpty = droppedNonEmpty
 
     // standrd analysis outputs that we care about
     selectedDge = standard_analysis_workflow.out.dge
@@ -235,7 +427,7 @@ workflow {
     doubletAssignments = standard_analysis_workflow.out.doubletAssignments
     donorList = standard_analysis_workflow.out.donorList
     donorCellMap = standard_analysis_workflow.out.donorCellMap
-    donorAssignmentSummaryStats = standard_analysis_workflow.out.donorAssignmentSummaryStats    
+    donorAssignmentSummaryStats = standard_analysis_workflow.out.donorAssignmentSummaryStats
     donorAssignmentTearSheet = standard_analysis_workflow.out.donorAssignmentTearSheet
     donorCellBarcodes = standard_analysis_workflow.out.donorCellBarcodes
     donorAssignmentPdf = standard_analysis_workflow.out.donorAssignmentPdf
@@ -277,6 +469,12 @@ output {
     }
     dgeSummary {
         path {x -> alignmentDir(x)}
+    }
+    chimericTranscripts {
+        path {x -> alignmentDir(x)}
+    }
+    readsPerCell {
+        path { alignmentDirFromParams() }
     }
     dge {
         path {x -> alignmentDir(x)}
