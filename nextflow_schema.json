@@ -334,6 +334,12 @@
       "type": "string",
       "enum": ["DROPSEQ", "STARSOLO"]
     },
+    "start_at": {
+      "type": "string",
+      "description": "Pipeline stage where execution should start. Use 'beginning' for a full run, or reconstruct inputs from published results at a later stage.",
+      "default": "beginning",
+      "enum": ["beginning", "cell_selection", "standard_analysis"]
+    },
     "cloudVcf": {
       "type": "string",
       "format": "file-path"

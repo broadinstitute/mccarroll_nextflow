@@ -1,5 +1,6 @@
 include { parseCbrbYamlArgs; addSvmEstimatedParameters; loadSvmEstimatedParameters } from '../../modules/local/CbrbArgParser.nf'
 include {noMetaChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
+include { makeCbrbLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
 include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
@@ -17,11 +18,7 @@ workflow cbrb_workflow {
     sparseDgeFeaturesNoMeta = noMetaChannelHelper(sparseDgeFeatures)
     sparseDgeBarcodesNoMeta = noMetaChannelHelper(sparseDgeBarcodes)
     cellFeaturesNoMeta = noMetaChannelHelper(cellFeatures)
-    if (params.useSvmParameterEstimation && params.cbrbArgs.isEmpty()) {
-        cbrb_label = "auto"
-    } else {
-        cbrb_label = String.format('%04x', params.cbrbArgs.hashCode())
-    }
+    cbrb_label = makeCbrbLabel(params)
     meta = sparseDgeMatrix.map { meta, _file -> meta +[cbrb_label: cbrb_label] } // just take the meta from one of the inputs, they should all be the same
     parsedCbrbArgs = parseCbrbYamlArgs(params.cbrbArgs)
     useSvmParameterEstimation = params.useSvmParameterEstimation && 
