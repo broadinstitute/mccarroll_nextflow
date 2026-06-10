@@ -1,7 +1,7 @@
 include {CALL_STAMPS_SVM_NUCLEI} from '../../modules/local/callSTAMPsSvmNuclei.nf'
 include {CALL_STAMPS_MANUAL_THRESHOLDS} from '../../modules/local/callSTAMPsManualThresholds.nf'
 include {sparseMatrixChannelHelper; noMetaChannelHelper} from '../../modules/local/workflowUtil.nf'
-include { hasManualThresholds; makeManualThresholdLabel } from '../../modules/local/WorkflowPathUtil.nf'
+include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
 
 // This should be handled in CALL_STAMPS_MANUAL_THRESHOLDS but I can't figure out how to pass nulls to a process so handle it here for now.
 // I tried a typed process but I couldn't figure how to do it and it's beta anyway.
@@ -21,8 +21,8 @@ workflow cell_selection_workflow {
     cbrbNumTranscripts
 
     main:
-    if (hasManualThresholds(params)) {
-        cell_selection_label = makeManualThresholdLabel(params)
+    if (hasManualCellSelectionThresholds(params)) {
+        cell_selection_label = makeManualCellSelectionLabel(params)
         CALL_STAMPS_MANUAL_THRESHOLDS(noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
             noMetaChannelHelper(cellFeatures),
             noMetaChannelHelper(cbrbNonEmpties),

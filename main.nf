@@ -50,7 +50,7 @@ def alignmentDirFromParams() {
     return buildReferenceMetadataLocator(params.reference).referenceName + "/"
 }
 
-def validateDemultiplexingParams() {
+def validateDropulationParams() {
     if (params.vcf && !params.donorFile) {
         log.error "If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings."
         exit 1
@@ -184,7 +184,7 @@ workflow {
         params.show_hidden
     )
 
-    validateDemultiplexingParams()
+    validateDropulationParams()
     validateStartAtParam()
 
     def startAt = params.start_at
@@ -296,10 +296,7 @@ workflow {
     // Stage boundary: prepare cell-selection inputs.
     // Input source is either the canonical upstream channels or reconstructed files.
     if (shouldRunStage(startAt, 'cell_selection')) {
-        if (startAt != 'cell_selection') {
-            // Input: canonical channels already assigned by upstream stages.
-            // Emits: the canonical cell-selection boundary channels.
-        } else {
+        if (startAt == 'cell_selection') {
             sparseDgeMatrix = restartTupleChannel(restartInputs.sparseDgeMatrix, finalMeta)
             sparseDgeFeatures = restartTupleChannel(restartInputs.sparseDgeFeatures, finalMeta)
             sparseDgeBarcodes = restartTupleChannel(restartInputs.sparseDgeBarcodes, finalMeta)
@@ -313,10 +310,8 @@ workflow {
             readsPerCell = restartPathChannel(restartInputs.readsPerCell)
             alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
         }
-    }
 
-    // Stage execution: run cell selection as soon as its inputs are wired.
-    if (shouldRunStage(startAt, 'cell_selection')) {
+        // Stage execution: run cell selection as soon as its inputs are wired.
         cell_selection_workflow(
             sparseDgeMatrix,
             sparseDgeFeatures,
@@ -338,10 +333,7 @@ workflow {
     // Stage boundary: prepare standard-analysis inputs.
     // Input source is either the canonical handoff channels or reconstructed files.
     if (shouldRunStage(startAt, 'standard_analysis')) {
-        if (startAt != 'standard_analysis') {
-            // Input: canonical handoff channels from the previous stage.
-            // Emits: the canonical standard-analysis boundary channels.
-        } else {
+        if (startAt == 'standard_analysis') {
             selectedCellBarcodes = restartTupleChannel(restartInputs.selectedCellBarcodes, selectedCellsMeta)
             cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
             cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
@@ -350,11 +342,9 @@ workflow {
             readsPerCell = restartPathChannel(restartInputs.readsPerCell)
             alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
         }
-    }
 
-    // Input: either post-cell-selection handoff channels or reconstructed restart files at the standard-analysis boundary.
-    // Emits: standard-analysis outputs and remains the single linear continuation point for later stages.
-    if (shouldRunStage(startAt, 'standard_analysis')) {
+        // Input: either post-cell-selection handoff channels or reconstructed restart files at the standard-analysis boundary.
+        // Emits: standard-analysis outputs and remains the single linear continuation point for later stages.
         standard_analysis_workflow(
             selectedCellBarcodes,
             cbrbDge,

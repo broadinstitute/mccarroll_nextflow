@@ -1,4 +1,4 @@
-def hasManualThresholds(params) {
+def hasManualCellSelectionThresholds(params) {
     return params.minUMIsPerCell != null ||
         params.maxUMIsPerCell != null ||
         params.minIntronicPerCell != null ||
@@ -8,7 +8,7 @@ def hasManualThresholds(params) {
 /**
  * Create label for manual-threshold cell selection.
  */
-def makeManualThresholdLabel(params) {
+def makeManualCellSelectionLabel(params) {
     def labelComponents = []
 
     if (params.minUMIsPerCell != null ||
@@ -38,7 +38,7 @@ def makeManualThresholdLabel(params) {
 }
 
 def makeCellSelectionLabel(params) {
-    return hasManualThresholds(params) ? makeManualThresholdLabel(params) : 'auto'
+    return hasManualCellSelectionThresholds(params) ? makeManualCellSelectionLabel(params) : 'auto'
 }
 
 def makeCbrbLabel(params) {
