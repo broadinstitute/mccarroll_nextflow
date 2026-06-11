@@ -343,6 +343,13 @@
     "cloudVcf": {
       "type": "string",
       "format": "file-path"
+    },
+    "mapMyCellsQueryMarkers": {
+      "type": "string",
+      "format": "file-path"
+    },
+    "mapMyCellsArgs": {
+      "type": "string"
     }
   },
   "required": ["project", "library", "sampleType"]

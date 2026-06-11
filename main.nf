@@ -13,12 +13,12 @@
 */
 nextflow.enable.strict = true
 
-include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
 include { tag_and_split_bam_workflow } from './subworkflows/local/tag_and_split_bam.nf'
 include { align_locus_function_workflow } from './subworkflows/local/align_locus_function.nf'
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
 include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
 include { standard_analysis_workflow } from './subworkflows/local/standard_analysis.nf'
+include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
 include { buildReferenceMetadataLocator } from './modules/local/ReferenceMetadataLocator.nf'
 include { buildRestartInputPaths; makeCellSelectionLabel; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
@@ -44,6 +44,11 @@ def standardAnalysisDir(tuple) {
     // Since there should be no user choices for standard analysis, outputs could just go into cell_selection
     // directory, but put them in a subdir to reduce clutter.
     return cellSelectionDir(tuple) + "standard_analysis/"
+}
+
+def mapMyCellsDir(tuple) {
+    def (meta, _file) = tuple
+    return standardAnalysisDir(tuple) + "map_my_cells/" + meta.mmcModel + "/"
 }
 
 def alignmentDirFromParams() {
@@ -120,15 +125,18 @@ params {
     version10X: String
     sampleType: String
     beadStructure: String
+
     // cbrb parameters
     useSvmParameterEstimation: Boolean
     forceTwoClusterSolution: Boolean
     cbrbArgs: String
+
     // cell selection parameters
     minUMIsPerCell: Integer
     maxUMIsPerCell: Integer
     minIntronicPerCell: Float
     maxIntronicPerCell: Float
+
     // standard analysis parameters
     vcf: Path
     cloudVcf: Path
@@ -138,7 +146,10 @@ params {
     detectDoubletsOptions: List
     computeCBRBAdjustedLikelihoods: Boolean
     metaGeneDgeFunctionalStrategy: String
-    start_at: String
+
+    // MapMyCells parameters 
+    mapMyCellsQueryMarkers: Path
+    mapMyCellsArgs: String
 
     // defaults
     cellBarcodeTag: String
@@ -152,6 +163,9 @@ params {
     dgeFunctionalStrategy: String
 
     // infrastructure parameters
+    start_at: String
+
+    // nf-core infrastructure parameters
     email: String
     help: Boolean
     help_full: Boolean
@@ -355,6 +369,18 @@ workflow {
             readsPerCell
         )
     }
+    if (params.mapMyCellsQueryMarkers) {
+        MapMyCells_fromSpecifiedMarkers_workflow(
+            standard_analysis_workflow.out.sparseDgeMatrix,
+            standard_analysis_workflow.out.sparseDgeFeatures,
+            standard_analysis_workflow.out.sparseDgeBarcodes
+        )
+        mapMyCellsJsonReport = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
+        mapMyCellsCsvReport = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
+    } else {
+        mapMyCellsJsonReport = channel.empty()
+        mapMyCellsCsvReport = channel.empty()
+    }
 
    //
     // SUBWORKFLOW: Run completion tasks
@@ -432,18 +458,11 @@ workflow {
     gmgDgeSummary = standard_analysis_workflow.out.gmgDgeSummary
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
-    json_report = null //NEXTFLOW.out.json_report
-    csv_report = null //NEXTFLOW.out.csv_report
-    converted_h5ad = null //NEXTFLOW.out.converted_h5ad
+    mapMyCellsJsonReport = mapMyCellsJsonReport
+    mapMyCellsCsvReport = mapMyCellsCsvReport
 }
 
 output {
-    json_report{
-    }
-    csv_report{
-    }
-    converted_h5ad{
-    }
     // unmapped outputs
     unmappedBam{
     }
@@ -624,6 +643,12 @@ output {
     }
     gmgDgeSummary {
         path {x -> standardAnalysisDir(x)}
+    }
+    mapMyCellsJsonReport {
+        path {x -> mapMyCellsDir(x)}
+    }
+    mapMyCellsCsvReport {
+        path {x -> mapMyCellsDir(x)}
     }
 }
 

@@ -1,32 +1,33 @@
 process MAPMYCELLS_FROMSPECIFIEDMARKERS {
-    label 'process_medium'
+    label 'process_single_medium'
+    label 'error_retry'
 
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
-    memory '16 GB'
-    scratch true // use local disk for input files because sqlite is slow over gcsfuse
-    stageInMode 'copy' // ensure files are copied to local scratch, rather than symlinked
 
     input:
+        val library
         path query_markers_json
         path precomputed_stats_h5ad
         path dge_h5ad
-        path gene_mapping
         val mmc_args
-        val analysis_identifier
 
     output:
-    path "${analysis_identifier}.json", emit: json_report
-    path "${analysis_identifier}.csv", emit: csv_report
+    path "${json_report}", emit: json_report
+    path "${csv_report}", emit: csv_report
 
     script:
+    json_report = "${library}.json"
+    csv_report = "${library}.csv"
     """
     python -m cell_type_mapper.cli.from_specified_markers \
         --query_markers.serialized_lookup '${query_markers_json}' \
         --precomputed_stats.path '${precomputed_stats_h5ad}' \
         --query_path '${dge_h5ad}' \
-        --extended_result_path '${analysis_identifier}.json' \
-        --csv_result_path '${analysis_identifier}.csv' \
-        ${gene_mapping? "--gene_mapping.db_path '${gene_mapping}'" : ""} \
-        ${mmc_args} --type_assignment.normalization raw
+        --extended_result_path '${json_report}' \
+        --csv_result_path '${csv_report}' \
+        ${mmc_args} --type_assignment.normalization raw \
+        --query_gene_id_col gene_ids \
+        --type_assignment.n_processors 1 \
+        --max_gb 8
     """
 }
