@@ -5,15 +5,16 @@ process MTX_TO_H5AD {
     memory '8 GB'
 
     input:
+        val library
         path matrix_mtx
         path features_tsv
         path barcodes_tsv
-        val output_file
 
     output:
-    path "${output_file}", emit: h5ad
+    path "${output_file}"
 
     script:
+    output_file = "${library}.h5ad"
     if (matrix_mtx.getParent() != features_tsv.getParent() || matrix_mtx.getParent() != barcodes_tsv.getParent()) {
         error "All three files (matrix.mtx, features.tsv.gz, barcodes.tsv.gz) must be in the same directory."
     }
@@ -36,12 +37,8 @@ process MTX_TO_H5AD {
     } else {
             prefix_opt = ""
     }
-    input_directory = matrix_mtx.getParent()
-    if (input_directory == null) {
-        input_directory = "."
-    }
     """
-    mtx_to_h5ad --input-directory '${input_directory}' \
+    mtx_to_h5ad --input-directory . \
         --output '${output_file}' \
         ${prefix_opt}
     """
