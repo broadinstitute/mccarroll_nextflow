@@ -4,7 +4,6 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
         // Although the BAM doesn't have the most complete meta, it's used here because this is run on split BAMs so the output files need to be named appropriately.

@@ -1,6 +1,5 @@
 process MAKE_SPARSE_DGE {
     label 'process_low'
-    memory '16 GB'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:

@@ -1,6 +1,5 @@
 process CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE {
         label 'process_low'
-    memory '16 GB'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:

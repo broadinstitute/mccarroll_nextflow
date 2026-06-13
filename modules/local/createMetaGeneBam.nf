@@ -4,7 +4,6 @@ process CREATE_META_GENE_BAM {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
      input:
     tuple val(meta), path(bam)

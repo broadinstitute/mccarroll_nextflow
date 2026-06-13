@@ -2,7 +2,6 @@ include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf
 
 process DIGITAL_EXPRESSION {
     label 'process_low'
-    memory '16 GB'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:

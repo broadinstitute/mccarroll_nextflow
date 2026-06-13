@@ -2,7 +2,6 @@ process DONOR_ASSIGNMENT_QC {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_r:current'
-    memory '8 GB'
 
     input:
     val library
