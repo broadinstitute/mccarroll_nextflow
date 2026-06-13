@@ -2,7 +2,6 @@ process HDF5_10X_TO_TEXT {
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_python:current'
-    memory '8 GB'
 
     input:
         tuple val(meta), path(inputH5)

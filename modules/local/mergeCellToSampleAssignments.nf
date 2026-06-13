@@ -2,7 +2,6 @@ process MERGE_CELL_TO_SAMPLE_ASSIGNMENTS {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
     val library

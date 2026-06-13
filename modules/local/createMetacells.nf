@@ -4,7 +4,6 @@ process CREATE_METACELLS {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '16 GB'
 
     input:
     tuple val(meta), path(assignments), val(donor)

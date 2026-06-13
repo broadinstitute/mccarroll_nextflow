@@ -1,6 +1,5 @@
 process MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE {
     label 'process_low'
-    memory '16 GB'
      container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_java:current'
 
     input:

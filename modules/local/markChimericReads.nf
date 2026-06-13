@@ -5,7 +5,6 @@ process MARK_CHIMERIC_READS {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
         tuple val(meta), path(inputBam)

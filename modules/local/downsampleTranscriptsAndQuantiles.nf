@@ -2,7 +2,6 @@ process DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
         tuple val(meta), path(selectedCells)

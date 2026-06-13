@@ -4,7 +4,6 @@ process SELECT_CELLS_BY_NUM_TRANSCRIPTS {
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
     tuple val(meta), path(inputBam)

@@ -3,7 +3,6 @@ process PREALIGNMENT_TAG_AND_TRIM {
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
-    memory '8 GB'
 
     input:
         tuple val(meta), path(inputBam)

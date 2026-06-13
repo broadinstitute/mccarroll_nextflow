@@ -2,7 +2,6 @@ process DGE_TO_H5AD {
     label 'process_medium'
 
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_python:current'
-    memory '8 GB'
 
     input:
         path dge_matrix
