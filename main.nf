@@ -222,6 +222,8 @@ workflow {
     unmappedBam = channel.empty()
     splitBamManifest = channel.empty()
     unmappedProperties = channel.empty()
+    correctedBarcodeMetrics = channel.empty()
+    barcodeCounts = channel.empty()
     alignedBam = channel.empty()
     alignedBai = channel.empty()
     sizeSelectedCells = channel.empty()
@@ -282,6 +284,8 @@ workflow {
 
         unmappedBam = tag_and_split_bam_workflow.out.splitBams
         splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
+        correctedBarcodeMetrics = tag_and_split_bam_workflow.out.correctedBarcodeMetrics
+        barcodeCounts = tag_and_split_bam_workflow.out.barcodeCounts
         unmappedProperties = tag_and_split_bam_workflow.out.properties
         alignedBam = align_locus_function_workflow.out.alignedBam
         alignedBai = align_locus_function_workflow.out.alignedBai
@@ -406,6 +410,8 @@ workflow {
     publish:
     unmappedBam = unmappedBam
     splitBamManifest = splitBamManifest
+    correctedBarcodeMetrics = correctedBarcodeMetrics
+    barcodeCounts = barcodeCounts
     unmappedProperties = unmappedProperties
     alignedBam = alignedBam
     alignedBai = alignedBai
@@ -483,6 +489,10 @@ output {
     unmappedBam{
     }
     splitBamManifest{
+    }
+    correctedBarcodeMetrics {        
+    }
+    barcodeCounts {
     }
     unmappedProperties {
     }
