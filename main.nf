@@ -221,6 +221,7 @@ workflow {
 
     unmappedBam = channel.empty()
     splitBamManifest = channel.empty()
+    unmappedProperties = channel.empty()
     alignedBam = channel.empty()
     alignedBai = channel.empty()
     sizeSelectedCells = channel.empty()
@@ -234,6 +235,7 @@ workflow {
     sparseDgeFeatures = channel.empty()
     sparseDgeBarcodes = channel.empty()
     cellFeatures = channel.empty()
+    alignmentProperties = channel.empty()
     cbrbH5 = channel.empty()
     cbrbBarcodes = channel.empty()
     cbrbMetrics = channel.empty()
@@ -246,7 +248,9 @@ workflow {
     cbrbDge = channel.empty()
     cbrbNumTranscripts = channel.empty()
     cbrbCellFeatures = channel.empty()
+    cbrbProperties = channel.empty()
     selectedCellBarcodes = channel.empty()
+    cellSelectionProperties = channel.empty()
     ambientCellBarcodes = channel.empty()
     cellSelectionAssignmentsPdf = channel.empty()
     cellSelectionAssignmentsSummary = channel.empty()
@@ -278,6 +282,7 @@ workflow {
 
         unmappedBam = tag_and_split_bam_workflow.out.splitBams
         splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
+        unmappedProperties = tag_and_split_bam_workflow.out.properties
         alignedBam = align_locus_function_workflow.out.alignedBam
         alignedBai = align_locus_function_workflow.out.alignedBai
         sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
@@ -291,6 +296,7 @@ workflow {
         sparseDgeFeatures = align_locus_function_workflow.out.sparseDgeFeatures
         sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
         cellFeatures = align_locus_function_workflow.out.cellFeatures
+        alignmentProperties = align_locus_function_workflow.out.properties
 
         cbrbH5 = cbrb_workflow.out.h5
         cbrbBarcodes = cbrb_workflow.out.barcodes
@@ -304,6 +310,7 @@ workflow {
         cbrbDge = cbrb_workflow.out.dge
         cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
         cbrbCellFeatures = cbrb_workflow.out.cellFeatures
+        cbrbProperties = cbrb_workflow.out.properties
 
     }
 
@@ -340,6 +347,7 @@ workflow {
         cellSelectionAssignmentsPdf = cell_selection_workflow.out.cellSelectionAssignmentsPdf
         cellSelectionAssignmentsSummary = cell_selection_workflow.out.cellSelectionAssignmentsSummary
         droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
+        cellSelectionProperties = cell_selection_workflow.out.properties
 
         // The standard-analysis handoff stays on the canonical channels already assigned above.
     }
@@ -396,7 +404,7 @@ workflow {
     publish:
     unmappedBam = unmappedBam
     splitBamManifest = splitBamManifest
-    unmappedProperties = tag_and_split_bam_workflow.out.properties
+    unmappedProperties = unmappedProperties
     alignedBam = alignedBam
     alignedBai = alignedBai
     sizeSelectedCells = sizeSelectedCells
@@ -410,7 +418,7 @@ workflow {
     sparseDgeFeatures = sparseDgeFeatures
     sparseDgeBarcodes = sparseDgeBarcodes
     cellFeatures = cellFeatures
-    alignmentProperties = align_locus_function_workflow.out.properties
+    alignmentProperties = alignmentProperties
 
     cbrbH5 = cbrbH5
     cbrbBarcodes = cbrbBarcodes
@@ -424,13 +432,14 @@ workflow {
     cbrbDge = cbrbDge
     cbrbNumTranscripts = cbrbNumTranscripts
     cbrbCellFeatures = cbrbCellFeatures
-    cbrbProperties = cbrb_workflow.out.properties
+    cbrbProperties = cbrbProperties
 
     selectedCellBarcodes = selectedCellBarcodes
     ambientCellBarcodes = ambientCellBarcodes
     cellSelectionAssignmentsPdf = cellSelectionAssignmentsPdf
     cellSelectionAssignmentsSummary = cellSelectionAssignmentsSummary
     droppedNonEmpty = droppedNonEmpty
+    cellSelectionProperties = cellSelectionProperties
 
     // standrd analysis outputs that we care about
     selectedDge = standard_analysis_workflow.out.dge
@@ -573,6 +582,9 @@ output {
         path {x -> cellSelectionDir(x)}
     }
     droppedNonEmpty {
+        path {x -> cellSelectionDir(x)}
+    }
+    cellSelectionProperties {
         path {x -> cellSelectionDir(x)}
     }
 
