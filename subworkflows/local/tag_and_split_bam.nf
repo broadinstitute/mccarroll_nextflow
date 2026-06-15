@@ -4,7 +4,7 @@ include {CORRECT_SCRNA_READ_PAIRS} from '../../modules/local/correctScrnaReadPai
 include {SPLIT_BAM_BY_CELL} from '../../modules/local/splitBamByCell.nf'
 include {collectInOrder} from '../../modules/local/workflowUtil.nf'
 include {WRITE_PROPERTIES} from '../../modules/local/writeProperties.nf'
-
+include {MERGE_BARCODE_CORRECTION_METRICS} from '../../modules/local/mergeBarcodeCorrectionMetrics.nf'
 workflow tag_and_split_bam_workflow {
     take:
         fastq_read1
@@ -70,6 +70,10 @@ workflow tag_and_split_bam_workflow {
     )
     // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
     // but no one really cares about that output.
+    MERGE_BARCODE_CORRECTION_METRICS(
+            library,
+            collectInOrder(CORRECT_SCRNA_READ_PAIRS.out.correctedBarcodeMetrics)
+    )
 
     // Because SPLIT_BAM_BY_CELL.out.splitBams is a glob, it produces a channel containing a single item which is a
     // list of all the split BAMs.  We want to flatten that so that the output channel contains one item per split BAM.
@@ -77,6 +81,7 @@ workflow tag_and_split_bam_workflow {
     emit:
     rawBam = localRawBam
     barcodeCounts = COUNT_BARCODE_SEQUENCES.out.barcodeCounts
+    correctedBarcodeMetrics = MERGE_BARCODE_CORRECTION_METRICS.out
     cbcCorrectedBam = CORRECT_SCRNA_READ_PAIRS.out.correctedBam
     splitBams = splitBams
     splitBamReport = SPLIT_BAM_BY_CELL.out.splitBamReport
