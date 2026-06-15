@@ -385,9 +385,11 @@ workflow {
         )
         mapMyCellsJsonReport = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
         mapMyCellsCsvReport = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
+        mapMyCellsProperties = MapMyCells_fromSpecifiedMarkers_workflow.out.properties
     } else {
         mapMyCellsJsonReport = channel.empty()
         mapMyCellsCsvReport = channel.empty()
+        mapMyCellsProperties = channel.empty()
     }
 
    //
@@ -470,9 +472,10 @@ workflow {
     gmgDgeSummary = standard_analysis_workflow.out.gmgDgeSummary
     standardAnalysisProperties = standard_analysis_workflow.out.properties
 
-    // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
+    // MapMyCells outputs
     mapMyCellsJsonReport = mapMyCellsJsonReport
     mapMyCellsCsvReport = mapMyCellsCsvReport
+    mapMyCellsProperties = mapMyCellsProperties
 }
 
 output {
@@ -675,6 +678,9 @@ output {
         path {x -> mapMyCellsDir(x)}
     }
     mapMyCellsCsvReport {
+        path {x -> mapMyCellsDir(x)}
+    }
+    mapMyCellsProperties {
         path {x -> mapMyCellsDir(x)}
     }
 }
