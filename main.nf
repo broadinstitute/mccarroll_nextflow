@@ -468,6 +468,7 @@ workflow {
     metageneDgeSummary = standard_analysis_workflow.out.metageneDgeSummary
     gmgDge = standard_analysis_workflow.out.gmgDge
     gmgDgeSummary = standard_analysis_workflow.out.gmgDgeSummary
+    standardAnalysisProperties = standard_analysis_workflow.out.properties
 
     // MapMyCells outputs -- these are not currently being generated, but I want to be able to publish them when they are
     mapMyCellsJsonReport = mapMyCellsJsonReport
@@ -665,6 +666,9 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     gmgDgeSummary {
+        path {x -> standardAnalysisDir(x)}
+    }
+    standardAnalysisProperties {
         path {x -> standardAnalysisDir(x)}
     }
     mapMyCellsJsonReport {

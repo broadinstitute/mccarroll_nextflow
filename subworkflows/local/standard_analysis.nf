@@ -22,6 +22,7 @@ include { DIGITAL_EXPRESSION } from '../../modules/local/digitalExpression.nf'
 include { MERGE_SPLIT_DGES } from '../../modules/local/mergeSplitDges.nf'
 include { MERGE_DGE_SUMMARIES; MERGE_DGE_SUMMARIES as MERGE_GMG_DGE_SUMMARIES } from '../../modules/local/mergeDgeSummaries.nf'
 include { MERGE_DGE} from '../../modules/local/mergeDge.nf'
+include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
 workflow standard_analysis_workflow {
     take:
@@ -86,7 +87,12 @@ workflow standard_analysis_workflow {
     gmgDge = combineIntoTupleChannel(meta, MERGE_DGE.out.dge)
     gmgDgeSummary = combineIntoTupleChannel(meta, MERGE_GMG_DGE_SUMMARIES.out)
 
+    workflowProperties = [
+        metaGeneDgeFunctionalStrategy: functionalStrategy
+    ]
     if (params.vcf) {
+        workflowProperties.vcf = params.vcf.toString()
+        workflowProperties.donorFile = params.donorFile.toString()
         bcf = params.cloudVcf ?: params.vcf
         nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
         GATHER_DIGITAL_ALLELE_COUNTS(bams, noChannelSelectedCells, 
@@ -156,11 +162,14 @@ workflow standard_analysis_workflow {
                 noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect())
             metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
             metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
+            workflowProperties.donor = params.donor
         } else {
             metacells = channel.empty()
             metacellMetrics = channel.empty()
         }
     }
+    WRITE_PROPERTIES(workflowProperties)
+    standardAnalysisProperties = combineIntoTupleChannel(meta, WRITE_PROPERTIES.out)
 
     emit:
     dge = FILTER_DGE.out.filteredDge
@@ -184,9 +193,11 @@ workflow standard_analysis_workflow {
     donorDgeSummary = donorDgeSummary
     metacells = metacells
     metacellMetrics = metacellMetrics
+    standardAnalysisProperties = standardAnalysisProperties
     metageneReport = metageneReport
     metageneDge = metageneDge
     metageneDgeSummary = metageneDgeSummary
     gmgDge = gmgDge
     gmgDgeSummary = gmgDgeSummary
+    properties = standardAnalysisProperties
 }
