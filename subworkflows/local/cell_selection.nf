@@ -1,9 +1,10 @@
 include {CALL_STAMPS_SVM_NUCLEI} from '../../modules/local/callSTAMPsSvmNuclei.nf'
 include {CALL_STAMPS_MANUAL_THRESHOLDS} from '../../modules/local/callSTAMPsManualThresholds.nf'
-include {sparseMatrixChannelHelper; noMetaChannelHelper} from '../../modules/local/workflowUtil.nf'
+include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
 include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
+include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
-// This should be handled in CALL_STAMPS_MANUAL_THRESHOLDS but I can't figure out how to pass nulls to a process so handle it here for now.
+// TODO: This should be handled in CALL_STAMPS_MANUAL_THRESHOLDS but I can't figure out how to pass nulls to a process so handle it here for now.
 // I tried a typed process but I couldn't figure how to do it and it's beta anyway.
 def valueOrNA(val) {
     return val != null ? val : "NA"
@@ -50,10 +51,20 @@ workflow cell_selection_workflow {
         droppedNonEmpty = CALL_STAMPS_SVM_NUCLEI.out.droppedNonEmpty
     }
 
+    workflowProperties = [
+        minUMIsPerCell: params.minUMIsPerCell,
+        maxUMIsPerCell: params.maxUMIsPerCell,
+        minIntronicPerCell: params.minIntronicPerCell,
+        maxIntronicPerCell: params.maxIntronicPerCell
+    ]
+    WRITE_PROPERTIES(workflowProperties)
+    cellSelectionProperties = combineIntoTupleChannel(metaOnlyChannelHelper(selectedCellBarcodes), WRITE_PROPERTIES.out)
+
     emit:
     selectedCellBarcodes = selectedCellBarcodes
     ambientCellBarcodes = ambientCellBarcodes
     cellSelectionAssignmentsPdf = cellSelectionAssignmentsPdf
     cellSelectionAssignmentsSummary = cellSelectionAssignmentsSummary
     droppedNonEmpty = droppedNonEmpty
+    properties = cellSelectionProperties
 }
