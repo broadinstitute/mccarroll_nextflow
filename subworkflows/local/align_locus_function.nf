@@ -15,7 +15,7 @@ include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
 include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
 include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
 include {MERGE_DGE_SUMMARIES} from '../../modules/local/mergeDgeSummaries.nf'
-include {collectInOrder} from '../../modules/local/workflowUtil.nf'
+include {collectInOrder; addMeta} from '../../modules/local/workflowUtil.nf'
 include {MERGE_SPLIT_DGES} from '../../modules/local/mergeSplitDges.nf'
 include {MERGE_SINGLE_CELL_RNA_SEQ_METRICS} from '../../modules/local/mergeSingleCellRnaSeqMetrics.nf'
 include { MAKE_SPARSE_DGE } from '../../modules/local/makeSparseDge.nf'
@@ -23,6 +23,7 @@ include { BAM_TAG_HISTOGRAM } from '../../modules/local/bamTagHistogram.nf'
 include { MERGE_BAM_TAG_HISTOGRAMS } from '../../modules/local/mergeBamTagHistograms.nf'
 include { BUILD_CELL_FEATURES_SIMPLE } from '../../modules/local/buildCellFeaturesSimple.nf'
 include { MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE } from '../../modules/local/mergeMolecularBarcodeDistributionByGene.nf'
+include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 workflow align_locus_function_workflow {
     take:
         unmappedBams
@@ -214,19 +215,30 @@ workflow align_locus_function_workflow {
         MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out,
         MERGE_BAM_TAG_HISTOGRAMS.out
     )
+    workflowProperties = [
+        reference: params.reference.toString(),
+        strandStrategy: params.strandStrategy,
+        locusFunction: params.locusFunction,
+        minReadMq: params.dgeMinReadMq,
+        functionalStrategy: params.dgeFunctionalStrategy,
+        minTranscriptsPerCell: params.minimumTranscriptsPerCell
+    ]
+    WRITE_PROPERTIES(workflowProperties)
 
     // Add meta for exporting
-    sizeSelectedCells = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells.map {f -> tuple(finalMeta, f) }
-    sizeSelectedCellsMetrics = MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics.map {f -> tuple(finalMeta, f) }
-    dgeSummary = MERGE_DGE_SUMMARIES.out.map {f -> tuple(finalMeta, f) }
-    dge = MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
-    singleCellRnaSeqMetrics = MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out.map {f -> tuple(finalMeta, f) }
+    sizeSelectedCells = addMeta(finalMeta, MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells)
+    sizeSelectedCellsMetrics = addMeta(finalMeta, MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics)
+    dgeSummary = addMeta(finalMeta, MERGE_DGE_SUMMARIES.out)
+    dge = addMeta(finalMeta, MERGE_SPLIT_DGES.out.dge)
+    singleCellRnaSeqMetrics = addMeta(finalMeta, MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out)
     cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.map {f -> tuple(finalMeta, f) }
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
-    chimericTranscripts = MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts.map {f -> tuple(finalMeta, f) }
+    chimericTranscripts = addMeta(finalMeta, MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts)
+    outputProperties = addMeta(finalMeta, WRITE_PROPERTIES.out)
     emit:
+    properties = outputProperties
     alignedBam = alignedBams
     alignedBai = alignedBais
     // TODO: These should be merged.
