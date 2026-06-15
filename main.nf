@@ -396,6 +396,7 @@ workflow {
     publish:
     unmappedBam = unmappedBam
     splitBamManifest = splitBamManifest
+    unmappedProperties = tag_and_split_bam_workflow.out.properties
     alignedBam = alignedBam
     alignedBai = alignedBai
     sizeSelectedCells = sizeSelectedCells
@@ -467,6 +468,8 @@ output {
     unmappedBam{
     }
     splitBamManifest{
+    }
+    unmappedProperties {
     }
     // alignment, locus function outputs
     alignedBam{

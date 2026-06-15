@@ -3,6 +3,7 @@ include {COUNT_BARCODE_SEQUENCES} from '../../modules/local/countBarcodeSequence
 include {CORRECT_SCRNA_READ_PAIRS} from '../../modules/local/correctScrnaReadPairs.nf'
 include {SPLIT_BAM_BY_CELL} from '../../modules/local/splitBamByCell.nf'
 include {collectInOrder} from '../../modules/local/workflowUtil.nf'
+include {WRITE_PROPERTIES} from '../../modules/local/writeProperties.nf'
 
 workflow tag_and_split_bam_workflow {
     take:
@@ -35,6 +36,17 @@ workflow tag_and_split_bam_workflow {
     } else {
         error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
+    workflowProperties = [
+        library: library,
+        experimentDate: params.experimentDate,
+        version10X: params.version10X,
+        beadStructure: beadStructure,
+        allowedBarcodes: allowedBarcodes.toString(),
+        fivePrimeAdapter: params.fivePrimeAdapter,
+        fastq_read1: fastq_read1,
+        fastq_read2: fastq_read2
+    ]
+    WRITE_PROPERTIES(workflowProperties)
     // collect() because all the BAMs need to be processed together.
     collectedRawBams = collectInOrder(localRawBam)
     COUNT_BARCODE_SEQUENCES(
@@ -70,4 +82,5 @@ workflow tag_and_split_bam_workflow {
     splitBamReport = SPLIT_BAM_BY_CELL.out.splitBamReport
     splitBamManifest = SPLIT_BAM_BY_CELL.out.splitBamManifest
     bamList = SPLIT_BAM_BY_CELL.out.bamList
+    properties = WRITE_PROPERTIES.out
 }
