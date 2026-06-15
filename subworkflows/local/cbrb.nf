@@ -5,6 +5,8 @@ include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCb
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
 include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
 include { JOIN_CBRB_CELL_FEATURES } from '../../modules/local/joinCbrbCellFeatures.nf'
+include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
+
 workflow cbrb_workflow {
     take:
     sparseDgeMatrix
@@ -52,6 +54,14 @@ workflow cbrb_workflow {
         cellFeatures.map {m, file -> tuple(m + [cbrb_label: cbrb_label], file)},
         noMetaChannelHelper(HDF5_10X_TO_TEXT.out.numTranscripts),
     )
+    workflowProperties = [
+        useSvmParameterEstimation: params.useSvmParameterEstimation,
+        forceTwoClusterSolution: params.forceTwoClusterSolution,
+        cbrbArgs: params.cbrbArgs
+    ]
+    WRITE_PROPERTIES(workflowProperties)
+    cbrbProperties = combineIntoTupleChannel(metaWithArgs, WRITE_PROPERTIES.out)
+    
     
     emit:
     svmCbrbParameters = svmCbrbParameters
@@ -66,5 +76,6 @@ workflow cbrb_workflow {
     dge = HDF5_10X_TO_TEXT.out.dge
     numTranscripts = HDF5_10X_TO_TEXT.out.numTranscripts
     cellFeatures = JOIN_CBRB_CELL_FEATURES.out.cbrbCellFeatures
+    properties = cbrbProperties
 
 }

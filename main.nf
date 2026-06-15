@@ -424,6 +424,7 @@ workflow {
     cbrbDge = cbrbDge
     cbrbNumTranscripts = cbrbNumTranscripts
     cbrbCellFeatures = cbrbCellFeatures
+    cbrbProperties = cbrb_workflow.out.properties
 
     selectedCellBarcodes = selectedCellBarcodes
     ambientCellBarcodes = ambientCellBarcodes
@@ -552,6 +553,9 @@ output {
         path {x -> cbrbDir(x)}
     }
     cbrbCellFeatures {
+        path {x -> cbrbDir(x)}
+    }
+    cbrbProperties {
         path {x -> cbrbDir(x)}
     }
 

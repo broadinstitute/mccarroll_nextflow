@@ -12,7 +12,7 @@ process WRITE_PROPERTIES {
     script:
     output_file = "properties.yaml"
     // Configure options to force Newline (Block) style
-    options = new org.yaml.snakeyaml.DumperOptions()
+    def options = new org.yaml.snakeyaml.DumperOptions()
     options.setDefaultFlowStyle(org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK)
     options.setPrettyFlow(true) // Ensures clean alignment
     def yaml_str = new org.yaml.snakeyaml.Yaml(options).dump(properties)
