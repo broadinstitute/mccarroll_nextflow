@@ -410,6 +410,7 @@ workflow {
     sparseDgeFeatures = sparseDgeFeatures
     sparseDgeBarcodes = sparseDgeBarcodes
     cellFeatures = cellFeatures
+    alignmentProperties = align_locus_function_workflow.out.properties
 
     cbrbH5 = cbrbH5
     cbrbBarcodes = cbrbBarcodes
@@ -509,6 +510,9 @@ output {
         path {x -> alignmentDir(x)}
     }
     cellFeatures {
+        path {x -> alignmentDir(x)}
+    }
+    alignmentProperties {
         path {x -> alignmentDir(x)}
     }
 

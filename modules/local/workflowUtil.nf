@@ -41,3 +41,9 @@ def combineIntoTupleChannel(channel1, channel2) {
         tuple(v1, v2)
     }
 }
+
+def addMeta(meta, channel) {
+    return channel.map { file ->
+        tuple(meta, file)
+    }
+}
