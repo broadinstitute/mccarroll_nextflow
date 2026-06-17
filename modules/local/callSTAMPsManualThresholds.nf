@@ -27,12 +27,16 @@ process CALL_STAMPS_MANUAL_THRESHOLDS {
     output_pdf = "${dataset_name}.cell_selection_assignments.pdf"
     output_summary = "${dataset_name}.cell_selection_assignments_summary.txt"
     output_dropped_non_empty = "${dataset_name}.not_cell_not_empty.txt"
+    def minUMIs     = minUMIsPerCell     != null ? minUMIsPerCell     : "NA"
+    def maxUMIs     = maxUMIsPerCell     != null ? maxUMIsPerCell     : "NA"
+    def minIntronic = minIntronicPerCell != null ? minIntronicPerCell : "NA"
+    def maxIntronic = maxIntronicPerCell != null ? maxIntronicPerCell : "NA"
 
     """
     Rscript -e 'message(date(), " Start ", "CallSTAMPs")' \
     -e 'suppressPackageStartupMessages(library(Dropseq.cellselection))' \
-    -e 'CallSTAMPs(dataset_name="${dataset_name}",cellFeaturesFile="${cellFeatures}",outCellFile="${output_file}",outPDF="${output_pdf}",outAmbientCellFile="${output_ambient}",outSummaryFile="${output_summary}",is_10x=TRUE,outDroppedNonEmptiesFile="${output_dropped_non_empty}",cbrbNonEmptiesFile="${cbrbNonEmpties}",cbrbRetainedUMIsFile="${cbrbNumTranscripts}",method_selected="manual_selection",minUMIsPerCell=${minUMIsPerCell},maxUMIsPerCell=${maxUMIsPerCell},minIntronicPerCell=${minIntronicPerCell},maxIntronicPerCell=${maxIntronicPerCell},sparseDgeDir=".")' \
-    -e 'message(date(), " Done ", "CallSTAMPs")' 
+    -e 'CallSTAMPs(dataset_name="${dataset_name}",cellFeaturesFile="${cellFeatures}",outCellFile="${output_file}",outPDF="${output_pdf}",outAmbientCellFile="${output_ambient}",outSummaryFile="${output_summary}",is_10x=TRUE,outDroppedNonEmptiesFile="${output_dropped_non_empty}",cbrbNonEmptiesFile="${cbrbNonEmpties}",cbrbRetainedUMIsFile="${cbrbNumTranscripts}",method_selected="manual_selection",minUMIsPerCell=${minUMIs},maxUMIsPerCell=${maxUMIs},minIntronicPerCell=${minIntronic},maxIntronicPerCell=${maxIntronic},sparseDgeDir=".")' \
+    -e 'message(date(), " Done ", "CallSTAMPs")'
     """
 
 }

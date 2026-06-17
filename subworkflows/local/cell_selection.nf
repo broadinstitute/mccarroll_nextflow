@@ -4,13 +4,6 @@ include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; 
 include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
-// TODO: This should be handled in CALL_STAMPS_MANUAL_THRESHOLDS but I can't figure out how to pass nulls to a process so handle it here for now.
-// I tried a typed process but I couldn't figure how to do it and it's beta anyway.
-def valueOrNA(val) {
-    return val != null ? val : "NA"
-}
-
-
 // TODO: support manual thresholds
 workflow cell_selection_workflow {
     take:
@@ -28,10 +21,10 @@ workflow cell_selection_workflow {
             noMetaChannelHelper(cellFeatures),
             noMetaChannelHelper(cbrbNonEmpties),
             cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
-            valueOrNA(params.minUMIsPerCell),
-            valueOrNA(params.maxUMIsPerCell),
-            valueOrNA(params.minIntronicPerCell),
-            valueOrNA(params.maxIntronicPerCell)
+            params.minUMIsPerCell,
+            params.maxUMIsPerCell,
+            params.minIntronicPerCell,
+            params.maxIntronicPerCell
         )
         selectedCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.selectedCellBarcodes
         ambientCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.ambientCellBarcodes
