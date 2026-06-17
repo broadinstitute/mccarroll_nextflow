@@ -107,7 +107,11 @@ def restartAlignedBamChannel(pathPattern, boolean doBQSR, String referenceName) 
             def bamBase = doBQSR ?
                 bam.getName().replaceFirst(/\.bam$/, '') :
                 bam.getName().replaceFirst(/\.chimeric_marked\.bam$/, '')
-            def collectIndex = bamBase.replaceFirst(/.*\./, '') as Integer
+            def indexStr = bamBase.replaceFirst(/.*\./, '')
+            if (!indexStr.isInteger()) {
+                error "Cannot parse numeric collectIndex from BAM filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].bam"
+            }
+            def collectIndex = indexStr as Integer
             tuple([id: bamBase, bamBase: bamBase, collectIndex: collectIndex, referenceName: referenceName], bam)
         }
 }
@@ -219,6 +223,10 @@ workflow {
         doBQSR
     )
 
+    // Default all stage outputs to empty; each block below overwrites the channels it produces.
+    // When adding outputs to a stage, add the corresponding channel.empty() initializer here.
+
+    // tag_and_split + align_locus_function outputs
     unmappedBam = channel.empty()
     splitBamManifest = channel.empty()
     unmappedProperties = channel.empty()
@@ -238,6 +246,8 @@ workflow {
     sparseDgeBarcodes = channel.empty()
     cellFeatures = channel.empty()
     alignmentProperties = channel.empty()
+
+    // cbrb outputs
     cbrbH5 = channel.empty()
     cbrbBarcodes = channel.empty()
     cbrbMetrics = channel.empty()
@@ -251,6 +261,8 @@ workflow {
     cbrbNumTranscripts = channel.empty()
     cbrbCellFeatures = channel.empty()
     cbrbProperties = channel.empty()
+
+    // cell_selection outputs
     selectedCellBarcodes = channel.empty()
     cellSelectionProperties = channel.empty()
     ambientCellBarcodes = channel.empty()

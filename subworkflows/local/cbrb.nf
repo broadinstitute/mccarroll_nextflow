@@ -21,7 +21,7 @@ workflow cbrb_workflow {
     sparseDgeBarcodesNoMeta = noMetaChannelHelper(sparseDgeBarcodes)
     cellFeaturesNoMeta = noMetaChannelHelper(cellFeatures)
     cbrb_label = makeCbrbLabel(params)
-    meta = sparseDgeMatrix.map { meta, _file -> meta +[cbrb_label: cbrb_label] } // just take the meta from one of the inputs, they should all be the same
+    meta = sparseDgeMatrix.map { meta, _file -> meta + [cbrb_label: cbrb_label] } // all inputs share the same meta; any can be used
     parsedCbrbArgs = parseCbrbYamlArgs(params.cbrbArgs)
     useSvmParameterEstimation = params.useSvmParameterEstimation && 
         (!parsedCbrbArgs.expectedCells || !parsedCbrbArgs.totalDropletsIncluded)
