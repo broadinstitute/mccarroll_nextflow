@@ -4,7 +4,6 @@ include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; 
 include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
-// TODO: support manual thresholds
 workflow cell_selection_workflow {
     take:
     sparseDgeMatrix

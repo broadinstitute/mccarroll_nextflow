@@ -203,11 +203,7 @@ workflow align_locus_function_workflow {
     MAKE_SPARSE_DGE(
         MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
     )
-    // TODO: Dropseq.cellselection::buildCellFeaturesSimple
-    // inputs: readsPerCell, dgeSummary, singleCellRnaSeqMetrics, 
-
-
-
+    
     BUILD_CELL_FEATURES_SIMPLE(
         params.library,
         params.minimumTranscriptsPerCell,

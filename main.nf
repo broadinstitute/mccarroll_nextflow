@@ -553,7 +553,6 @@ output {
     }
 
     // CBRB outputs
-    // TODO: should these go into a subdirectory of <reference>/cbrb/ based on the CBRB options, like Zamboni workflow?
     cbrbH5 {
         path {x -> cbrbDir(x)}
     }

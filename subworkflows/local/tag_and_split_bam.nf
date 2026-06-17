@@ -68,8 +68,6 @@ workflow tag_and_split_bam_workflow {
             collectInOrder(CORRECT_SCRNA_READ_PAIRS.out.correctedBam),
             params.targetBamSizeMBytes
     )
-    // TODO: corrected_barcode_metrics output from CORRECT_SCRNA_READ_PAIRS should be merged across BAMs,
-    // but no one really cares about that output.
     MERGE_BARCODE_CORRECTION_METRICS(
             library,
             collectInOrder(CORRECT_SCRNA_READ_PAIRS.out.correctedBarcodeMetrics)
