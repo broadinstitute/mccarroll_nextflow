@@ -29,6 +29,7 @@ include { MERGE_READ_QUALITY_METRICS } from '../../modules/local/mergeReadQualit
 include { MERGE_RNA_SEQ_METRICS } from '../../modules/local/mergeRnaSeqMetrics.nf'
 include { PLOT_ALIGNMENT_SUMMARY } from '../../modules/local/plotAlignmentSummary.nf'
 include { PICARD_COLLECTRNASEQMETRICS } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
+include { MERGE_CHIMERIC_READ_METRICS } from '../../modules/local/mergeChimericReadMetrics.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -211,6 +212,10 @@ workflow align_locus_function_workflow {
         collectInOrder(BAM_TAG_HISTOGRAM.out.histogram),
         numReadsPerCellExtension
     )
+    MERGE_CHIMERIC_READ_METRICS(
+        params.library,
+        collectInOrder(MARK_CHIMERIC_READS.out.chimericReadMetrics)
+    )
 
     MERGE_READ_QUALITY_METRICS(
         params.library,
@@ -258,6 +263,7 @@ workflow align_locus_function_workflow {
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
+    chimericReadMetrics = addMeta(finalMeta, MERGE_CHIMERIC_READ_METRICS.out)
     chimericTranscripts = addMeta(finalMeta, MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts)
     outputProperties = addMeta(finalMeta, WRITE_PROPERTIES.out)
     readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out)
@@ -268,7 +274,7 @@ workflow align_locus_function_workflow {
     alignedBam = alignedBams
     alignedBai = alignedBais
     // TODO: These should be merged.
-    chimericReadMetrics = MARK_CHIMERIC_READS.out.chimericReadMetrics
+    chimericReadMetrics = chimericReadMetrics
     chimericTranscripts = chimericTranscripts
     sizeSelectedCells = sizeSelectedCells
     sizeSelectedCellsMetrics = sizeSelectedCellsMetrics

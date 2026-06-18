@@ -240,6 +240,7 @@ workflow {
     sizeSelectedCellsMetrics = channel.empty()
     dgeSummary = channel.empty()
     chimericTranscripts = channel.empty()
+    chimericReadMetrics = channel.empty()
     readsPerCell = channel.empty()
     singleCellRnaSeqMetrics = channel.empty()
     dge = channel.empty()
@@ -310,6 +311,7 @@ workflow {
         sizeSelectedCellsMetrics = align_locus_function_workflow.out.sizeSelectedCellsMetrics
         dgeSummary = align_locus_function_workflow.out.dgeSummary
         chimericTranscripts = align_locus_function_workflow.out.chimericTranscripts
+        chimericReadMetrics = align_locus_function_workflow.out.chimericReadMetrics
         readsPerCell = align_locus_function_workflow.out.readsPerCell
         singleCellRnaSeqMetrics = align_locus_function_workflow.out.singleCellRnaSeqMetrics
         dge = align_locus_function_workflow.out.dge
@@ -352,6 +354,7 @@ workflow {
             cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
             dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
             chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
+            chimericReadMetrics = restartTupleChannel(restartInputs.chimericReadMetrics, finalMeta)
             readsPerCell = restartPathChannel(restartInputs.readsPerCell)
             alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
         }
@@ -385,6 +388,7 @@ workflow {
             cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
             dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
             chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
+            chimericReadMetrics = restartTupleChannel(restartInputs.chimericReadMetrics, finalMeta)
             readsPerCell = restartPathChannel(restartInputs.readsPerCell)
             alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
         }
@@ -442,6 +446,7 @@ workflow {
     sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
     dgeSummary = dgeSummary
     chimericTranscripts = chimericTranscripts
+    chimericReadMetrics = chimericReadMetrics
     readsPerCell = readsPerCell
     singleCellRnaSeqMetrics = singleCellRnaSeqMetrics
     dge = dge
@@ -539,6 +544,9 @@ output {
         path {x -> alignmentDir(x)}
     }
     chimericTranscripts {
+        path {x -> alignmentDir(x)}
+    }
+    chimericReadMetrics {
         path {x -> alignmentDir(x)}
     }
     readsPerCell {
