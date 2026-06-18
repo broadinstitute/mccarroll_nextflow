@@ -494,7 +494,8 @@ workflow {
     selectedSparseDgeBarcodes = standard_analysis_workflow.out.sparseDgeBarcodes
     umiReadIntervals = standard_analysis_workflow.out.umiReadIntervals
     molBc = standard_analysis_workflow.out.molBc
-    umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
+    // don't care about umi saturation histogram
+    //umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
     digitalAlleleFrequencies = standard_analysis_workflow.out.digitalAlleleFrequencies
     donorAssignments = standard_analysis_workflow.out.donorAssignments
     doubletAssignments = standard_analysis_workflow.out.doubletAssignments
@@ -681,9 +682,12 @@ output {
     molBc {
         path {x -> standardAnalysisDir(x)}
     }
+    // don't care about umi saturation histogram
+    /*
     umiSaturationHistogram {
         path {x -> standardAnalysisDir(x)}
     }
+    */
     digitalAlleleFrequencies {
         path {x -> standardAnalysisDir(x)}
     }
