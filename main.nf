@@ -517,6 +517,8 @@ workflow {
     standardAnalysisProperties = standard_analysis_workflow.out.properties
     standardAnalysisPdf = standard_analysis_workflow.out.standardAnalysisPdf
     umiSaturationMetrics = standard_analysis_workflow.out.umiSaturationMetrics
+    sexCalls = standard_analysis_workflow.out.sexCalls
+    sexPdf = standard_analysis_workflow.out.sexPdf
 
     // MapMyCells outputs
     mapMyCellsJsonReport = mapMyCellsJsonReport
@@ -751,6 +753,12 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     umiSaturationMetrics {
+        path {x -> standardAnalysisDir(x)}
+    }
+    sexCalls {
+        path {x -> standardAnalysisDir(x)}
+    }
+    sexPdf {
         path {x -> standardAnalysisDir(x)}
     }
     mapMyCellsJsonReport {

@@ -23,6 +23,7 @@ include { MERGE_SPLIT_DGES } from '../../modules/local/mergeSplitDges.nf'
 include { MERGE_DGE_SUMMARIES; MERGE_DGE_SUMMARIES as MERGE_GMG_DGE_SUMMARIES } from '../../modules/local/mergeDgeSummaries.nf'
 include { MERGE_DGE} from '../../modules/local/mergeDge.nf'
 include { PLOT_STANDARD_ANALYSIS } from '../../modules/local/plotStandardAnalysis.nf'
+include { CALL_SEX_FROM_METACELLS } from '../../modules/local/callSexFromMetacells.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
 workflow standard_analysis_workflow {
@@ -185,6 +186,15 @@ workflow standard_analysis_workflow {
             metacellMetrics = channel.empty()
         }
     }
+    if ((params.vcf || params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
+        CALL_SEX_FROM_METACELLS(params.library, referenceMetadataLocator.xipherConfig, 
+        CREATE_METACELLS.out.metacells.collect(), CREATE_METACELLS.out.metacellMetrics.collect())
+        sexCalls = combineIntoTupleChannel(meta, CALL_SEX_FROM_METACELLS.out.sexCalls)
+        sexPdf = combineIntoTupleChannel(meta, CALL_SEX_FROM_METACELLS.out.pdf)
+    } else {
+        sexCalls = channel.empty()
+        sexPdf = channel.empty()
+    }
     WRITE_PROPERTIES(workflowProperties)
     standardAnalysisProperties = combineIntoTupleChannel(meta, WRITE_PROPERTIES.out)
 
@@ -218,5 +228,7 @@ workflow standard_analysis_workflow {
     gmgDgeSummary = gmgDgeSummary
     properties = standardAnalysisProperties
     standardAnalysisPdf = standardAnalysisPdf
+    sexCalls = sexCalls
+    sexPdf = sexPdf
     umiSaturationMetrics = umiSaturationMetrics
 }
