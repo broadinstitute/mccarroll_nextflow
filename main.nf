@@ -515,6 +515,8 @@ workflow {
     gmgDge = standard_analysis_workflow.out.gmgDge
     gmgDgeSummary = standard_analysis_workflow.out.gmgDgeSummary
     standardAnalysisProperties = standard_analysis_workflow.out.properties
+    standardAnalysisPdf = standard_analysis_workflow.out.standardAnalysisPdf
+    umiSaturationMetrics = standard_analysis_workflow.out.umiSaturationMetrics
 
     // MapMyCells outputs
     mapMyCellsJsonReport = mapMyCellsJsonReport
@@ -743,6 +745,12 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     standardAnalysisProperties {
+        path {x -> standardAnalysisDir(x)}
+    }
+    standardAnalysisPdf {
+        path {x -> standardAnalysisDir(x)}
+    }
+    umiSaturationMetrics {
         path {x -> standardAnalysisDir(x)}
     }
     mapMyCellsJsonReport {
