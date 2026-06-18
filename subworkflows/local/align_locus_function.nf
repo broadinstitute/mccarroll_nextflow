@@ -24,6 +24,12 @@ include { MERGE_BAM_TAG_HISTOGRAMS } from '../../modules/local/mergeBamTagHistog
 include { BUILD_CELL_FEATURES_SIMPLE } from '../../modules/local/buildCellFeaturesSimple.nf'
 include { MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE } from '../../modules/local/mergeMolecularBarcodeDistributionByGene.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
+include { GATHER_READ_QUALITY_METRICS } from '../../modules/local/gatherReadQualityMetrics.nf'
+include { MERGE_READ_QUALITY_METRICS } from '../../modules/local/mergeReadQualityMetrics.nf'
+include { MERGE_RNA_SEQ_METRICS } from '../../modules/local/mergeRnaSeqMetrics.nf'
+include { PLOT_ALIGNMENT_SUMMARY } from '../../modules/local/plotAlignmentSummary.nf'
+include { PICARD_COLLECTRNASEQMETRICS } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
+
 workflow align_locus_function_workflow {
     take:
         unmappedBams
@@ -171,6 +177,13 @@ workflow align_locus_function_workflow {
         loadMtSequences(referenceMetadataLocator.contigGroups),
         params.cellBarcodeTag
     )
+    GATHER_READ_QUALITY_METRICS(alignedBams)
+    PICARD_COLLECTRNASEQMETRICS(
+        alignedBams,
+        referenceMetadataLocator.refFlat,
+        params.reference,
+        referenceMetadataLocator.ribosomalIntervals
+    )
 
     // Merging of split-bam 20-transcript DGE stuff
     selectedCellsList = collectInOrder(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells)
@@ -197,6 +210,20 @@ workflow align_locus_function_workflow {
         params.library,
         collectInOrder(BAM_TAG_HISTOGRAM.out.histogram),
         numReadsPerCellExtension
+    )
+
+    MERGE_READ_QUALITY_METRICS(
+        params.library,
+        collectInOrder(GATHER_READ_QUALITY_METRICS.out)
+    )
+    MERGE_RNA_SEQ_METRICS(
+        params.library,
+        collectInOrder(PICARD_COLLECTRNASEQMETRICS.out.metrics)
+    )
+    PLOT_ALIGNMENT_SUMMARY(
+        params.library,
+        MERGE_READ_QUALITY_METRICS.out,
+        MERGE_RNA_SEQ_METRICS.out
     )
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
@@ -233,6 +260,9 @@ workflow align_locus_function_workflow {
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
     chimericTranscripts = addMeta(finalMeta, MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts)
     outputProperties = addMeta(finalMeta, WRITE_PROPERTIES.out)
+    readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out)
+    rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out)
+    alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out)
     emit:
     properties = outputProperties
     alignedBam = alignedBams
@@ -249,5 +279,8 @@ workflow align_locus_function_workflow {
     sparseDgeFeatures = sparseDgeFeatures
     sparseDgeBarcodes = sparseDgeBarcodes
     cellFeatures = cellFeatures
+    readQualityMetrics = readQualityMetrics
+    rnaSeqMetrics = rnaSeqMetrics
+    alignmentSummaryPdf = alignmentSummaryPdf
     readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out
 }

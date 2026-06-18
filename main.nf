@@ -226,12 +226,14 @@ workflow {
     // Default all stage outputs to empty; each block below overwrites the channels it produces.
     // When adding outputs to a stage, add the corresponding channel.empty() initializer here.
 
-    // tag_and_split + align_locus_function outputs
+    // tag_and_split outputs
     unmappedBam = channel.empty()
     splitBamManifest = channel.empty()
     unmappedProperties = channel.empty()
     correctedBarcodeMetrics = channel.empty()
     barcodeCounts = channel.empty()
+
+    // align_locus_function outputs
     alignedBam = channel.empty()
     alignedBai = channel.empty()
     sizeSelectedCells = channel.empty()
@@ -246,6 +248,9 @@ workflow {
     sparseDgeBarcodes = channel.empty()
     cellFeatures = channel.empty()
     alignmentProperties = channel.empty()
+    alignmentSummaryPdf = channel.empty()
+    readQualityMetrics = channel.empty()
+    rnaSeqMetrics = channel.empty()
 
     // cbrb outputs
     cbrbH5 = channel.empty()
@@ -312,6 +317,9 @@ workflow {
         sparseDgeFeatures = align_locus_function_workflow.out.sparseDgeFeatures
         sparseDgeBarcodes = align_locus_function_workflow.out.sparseDgeBarcodes
         cellFeatures = align_locus_function_workflow.out.cellFeatures
+        readQualityMetrics = align_locus_function_workflow.out.readQualityMetrics
+        rnaSeqMetrics = align_locus_function_workflow.out.rnaSeqMetrics
+        alignmentSummaryPdf = align_locus_function_workflow.out.alignmentSummaryPdf
         alignmentProperties = align_locus_function_workflow.out.properties
 
         cbrbH5 = cbrb_workflow.out.h5
@@ -420,11 +428,14 @@ workflow {
     )
 
     publish:
+    // unmapped BAM outputs
     unmappedBam = unmappedBam
     splitBamManifest = splitBamManifest
     correctedBarcodeMetrics = correctedBarcodeMetrics
     barcodeCounts = barcodeCounts
     unmappedProperties = unmappedProperties
+
+    // aligned BAM outputs
     alignedBam = alignedBam
     alignedBai = alignedBai
     sizeSelectedCells = sizeSelectedCells
@@ -439,6 +450,9 @@ workflow {
     sparseDgeBarcodes = sparseDgeBarcodes
     cellFeatures = cellFeatures
     alignmentProperties = alignmentProperties
+    readQualityMetrics = readQualityMetrics
+    rnaSeqMetrics = rnaSeqMetrics
+    alignmentSummaryPdf = alignmentSummaryPdf
 
     cbrbH5 = cbrbH5
     cbrbBarcodes = cbrbBarcodes
@@ -549,6 +563,15 @@ output {
         path {x -> alignmentDir(x)}
     }
     alignmentProperties {
+        path {x -> alignmentDir(x)}
+    }
+    readQualityMetrics {
+        path {x -> alignmentDir(x)}
+    }
+    rnaSeqMetrics {
+        path {x -> alignmentDir(x)}
+    }
+    alignmentSummaryPdf {
         path {x -> alignmentDir(x)}
     }
 
