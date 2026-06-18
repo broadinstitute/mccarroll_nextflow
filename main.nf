@@ -447,9 +447,10 @@ workflow {
     dgeSummary = dgeSummary
     chimericTranscripts = chimericTranscripts
     chimericReadMetrics = chimericReadMetrics
-    readsPerCell = readsPerCell
+    // These two are not published -- emobodied in cellFeatures and sparse matrix
+    //readsPerCell = readsPerCell
+    //dge = dge
     singleCellRnaSeqMetrics = singleCellRnaSeqMetrics
-    dge = dge
     sparseDgeMatrix = sparseDgeMatrix
     sparseDgeFeatures = sparseDgeFeatures
     sparseDgeBarcodes = sparseDgeBarcodes
@@ -549,12 +550,18 @@ output {
     chimericReadMetrics {
         path {x -> alignmentDir(x)}
     }
+    /*
+     * Reads per cell is not needed -- this gets included in cellFeatures
     readsPerCell {
         path { alignmentDirFromParams() }
     }
+    */
+    /* 
+     * DGE is not needed -- sparse matrix should be good enough.
     dge {
         path {x -> alignmentDir(x)}
     }
+    */
     singleCellRnaSeqMetrics {
         path {x -> alignmentDir(x)}
     }
