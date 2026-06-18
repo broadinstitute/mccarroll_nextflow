@@ -6,6 +6,8 @@ include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/r
 include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
 include { JOIN_CBRB_CELL_FEATURES } from '../../modules/local/joinCbrbCellFeatures.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
+include { DUMP_ELBO_TABLE } from '../../modules/local/dumpElboTable.nf'
+include { PLOT_CBRB_TEAR_SHEET } from '../../modules/local/plotCbrbTearSheet.nf'
 
 workflow cbrb_workflow {
     take:
@@ -14,6 +16,7 @@ workflow cbrb_workflow {
     sparseDgeBarcodes
     cellFeatures
     denseDgeMatrix
+    readQualityMetrics
 
     main:
     sparseDgeMatrixNoMeta = noMetaChannelHelper(sparseDgeMatrix)
@@ -54,6 +57,21 @@ workflow cbrb_workflow {
         cellFeatures.map {m, file -> tuple(m + [cbrb_label: cbrb_label], file)},
         noMetaChannelHelper(HDF5_10X_TO_TEXT.out.numTranscripts),
     )
+    DUMP_ELBO_TABLE(
+        params.library,
+        noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.h5)
+    )
+    PLOT_CBRB_TEAR_SHEET(
+        params.library,
+        cbrb_label,
+        DUMP_ELBO_TABLE.out.collect(),
+        noMetaChannelHelper(HDF5_10X_TO_TEXT.out.numTranscripts).collect(),
+        noMetaChannelHelper(readQualityMetrics).collect(),
+        noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.pdf).collect(),
+        noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.metrics).collect(),
+        noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.barcodes).collect(),
+        noMetaChannelHelper(cellFeatures).collect()
+    )
     workflowProperties = [
         useSvmParameterEstimation: params.useSvmParameterEstimation,
         forceTwoClusterSolution: params.forceTwoClusterSolution,
@@ -61,7 +79,7 @@ workflow cbrb_workflow {
     ]
     WRITE_PROPERTIES(workflowProperties)
     cbrbProperties = combineIntoTupleChannel(metaWithArgs, WRITE_PROPERTIES.out)
-    
+    cbrbTearSheet = combineIntoTupleChannel(metaWithArgs, PLOT_CBRB_TEAR_SHEET.out)
     
     emit:
     svmCbrbParameters = svmCbrbParameters
@@ -77,5 +95,6 @@ workflow cbrb_workflow {
     numTranscripts = HDF5_10X_TO_TEXT.out.numTranscripts
     cellFeatures = JOIN_CBRB_CELL_FEATURES.out.cbrbCellFeatures
     properties = cbrbProperties
+    cbrbTearSheet = cbrbTearSheet
 
 }
