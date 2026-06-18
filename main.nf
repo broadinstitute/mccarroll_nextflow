@@ -266,6 +266,7 @@ workflow {
     cbrbDge = channel.empty()
     cbrbNumTranscripts = channel.empty()
     cbrbCellFeatures = channel.empty()
+    cbrbTearSheet = channel.empty()
     cbrbProperties = channel.empty()
 
     // cell_selection outputs
@@ -297,7 +298,8 @@ workflow {
             align_locus_function_workflow.out.sparseDgeFeatures,
             align_locus_function_workflow.out.sparseDgeBarcodes,
             align_locus_function_workflow.out.cellFeatures,
-            align_locus_function_workflow.out.dge
+            align_locus_function_workflow.out.dge,
+            align_locus_function_workflow.out.readQualityMetrics
         )
 
         unmappedBam = tag_and_split_bam_workflow.out.splitBams
@@ -337,6 +339,7 @@ workflow {
         cbrbNumTranscripts = cbrb_workflow.out.numTranscripts
         cbrbCellFeatures = cbrb_workflow.out.cellFeatures
         cbrbProperties = cbrb_workflow.out.properties
+        cbrbTearSheet = cbrb_workflow.out.cbrbTearSheet
 
     }
 
@@ -352,6 +355,7 @@ workflow {
             cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
             cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
             cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
+            cbrbTearSheet = restartTupleChannel(restartInputs.cbrbTearSheet, cbrbMeta)
             dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
             chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
             chimericReadMetrics = restartTupleChannel(restartInputs.chimericReadMetrics, finalMeta)
@@ -472,6 +476,7 @@ workflow {
     cbrbDge = cbrbDge
     cbrbNumTranscripts = cbrbNumTranscripts
     cbrbCellFeatures = cbrbCellFeatures
+    cbrbTearSheet = cbrbTearSheet
     cbrbProperties = cbrbProperties
 
     selectedCellBarcodes = selectedCellBarcodes
@@ -625,6 +630,9 @@ output {
         path {x -> cbrbDir(x)}
     }
     cbrbCellFeatures {
+        path {x -> cbrbDir(x)}
+    }
+    cbrbTearSheet {
         path {x -> cbrbDir(x)}
     }
     cbrbProperties {
