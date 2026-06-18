@@ -22,6 +22,7 @@ include { DIGITAL_EXPRESSION } from '../../modules/local/digitalExpression.nf'
 include { MERGE_SPLIT_DGES } from '../../modules/local/mergeSplitDges.nf'
 include { MERGE_DGE_SUMMARIES; MERGE_DGE_SUMMARIES as MERGE_GMG_DGE_SUMMARIES } from '../../modules/local/mergeDgeSummaries.nf'
 include { MERGE_DGE} from '../../modules/local/mergeDge.nf'
+include { PLOT_STANDARD_ANALYSIS } from '../../modules/local/plotStandardAnalysis.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
 workflow standard_analysis_workflow {
@@ -47,6 +48,14 @@ workflow standard_analysis_workflow {
     MERGE_UMI_READ_INTERVALS(meta, collectInOrder(GATHER_UMI_READ_INTERVALS.out.umiReadIntervals))
     CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE(selectedCells, noMetaChannelHelper(chimericTranscripts).collect())
     DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES(selectedCells, noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect())
+    PLOT_STANDARD_ANALYSIS(
+        params.library,
+        noMetaChannelHelper(DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES.out.umiSaturationHistogram).collect(),
+        noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect(),
+        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect()
+    )
+    standardAnalysisPdf = combineIntoTupleChannel(meta, PLOT_STANDARD_ANALYSIS.out.pdf)
+    umiSaturationMetrics = combineIntoTupleChannel(meta, PLOT_STANDARD_ANALYSIS.out.umi_saturation_metrics)
     DISCOVER_META_GENES(
         bams, 
         noChannelSelectedCells,
@@ -208,4 +217,6 @@ workflow standard_analysis_workflow {
     gmgDge = gmgDge
     gmgDgeSummary = gmgDgeSummary
     properties = standardAnalysisProperties
+    standardAnalysisPdf = standardAnalysisPdf
+    umiSaturationMetrics = umiSaturationMetrics
 }
