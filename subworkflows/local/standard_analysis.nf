@@ -25,6 +25,8 @@ include { MERGE_DGE} from '../../modules/local/mergeDge.nf'
 include { PLOT_STANDARD_ANALYSIS } from '../../modules/local/plotStandardAnalysis.nf'
 include { CALL_SEX_FROM_METACELLS } from '../../modules/local/callSexFromMetacells.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
+include { FILTER_CELL_METADATA } from '../../modules/local/filterCellMetadata.nf'
+include { JOIN_CELL_METADATA } from '../../modules/local/joinCellMetadata.nf'
 
 workflow standard_analysis_workflow {
     take:
@@ -163,6 +165,7 @@ workflow standard_analysis_workflow {
 
         donorDge = FILTER_DONOR_DGE.out.filteredDge
         donorDgeSummary = FILTER_DONOR_DGE.out.filteredDgeSummary
+        goodBarcodes = donorCellBarcodes
     } else {
         digitalAlleleFrequencies = channel.empty()
         donorAssignments = channel.empty()
@@ -185,7 +188,13 @@ workflow standard_analysis_workflow {
             metacells = channel.empty()
             metacellMetrics = channel.empty()
         }
+        goodBarcodes = selectedCells
     }
+    FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(goodBarcodes).collect())
+    JOIN_CELL_METADATA(params.library, FILTER_CELL_METADATA.out,
+        noMetaChannelHelper(donorCellMap).collect().ifEmpty([]), params.donor ?: '',
+        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
+    cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
     if ((params.vcf || params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
         CALL_SEX_FROM_METACELLS(params.library, referenceMetadataLocator.xipherConfig, 
         CREATE_METACELLS.out.metacells.collect(), CREATE_METACELLS.out.metacellMetrics.collect())
@@ -231,4 +240,5 @@ workflow standard_analysis_workflow {
     sexCalls = sexCalls
     sexPdf = sexPdf
     umiSaturationMetrics = umiSaturationMetrics
+    cellMetadata = cellMetadata
 }
