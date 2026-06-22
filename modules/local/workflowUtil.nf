@@ -47,3 +47,9 @@ def addMeta(meta, channel) {
         tuple(meta, file)
     }
 }
+
+// Nextflow cannot create a value channel from a null val input, so coerce a possibly-null
+// param into the sentinel 'NA' before passing it as a process val input.
+def naIfNull(value) {
+    return value != null ? value : 'NA'
+}
