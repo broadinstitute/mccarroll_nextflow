@@ -1,6 +1,6 @@
 include {CALL_STAMPS_SVM_NUCLEI} from '../../modules/local/callSTAMPsSvmNuclei.nf'
 include {CALL_STAMPS_MANUAL_THRESHOLDS} from '../../modules/local/callSTAMPsManualThresholds.nf'
-include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
+include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel; naIfNull} from '../../modules/local/workflowUtil.nf'
 include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
@@ -20,10 +20,10 @@ workflow cell_selection_workflow {
             noMetaChannelHelper(cellFeatures),
             noMetaChannelHelper(cbrbNonEmpties),
             cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
-            params.minUMIsPerCell,
-            params.maxUMIsPerCell,
-            params.minIntronicPerCell,
-            params.maxIntronicPerCell
+            naIfNull(params.minUMIsPerCell),
+            naIfNull(params.maxUMIsPerCell),
+            naIfNull(params.minIntronicPerCell),
+            naIfNull(params.maxIntronicPerCell)
         )
         selectedCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.selectedCellBarcodes
         ambientCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.ambientCellBarcodes
