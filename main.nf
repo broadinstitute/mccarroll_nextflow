@@ -507,6 +507,7 @@ workflow {
     donorAssignmentPdf = standard_analysis_workflow.out.donorAssignmentPdf
     donorDge = standard_analysis_workflow.out.donorDge
     donorDgeSummary = standard_analysis_workflow.out.donorDgeSummary
+    standardAnalysisCellMetadata = standard_analysis_workflow.out.cellMetadata
     metacells = standard_analysis_workflow.out.metacells
     metacellMetrics = standard_analysis_workflow.out.metacellMetrics
     metageneReport = standard_analysis_workflow.out.metageneReport
@@ -759,6 +760,9 @@ output {
         path {x -> standardAnalysisDir(x)}
     }
     sexPdf {
+        path {x -> standardAnalysisDir(x)}
+    }
+    standardAnalysisCellMetadata {
         path {x -> standardAnalysisDir(x)}
     }
     mapMyCellsJsonReport {
