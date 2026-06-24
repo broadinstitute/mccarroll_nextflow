@@ -2,7 +2,7 @@ include {noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper; combineInto
 include { buildReferenceMetadataLocator; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {FILTER_DGE; FILTER_DGE as FILTER_DONOR_DGE} from '../../modules/local/filterDge.nf'
 include {MAKE_TRIPLET_DGE} from '../../modules/local/makeTripletDge.nf'
-include { GATHER_UMI_READ_INTERVALS } from '../../modules/local/gatherUmiReadIntervals.nf'
+include { GATHER_UMI_READ_INTERVALS } from '../../modules/local/gatherUMIReadIntervals.nf'
 include { MERGE_UMI_READ_INTERVALS } from '../../modules/local/mergeUMIReadIntervals.nf'
 include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE } from '../../modules/local/chimericReportEditDistanceCollapse.nf'
 include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
