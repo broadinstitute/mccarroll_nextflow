@@ -15,12 +15,22 @@ workflow tag_and_split_bam_workflow {
         allowedBarcodes
 
     main:
+        workflowProperties = [
+        library: library,
+        experimentDate: params.experimentDate,
+        version10X: params.version10X,
+        beadStructure: beadStructure,
+        allowedBarcodes: allowedBarcodes.toString(),
+        fivePrimeAdapter: params.fivePrimeAdapter
+        ]
     if (fastq_read1.size() > 0) {
         // Check that read1 and read2 lists have the same length
         if (fastq_read1.size() != fastq_read2.size()) {
             error "The number of read1 and read2 files must be the same: " +
                     "found ${fastq_read1.size()} read1 files and ${fastq_read2.size()} read2 files."
         }
+        workflowProperties.fastq_read1 = fastq_read1
+        workflowProperties.fastq_read2 = fastq_read2
         fastqTuples = fastq_read1.withIndex().collect { read1, idx ->
             def read2 = fastq_read2[idx]
             // funky BAM file naming convention, plus passing meta.library so closuer in modules.config can set RG values
@@ -30,22 +40,16 @@ workflow tag_and_split_bam_workflow {
         PICARD_FASTQTOSAM(fastqChannel)
         localRawBam = PICARD_FASTQTOSAM.out.bam
     } else if (rawBam.size() > 0) {
+        workflowProperties.rawBam = rawBam
         // TODO: This doesn't work.  COUNT_BARCODE_SEQUENCES create a command line without the directory,
         //  which causes the process to fail because it can't find the BAM file.
-        localRawBam = rawBam
+        bamTuples = rawBam.withIndex().collect { bam, idx ->
+            return [[id: library + "." + idx + ".raw", library: library, collectIndex: idx], bam]
+        }
+        localRawBam = channel.fromList(bamTuples)
     } else {
         error "Manifest must contain either 'fastq' or 'rawBam' key."
     }
-    workflowProperties = [
-        library: library,
-        experimentDate: params.experimentDate,
-        version10X: params.version10X,
-        beadStructure: beadStructure,
-        allowedBarcodes: allowedBarcodes.toString(),
-        fivePrimeAdapter: params.fivePrimeAdapter,
-        fastq_read1: fastq_read1,
-        fastq_read2: fastq_read2
-    ]
     WRITE_PROPERTIES(workflowProperties)
     // collect() because all the BAMs need to be processed together.
     collectedRawBams = collectInOrder(localRawBam)
