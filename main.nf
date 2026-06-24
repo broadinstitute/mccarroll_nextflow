@@ -123,9 +123,9 @@ params {
     experimentDate: String
     reference: Path
     cloudReference: Path
-    fastq_read1: List
-    fastq_read2: List
-    rawBam: List
+    fastq_read1: List<String>
+    fastq_read2: List<String>
+    rawBam: List<String>
     version10X: String
     sampleType: String
     beadStructure: String
@@ -146,8 +146,8 @@ params {
     cloudVcf: Path
     donorFile: Path
     donor: String
-    assignCellsToSamplesOptions: List
-    detectDoubletsOptions: List
+    assignCellsToSamplesOptions: List<String>
+    detectDoubletsOptions: List<String>
     computeCBRBAdjustedLikelihoods: Boolean
     metaGeneDgeFunctionalStrategy: String
 
