@@ -3,7 +3,7 @@ include {noMetaChannelHelper; combineIntoTupleChannel} from '../../modules/local
 include { makeCbrbLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
-include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10x_to_text.nf'
+include { HDF5_10X_TO_TEXT } from '../../modules/local/hdf5_10X_to_text.nf'
 include { JOIN_CBRB_CELL_FEATURES } from '../../modules/local/joinCbrbCellFeatures.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 include { DUMP_ELBO_TABLE } from '../../modules/local/dumpElboTable.nf'
