@@ -1,7 +1,8 @@
 process WRITE_PROPERTIES {
     label 'process_single'
 
-    container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
+    // TODO: this should run locally, or at least use a very lightweight container 
+    container 'quay.io/broadinstitute/drop-seq_r:current'
 
     input:
         val properties
