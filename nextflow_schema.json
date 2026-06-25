@@ -226,7 +226,7 @@
       "default": []
     },
     "version10X": {
-      "type": ["number", "string"]
+      "type": "string"
     },
     "sampleType": {
       "type": "string",
