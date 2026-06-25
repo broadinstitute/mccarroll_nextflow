@@ -23,7 +23,7 @@ workflow tag_and_split_bam_workflow {
         allowedBarcodes: allowedBarcodes.toString(),
         fivePrimeAdapter: params.fivePrimeAdapter
         ]
-    if (fastq_read1.size() > 0) {
+    if (fastq_read1 != null && fastq_read1.size() > 0) {
         // Check that read1 and read2 lists have the same length
         if (fastq_read1.size() != fastq_read2.size()) {
             error "The number of read1 and read2 files must be the same: " +
@@ -39,7 +39,7 @@ workflow tag_and_split_bam_workflow {
         fastqChannel = channel.fromList(fastqTuples)
         PICARD_FASTQTOSAM(fastqChannel)
         localRawBam = PICARD_FASTQTOSAM.out.bam
-    } else if (rawBam.size() > 0) {
+    } else if (rawBam != null && rawBam.size() > 0) {
         workflowProperties.rawBam = rawBam
         // TODO: This doesn't work.  COUNT_BARCODE_SEQUENCES create a command line without the directory,
         //  which causes the process to fail because it can't find the BAM file.

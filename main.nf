@@ -123,17 +123,17 @@ params {
     experimentDate: String
     reference: Path
     cloudReference: Path
-    fastq_read1: List<String>
-    fastq_read2: List<String>
-    rawBam: List<String>
+    fastq_read1: List<String> = []
+    fastq_read2: List<String> = []
+    rawBam: List<String> = []
     version10X: String
     sampleType: String
     beadStructure: String
 
     // cbrb parameters
-    useSvmParameterEstimation: Boolean
-    forceTwoClusterSolution: Boolean
-    cbrbArgs: String
+    useSvmParameterEstimation: Boolean = true
+    forceTwoClusterSolution: Boolean = false
+    cbrbArgs: String = ''
 
     // cell selection parameters
     minUMIsPerCell: Integer
@@ -146,28 +146,28 @@ params {
     cloudVcf: Path
     donorFile: Path
     donor: String
-    assignCellsToSamplesOptions: List<String>
-    detectDoubletsOptions: List<String>
-    computeCBRBAdjustedLikelihoods: Boolean
+    assignCellsToSamplesOptions: List<String> = []
+    detectDoubletsOptions: List<String> = []
+    computeCBRBAdjustedLikelihoods: Boolean = true
     metaGeneDgeFunctionalStrategy: String
 
     // MapMyCells parameters 
     mapMyCellsQueryMarkers: Path
-    mapMyCellsArgs: String
+    mapMyCellsArgs: String = ''
 
     // defaults
-    cellBarcodeTag: String
-    molecularBarcodeTag: String
-    targetBamSizeMBytes: Integer
-    fivePrimeAdapter: String
-    strandStrategy: String
-    locusFunction: String
-    minimumTranscriptsPerCell: Integer
-    dgeMinReadMq: Integer
-    dgeFunctionalStrategy: String
+    cellBarcodeTag: String          = 'XC'
+    molecularBarcodeTag: String     = 'XM'
+    targetBamSizeMBytes: Integer    = 2048
+    fivePrimeAdapter: String        = 'AAGCAGTGGTATCAACGCAGAGTACATGGG'
+    strandStrategy: String          = 'SENSE'
+    locusFunction: String           = 'EXONIC_INTRONIC'
+    minimumTranscriptsPerCell: Integer = 20
+    dgeMinReadMq: Integer = 10
+    dgeFunctionalStrategy: String = 'DROPSEQ'
 
     // infrastructure parameters
-    start_at: String
+    start_at: String = 'beginning'
 
     // nf-core infrastructure parameters
     email: String
