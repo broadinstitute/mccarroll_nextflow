@@ -1,3 +1,6 @@
+include {hasExtension; replaceExtension} from './FileUtil.nf'
+
+
 process CORRECT_SCRNA_READ_PAIRS {
     label 'process_single'
 
@@ -28,9 +31,15 @@ process CORRECT_SCRNA_READ_PAIRS {
     script:
     if (!output_file.any()) {
         def firstBam = bams.getAt(0)
-        output_file = firstBam.getName().replace(".raw.bam", ".cbc_corrected.bam")
+        if (hasExtension(firstBam, "raw.bam")) {
+            output_file = replaceExtension(firstBam, "raw.bam", "cbc_corrected.bam")
+        } else if (hasExtension(firstBam, "bam")) {
+            output_file = replaceExtension(firstBam, "bam", "cbc_corrected.bam")
+        } else  {
+            throw new RuntimeException("Unsupported BAM file extension: ${firstBam}")
+        }
     }
-    metrics_file = output_file.replace(".cbc_corrected.bam", ".corrected_barcode_metrics")
+    metrics_file = replaceExtension(output_file, "cbc_corrected.bam", "corrected_barcode_metrics")
     def parsedBeadStructure = new BeadStructure(beadStructure)
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Cellular)
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1 // Convert from zero-based to one-based indexing for Java command line argument
