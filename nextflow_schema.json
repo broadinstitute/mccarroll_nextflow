@@ -349,5 +349,5 @@
       "type": "string"
     }
   },
-  "required": ["project", "library", "sampleType"]
+  "required": ["project", "library", "sampleType", "outdir"]
 }
