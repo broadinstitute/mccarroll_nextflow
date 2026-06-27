@@ -184,9 +184,6 @@
       "type": "string",
       "format": "file-path"
     },
-    "project": {
-      "type": "string"
-    },
     "library": {
       "type": "string"
     },
@@ -349,5 +346,5 @@
       "type": "string"
     }
   },
-  "required": ["project", "library", "sampleType", "outdir"]
+  "required": ["library", "sampleType", "outdir"]
 }
