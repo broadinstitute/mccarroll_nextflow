@@ -118,7 +118,6 @@ def restartAlignedBamChannel(pathPattern, boolean doBQSR, String referenceName) 
 
 params {
     allowedBarcodes: Path
-    project: String
     library: String
     experimentDate: String
     reference: Path
