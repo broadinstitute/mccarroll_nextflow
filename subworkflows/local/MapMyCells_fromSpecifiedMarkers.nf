@@ -22,7 +22,7 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow  {
         MTX_TO_H5AD.out,
         params.mapMyCellsArgs)
     workflowProperties = [
-        queryMarkers: params.mapMyCellsQueryMarkers.toString(),
+        queryMarkers: params.mapMyCellsQueryMarkers.toUriString(),
         mmcModel: modelLocator.modelName,
         mapMyCellsArgs: params.mapMyCellsArgs
     ]
