@@ -20,7 +20,7 @@ workflow tag_and_split_bam_workflow {
         experimentDate: params.experimentDate,
         version10X: params.version10X,
         beadStructure: beadStructure,
-        allowedBarcodes: allowedBarcodes.toString(),
+        allowedBarcodes: allowedBarcodes.toUriString(),
         fivePrimeAdapter: params.fivePrimeAdapter
         ]
     if (fastq_read1 != null && fastq_read1.size() > 0) {

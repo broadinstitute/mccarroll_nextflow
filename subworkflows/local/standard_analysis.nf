@@ -111,8 +111,8 @@ workflow standard_analysis_workflow {
         metaGeneDgeFunctionalStrategy: functionalStrategy
     ]
     if (params.vcf) {
-        workflowProperties.vcf = params.vcf.toString()
-        workflowProperties.donorFile = params.donorFile.toString()
+        workflowProperties.vcf = params.vcf.toUriString()
+        workflowProperties.donorFile = params.donorFile.toUriString()
         bcf = params.cloudVcf ?: params.vcf
         nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
         GATHER_DIGITAL_ALLELE_COUNTS(bams, noChannelSelectedCells, 

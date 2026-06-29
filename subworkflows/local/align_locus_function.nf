@@ -244,7 +244,7 @@ workflow align_locus_function_workflow {
         MERGE_BAM_TAG_HISTOGRAMS.out
     )
     workflowProperties = [
-        reference: params.reference.toString(),
+        reference: params.reference.toUriString(),
         strandStrategy: params.strandStrategy,
         locusFunction: params.locusFunction,
         minReadMq: params.dgeMinReadMq,
