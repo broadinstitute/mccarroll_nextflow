@@ -93,16 +93,16 @@ def shouldRunStage(String startAt, String stageName) {
 }
 
 def restartTupleChannel(pathPattern, meta) {
-    channel.fromPath(pathPattern.toString(), checkIfExists: true)
+    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
         .map { inputFile -> tuple(meta, inputFile) }
 }
 
 def restartPathChannel(pathPattern) {
-    channel.fromPath(pathPattern.toString(), checkIfExists: true)
+    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
 }
 
 def restartAlignedBamChannel(pathPattern, boolean doBQSR, String referenceName) {
-    channel.fromPath(pathPattern.toString(), checkIfExists: true)
+    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
         .map { bam ->
             def bamBase = doBQSR ?
                 bam.getName().replaceFirst(/\.bam$/, '') :
@@ -354,10 +354,8 @@ workflow {
             cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
             cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
             cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
-            cbrbTearSheet = restartTupleChannel(restartInputs.cbrbTearSheet, cbrbMeta)
             dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
             chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
-            chimericReadMetrics = restartTupleChannel(restartInputs.chimericReadMetrics, finalMeta)
             readsPerCell = restartPathChannel(restartInputs.readsPerCell)
             alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
         }
@@ -391,7 +389,6 @@ workflow {
             cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
             dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
             chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
-            chimericReadMetrics = restartTupleChannel(restartInputs.chimericReadMetrics, finalMeta)
             readsPerCell = restartPathChannel(restartInputs.readsPerCell)
             alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
         }

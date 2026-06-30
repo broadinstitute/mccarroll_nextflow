@@ -50,7 +50,7 @@ def makeCbrbLabel(params) {
 def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelectionLabel, doBQSR) {
     def root = outdir instanceof java.nio.file.Path ?
         outdir :
-        java.nio.file.Paths.get(outdir.toString())
+        file(outdir)
 
     def alignmentDir = root.resolve(referenceName)
     def cbrbDir = alignmentDir.resolve('cbrb').resolve(cbrbLabel)
