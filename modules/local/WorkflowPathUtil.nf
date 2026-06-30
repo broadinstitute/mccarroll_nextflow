@@ -47,10 +47,21 @@ def makeCbrbLabel(params) {
         String.format('%04x', params.cbrbArgs.hashCode())
 }
 
+def makePathFromString(str) {
+      def uri = java.net.URI.create(str)
+      def scheme = uri.getScheme();
+      if (scheme == null || scheme.equalsIgnoreCase("file")) {
+          // local path
+          return java.nio.file.Paths.get(str);
+      } else {
+          // delegate to whichever FileSystemProvider is registered for this scheme
+          return java.nio.file.Paths.get(uri);
+      }
+}
 def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelectionLabel, doBQSR) {
     def root = outdir instanceof java.nio.file.Path ?
         outdir :
-        java.nio.file.Paths.get(outdir.toString())
+        makePathFromString(outdir.toString())
 
     def alignmentDir = root.resolve(referenceName)
     def cbrbDir = alignmentDir.resolve('cbrb').resolve(cbrbLabel)
