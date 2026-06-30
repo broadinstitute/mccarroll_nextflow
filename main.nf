@@ -450,9 +450,9 @@ workflow {
     dgeSummary = dgeSummary
     chimericTranscripts = chimericTranscripts
     chimericReadMetrics = chimericReadMetrics
-    // These two are not published -- emobodied in cellFeatures and sparse matrix
-    //readsPerCell = readsPerCell
-    //dge = dge
+    // These two are published only for the purpose of start_at != beginning
+    readsPerCell = readsPerCell
+    dge = dge
     singleCellRnaSeqMetrics = singleCellRnaSeqMetrics
     sparseDgeMatrix = sparseDgeMatrix
     sparseDgeFeatures = sparseDgeFeatures
@@ -561,17 +561,17 @@ output {
         path {x -> alignmentDir(x)}
     }
     /*
-     * Reads per cell is not needed -- this gets included in cellFeatures
+     * published so that can start_at > beginning
+    */
     readsPerCell {
         path { alignmentDirFromParams() }
     }
-    */
     /* 
-     * DGE is not needed -- sparse matrix should be good enough.
+     * published so that can start_at > beginning
+    */
     dge {
         path {x -> alignmentDir(x)}
     }
-    */
     singleCellRnaSeqMetrics {
         path {x -> alignmentDir(x)}
     }
