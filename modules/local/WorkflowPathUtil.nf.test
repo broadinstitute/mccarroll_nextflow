@@ -1,0 +1,138 @@
+nextflow_function {
+
+    name "Test Functions"
+    script "modules/local/WorkflowPathUtil.nf"
+
+    test("buildRestartInputPaths builds local filesystem paths") {
+
+        function "buildRestartInputPaths"
+
+        when {
+            function {
+                """
+                input[0] = "/data/output"
+                input[1] = "hg19"
+                input[2] = "lib1"
+                input[3] = "auto"
+                input[4] = "auto"
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assert function.success
+
+            def paths = function.result
+            assert paths.alignmentDir == "/data/output/hg19"
+            assert paths.cbrbDir == "/data/output/hg19/cbrb/auto"
+            assert paths.cellSelectionDir == "/data/output/hg19/cbrb/auto/cell_selection/auto"
+            assert paths.sparseDgeMatrix == "/data/output/hg19/matrix.mtx.gz"
+            assert paths.cellFeatures == "/data/output/hg19/lib1.cell_features.txt"
+            // doBQSR == true -> plain .bam pattern
+            assert paths.alignedBamPattern == "/data/output/hg19/lib1.*.bam"
+            assert paths.cbrbBarcodes == "/data/output/hg19/cbrb/auto/lib1_cell_barcodes.csv"
+            assert paths.selectedCellBarcodes ==
+                "/data/output/hg19/cbrb/auto/cell_selection/auto/lib1.selectedCellBarcodes.txt"
+        }
+    }
+
+    test("buildRestartInputPaths preserves gs:// scheme") {
+
+        function "buildRestartInputPaths"
+
+        when {
+            function {
+                """
+                input[0] = "gs://mybucket/alecw/nextflow_output"
+                input[1] = "hg19"
+                input[2] = "lib1"
+                input[3] = "auto"
+                input[4] = "auto"
+                input[5] = false
+                """
+            }
+        }
+
+        then {
+            assert function.success
+
+            def paths = function.result
+            // The "//" after the scheme must survive (a java.nio Path would collapse it to "gs:/").
+            assert paths.alignmentDir == "gs://mybucket/alecw/nextflow_output/hg19"
+            assert paths.alignmentDir.startsWith("gs://")
+            assert !paths.alignmentDir.contains("gs:/m")
+
+            assert paths.cbrbDir == "gs://mybucket/alecw/nextflow_output/hg19/cbrb/auto"
+            assert paths.cellSelectionDir ==
+                "gs://mybucket/alecw/nextflow_output/hg19/cbrb/auto/cell_selection/auto"
+            assert paths.sparseDgeMatrix == "gs://mybucket/alecw/nextflow_output/hg19/matrix.mtx.gz"
+            // doBQSR == false -> chimeric_marked pattern
+            assert paths.alignedBamPattern ==
+                "gs://mybucket/alecw/nextflow_output/hg19/lib1.*.chimeric_marked.bam"
+            assert paths.selectedCellBarcodes ==
+                "gs://mybucket/alecw/nextflow_output/hg19/cbrb/auto/cell_selection/auto/lib1.selectedCellBarcodes.txt"
+
+            // No path should contain a doubled slash from joining.
+            paths.each { key, value ->
+                assert !value.replaceFirst("gs://", "").contains("//") : "doubled slash in ${key}: ${value}"
+            }
+        }
+    }
+
+    test("buildRestartInputPaths preserves gs:// scheme from a Path object") {
+
+        function "buildRestartInputPaths"
+
+        when {
+            function {
+                """
+                // file("gs://...") yields a java.nio Path on the GCS filesystem, not a String.
+                input[0] = file("gs://mybucket/alecw/nextflow_output")
+                input[1] = "hg19"
+                input[2] = "lib1"
+                input[3] = "auto"
+                input[4] = "auto"
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assert function.success
+
+            def paths = function.result
+            assert paths.alignmentDir == "gs://mybucket/alecw/nextflow_output/hg19"
+            assert paths.alignmentDir.startsWith("gs://")
+            assert paths.selectedCellBarcodes ==
+                "gs://mybucket/alecw/nextflow_output/hg19/cbrb/auto/cell_selection/auto/lib1.selectedCellBarcodes.txt"
+
+            paths.each { key, value ->
+                assert !value.replaceFirst("gs://", "").contains("//") : "doubled slash in ${key}: ${value}"
+            }
+        }
+    }
+
+    test("buildRestartInputPaths trims trailing slash on outdir") {
+
+        function "buildRestartInputPaths"
+
+        when {
+            function {
+                """
+                input[0] = "gs://mybucket/out/"
+                input[1] = "hg19"
+                input[2] = "lib1"
+                input[3] = "auto"
+                input[4] = "auto"
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert function.result.alignmentDir == "gs://mybucket/out/hg19"
+        }
+    }
+}
