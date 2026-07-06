@@ -1,0 +1,39 @@
+nextflow_process {
+
+    name "Test Process MAKE_GREETINGS"
+    script "modules/launch_downstream/make_greetings/make_greetings.nf"
+    process "MAKE_GREETINGS"
+
+    test("Produces three greetings") {
+
+        when {
+            process {
+                """
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            def lines = path(process.out.greetings.get(0)).readLines().findAll { it }
+            assert lines.size() == 3
+        }
+    }
+
+    test("Produces three greetings - stub") {
+        options "-stub"
+
+        when {
+            process {
+                """
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            def lines = path(process.out.greetings.get(0)).readLines().findAll { it }
+            assert lines.size() == 3
+        }
+    }
+}

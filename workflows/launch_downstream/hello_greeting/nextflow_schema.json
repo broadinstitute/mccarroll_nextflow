@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/broadinstitute/mccarroll_nextflow/master/workflows/launch_downstream/hello_greeting/nextflow_schema.json",
+  "title": "hello_greeting pipeline parameters",
+  "description": "Prints a greeting via the SAY_GREETING module",
+  "type": "object",
+  "$defs": {
+    "greeting_options": {
+      "title": "Greeting options",
+      "type": "object",
+      "description": "Parameters controlling the greeting that is printed.",
+      "properties": {
+        "greeting": {
+          "type": "string",
+          "default": "Hello",
+          "description": "Greeting to print."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/greeting_options"
+    }
+  ]
+}

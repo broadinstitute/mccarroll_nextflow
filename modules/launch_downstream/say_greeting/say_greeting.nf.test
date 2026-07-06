@@ -1,0 +1,38 @@
+nextflow_process {
+
+    name "Test Process SAY_GREETING"
+    script "modules/launch_downstream/say_greeting/say_greeting.nf"
+    process "SAY_GREETING"
+
+    test("Echoes the greeting") {
+
+        when {
+            process {
+                """
+                input[0] = "Bonjour"
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert path(process.out.greeting.get(0)).text.trim() == "Bonjour"
+        }
+    }
+
+    test("Echoes the greeting - stub") {
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = "Bonjour"
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}

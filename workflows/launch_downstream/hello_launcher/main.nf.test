@@ -1,0 +1,25 @@
+nextflow_pipeline {
+
+    name "Test Pipeline hello_launcher"
+    script "workflows/launch_downstream/hello_launcher/main.nf"
+
+    test("Launches hello once per greeting - stub") {
+        options "-stub"
+
+        when {
+            params {
+                seqeraWorkspace  = "demo-org/demo-workspace"
+                computeEnv       = "demo-compute-env"
+                helloPipeline    = "https://github.com/broadinstitute/mccarroll_nextflow"
+                helloMainScript  = "workflows/launch_downstream/hello_greeting/main.nf"
+                helloSchema      = "workflows/launch_downstream/hello_greeting/nextflow_schema.json"
+                helloRevision    = null
+                towerApiEndpoint = "https://api.cloud.seqera.io"
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+    }
+}

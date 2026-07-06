@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/broadinstitute/mccarroll_nextflow/master/workflows/launch_downstream/hello_launcher/nextflow_schema.json",
+  "title": "hello_launcher pipeline parameters",
+  "description": "Launches hello_greeting on Seqera Platform once per generated greeting",
+  "type": "object",
+  "$defs": {
+    "seqera_platform_options": {
+      "title": "Seqera Platform options",
+      "type": "object",
+      "description": "Parameters identifying where and what to launch.",
+      "required": ["seqeraWorkspace", "computeEnv"],
+      "properties": {
+        "seqeraWorkspace": {
+          "type": "string",
+          "description": "Target Seqera workspace as 'org/workspace'."
+        },
+        "computeEnv": {
+          "type": "string",
+          "description": "Compute environment display name in the target workspace."
+        },
+        "helloPipeline": {
+          "type": "string",
+          "default": "https://github.com/broadinstitute/mccarroll_nextflow",
+          "description": "Git repository of the pipeline to launch."
+        },
+        "helloMainScript": {
+          "type": "string",
+          "default": "workflows/launch_downstream/hello_greeting/main.nf",
+          "description": "Main script path of the pipeline to launch, relative to the repository root."
+        },
+        "helloSchema": {
+          "type": "string",
+          "default": "workflows/launch_downstream/hello_greeting/nextflow_schema.json",
+          "description": "Parameter schema path of the pipeline to launch, relative to the repository root."
+        },
+        "helloRevision": {
+          "type": "string",
+          "default": "ks_launch_downstream",
+          "description": "Git branch, tag, or commit holding hello_greeting."
+        },
+        "towerApiEndpoint": {
+          "type": "string",
+          "default": "https://api.cloud.seqera.io",
+          "description": "Seqera Platform API endpoint used by seqerakit."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/seqera_platform_options"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+nextflow_pipeline {
+
+    name "Test Pipeline hello_greeting"
+    script "workflows/launch_downstream/hello_greeting/main.nf"
+
+    test("Runs with the default greeting") {
+
+        then {
+            assert workflow.success
+        }
+    }
+
+    test("Runs with a custom greeting") {
+
+        when {
+            params {
+                greeting = "Bonjour"
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+    }
+}

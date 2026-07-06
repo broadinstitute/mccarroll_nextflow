@@ -1,0 +1,31 @@
+nextflow_process {
+
+    name "Test Process LAUNCH_HELLO"
+    script "modules/launch_downstream/launch_hello/launch_hello.nf"
+    process "LAUNCH_HELLO"
+
+    test("Launches hello for a greeting - stub") {
+        options "-stub"
+
+        when {
+            params {
+                seqeraWorkspace  = "demo-org/demo-workspace"
+                computeEnv       = "demo-compute-env"
+                helloPipeline    = "https://github.com/broadinstitute/mccarroll_nextflow"
+                helloMainScript  = "workflows/launch_downstream/hello_greeting/main.nf"
+                helloSchema      = "workflows/launch_downstream/hello_greeting/nextflow_schema.json"
+                helloRevision    = null
+                towerApiEndpoint = "https://api.cloud.seqera.io"
+            }
+            process {
+                """
+                input[0] = "Hello"
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}
