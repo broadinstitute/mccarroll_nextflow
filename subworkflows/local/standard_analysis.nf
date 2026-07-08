@@ -1,4 +1,4 @@
-include {noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
+include { noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper; combineIntoTupleChannel; getUserName } from '../../modules/local/workflowUtil.nf'
 include { buildReferenceMetadataLocator; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
 include {FILTER_DGE; FILTER_DGE as FILTER_DONOR_DGE} from '../../modules/local/filterDge.nf'
 include {MAKE_TRIPLET_DGE} from '../../modules/local/makeTripletDge.nf'
@@ -108,6 +108,7 @@ workflow standard_analysis_workflow {
     gmgDgeSummary = combineIntoTupleChannel(meta, MERGE_GMG_DGE_SUMMARIES.out)
 
     workflowProperties = [
+        submitter: getUserName(),
         metaGeneDgeFunctionalStrategy: functionalStrategy
     ]
     if (params.vcf) {

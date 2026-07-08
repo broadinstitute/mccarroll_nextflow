@@ -203,6 +203,7 @@ workflow {
 
     validateDropulationParams()
     validateStartAtParam()
+    print(workflow)
 
     def startAt = params.start_at
     def referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)

@@ -1,7 +1,7 @@
 include { MAPMYCELLS_FROMSPECIFIEDMARKERS } from '../../modules/local/MapMyCells_fromSpecifiedMarkers.nf'
 include { MTX_TO_H5AD                     } from '../../modules/local/mtx_to_h5ad.nf'
 include {buildMapMyCellsModelLocator} from '../../modules/local/MapMyCellsModelLocator.nf'
-include { noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel } from '../../modules/local/workflowUtil.nf'
+include { noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel; getUserName } from '../../modules/local/workflowUtil.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
 workflow MapMyCells_fromSpecifiedMarkers_workflow  {
@@ -22,6 +22,7 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow  {
         MTX_TO_H5AD.out,
         params.mapMyCellsArgs)
     workflowProperties = [
+        submitter: getUserName(),
         queryMarkers: params.mapMyCellsQueryMarkers.toUriString(),
         mmcModel: modelLocator.modelName,
         mapMyCellsArgs: params.mapMyCellsArgs

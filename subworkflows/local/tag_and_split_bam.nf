@@ -2,7 +2,7 @@ include { PICARD_FASTQTOSAM } from '../../modules/nf-core/picard/fastqtosam/main
 include {COUNT_BARCODE_SEQUENCES} from '../../modules/local/countBarcodeSequences.nf'
 include {CORRECT_SCRNA_READ_PAIRS} from '../../modules/local/correctScrnaReadPairs.nf'
 include {SPLIT_BAM_BY_CELL} from '../../modules/local/splitBamByCell.nf'
-include {collectInOrder} from '../../modules/local/workflowUtil.nf'
+include {collectInOrder; getUserName} from '../../modules/local/workflowUtil.nf'
 include {WRITE_PROPERTIES} from '../../modules/local/writeProperties.nf'
 include {MERGE_BARCODE_CORRECTION_METRICS} from '../../modules/local/mergeBarcodeCorrectionMetrics.nf'
 workflow tag_and_split_bam_workflow {
@@ -16,6 +16,7 @@ workflow tag_and_split_bam_workflow {
 
     main:
         workflowProperties = [
+        submitter: getUserName(),
         library: library,
         experimentDate: params.experimentDate,
         version10X: params.version10X,
