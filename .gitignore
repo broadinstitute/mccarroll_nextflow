@@ -4,7 +4,7 @@ lib/*.jar
 .nextflow.log*
 .nextflow
 results*
-work
+work*
 report-*.html
 null
 .vscode

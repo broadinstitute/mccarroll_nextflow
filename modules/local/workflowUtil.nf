@@ -53,3 +53,11 @@ def addMeta(meta, channel) {
 def naIfNull(value) {
     return value != null ? value : 'NA'
 }
+
+def getUserName() {
+    if (workflow.platform.user != null && workflow.platform.user.userName != null) {
+        return workflow.platform.user.userName
+    } else {
+        return "unknown"
+    }
+}

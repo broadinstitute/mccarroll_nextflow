@@ -1,6 +1,6 @@
 include {CALL_STAMPS_SVM_NUCLEI} from '../../modules/local/callSTAMPsSvmNuclei.nf'
 include {CALL_STAMPS_MANUAL_THRESHOLDS} from '../../modules/local/callSTAMPsManualThresholds.nf'
-include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel; naIfNull} from '../../modules/local/workflowUtil.nf'
+include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel; naIfNull; getUserName} from '../../modules/local/workflowUtil.nf'
 include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 
@@ -44,6 +44,7 @@ workflow cell_selection_workflow {
     }
 
     workflowProperties = [
+        submitter: getUserName(),
         minUMIsPerCell: params.minUMIsPerCell,
         maxUMIsPerCell: params.maxUMIsPerCell,
         minIntronicPerCell: params.minIntronicPerCell,

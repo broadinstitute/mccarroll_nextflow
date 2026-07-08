@@ -15,7 +15,7 @@ include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
 include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
 include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
 include {MERGE_DGE_SUMMARIES} from '../../modules/local/mergeDgeSummaries.nf'
-include {collectInOrder; addMeta} from '../../modules/local/workflowUtil.nf'
+include {collectInOrder; addMeta; getUserName} from '../../modules/local/workflowUtil.nf'
 include {MERGE_SPLIT_DGES} from '../../modules/local/mergeSplitDges.nf'
 include {MERGE_SINGLE_CELL_RNA_SEQ_METRICS} from '../../modules/local/mergeSingleCellRnaSeqMetrics.nf'
 include { MAKE_SPARSE_DGE } from '../../modules/local/makeSparseDge.nf'
@@ -244,6 +244,7 @@ workflow align_locus_function_workflow {
         MERGE_BAM_TAG_HISTOGRAMS.out
     )
     workflowProperties = [
+        submitter: getUserName(),
         reference: params.reference.toUriString(),
         strandStrategy: params.strandStrategy,
         locusFunction: params.locusFunction,

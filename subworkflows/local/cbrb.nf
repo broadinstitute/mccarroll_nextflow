@@ -1,5 +1,5 @@
 include { parseCbrbYamlArgs; addSvmEstimatedParameters; loadSvmEstimatedParameters } from '../../modules/local/CbrbArgParser.nf'
-include {noMetaChannelHelper; combineIntoTupleChannel} from '../../modules/local/workflowUtil.nf'
+include {noMetaChannelHelper; combineIntoTupleChannel; getUserName} from '../../modules/local/workflowUtil.nf'
 include { makeCbrbLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND } from '../../modules/nf-core/cellbender/removebackground/main.nf'
@@ -73,6 +73,7 @@ workflow cbrb_workflow {
         noMetaChannelHelper(cellFeatures).collect()
     )
     workflowProperties = [
+        submitter: getUserName(),
         useSvmParameterEstimation: params.useSvmParameterEstimation,
         forceTwoClusterSolution: params.forceTwoClusterSolution,
         cbrbArgs: params.cbrbArgs
