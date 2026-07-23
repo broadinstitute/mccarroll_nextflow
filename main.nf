@@ -18,6 +18,7 @@ include { align_locus_function_workflow } from './subworkflows/local/align_locus
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
 include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
 include { standard_analysis_workflow } from './subworkflows/local/standard_analysis.nf'
+include { dropulation_workflow } from './subworkflows/local/dropulation_workflow.nf'
 include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
 include { buildReferenceMetadataLocator } from './modules/local/ReferenceMetadataLocator.nf'
 include { buildRestartInputPaths; makeCellSelectionLabel; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
@@ -44,6 +45,14 @@ def standardAnalysisDir(tuple) {
     // Since there should be no user choices for standard analysis, outputs could just go into cell_selection
     // directory, but put them in a subdir to reduce clutter.
     return cellSelectionDir(tuple) + "standard_analysis/"
+}
+
+def dropulationDir(tuple) {
+    def (meta, _file) = tuple
+    if (!meta.containsKey('dropulation_label')) {
+        error "dropulationDir() called with meta that does not contain dropulation_label: ${meta}"
+    }
+    return standardAnalysisDir(tuple) + "village/" + meta.dropulation_label + "/"
 }
 
 def mapMyCellsDir(tuple) {
@@ -203,7 +212,6 @@ workflow {
 
     validateDropulationParams()
     validateStartAtParam()
-    print(workflow)
 
     def startAt = params.start_at
     def referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
@@ -402,9 +410,54 @@ workflow {
             dgeSummary,
             alignedBam,
             chimericTranscripts,
-            cbrbCellFeatures,
-            readsPerCell
+            cbrbCellFeatures
         )
+    }
+    if (params.vcf) {
+        dropulation_workflow(
+            selectedCellBarcodes,
+            alignedBam,
+            cbrbCellFeatures,
+            standard_analysis_workflow.out.dge,
+            standard_analysis_workflow.out.dgeSummary,
+            dgeSummary,
+            readsPerCell)
+        // dropulation outputs
+        dropulationProperties = dropulation_workflow.out.dropulationProperties
+        digitalAlleleFrequencies = dropulation_workflow.out.digitalAlleleFrequencies
+        donorAssignments = dropulation_workflow.out.donorAssignments
+        doubletAssignments = dropulation_workflow.out.doubletAssignments
+        donorList = dropulation_workflow.out.donorList
+        donorCellMap = dropulation_workflow.out.donorCellMap
+        donorAssignmentSummaryStats = dropulation_workflow.out.donorAssignmentSummaryStats
+        donorAssignmentTearSheet = dropulation_workflow.out.donorAssignmentTearSheet
+        donorCellBarcodes = dropulation_workflow.out.donorCellBarcodes
+        donorAssignmentPdf = dropulation_workflow.out.donorAssignmentPdf
+        donorDge = dropulation_workflow.out.donorDge
+        donorDgeSummary = dropulation_workflow.out.donorDgeSummary
+        donorCellMetadata = dropulation_workflow.out.cellMetadata
+        donorMetacells = dropulation_workflow.out.metacells
+        donorMetacellMetrics = dropulation_workflow.out.metacellMetrics
+        donorSexCalls = dropulation_workflow.out.donorSexCalls
+        donorSexPdf = dropulation_workflow.out.donorSexPdf
+    } else {
+        dropulationProperties = channel.empty()
+        digitalAlleleFrequencies = channel.empty()
+        donorAssignments = channel.empty()
+        doubletAssignments = channel.empty()
+        donorList = channel.empty()
+        donorCellMap = channel.empty()
+        donorAssignmentSummaryStats = channel.empty()
+        donorAssignmentTearSheet = channel.empty()
+        donorCellBarcodes = channel.empty()
+        donorAssignmentPdf = channel.empty()
+        donorDge = channel.empty()
+        donorDgeSummary = channel.empty()
+        donorCellMetadata = channel.empty()
+        donorMetacells = channel.empty()
+        donorMetacellMetrics = channel.empty()
+        donorSexCalls = channel.empty()
+        donorSexPdf = channel.empty()
     }
     if (params.mapMyCellsQueryMarkers) {
         MapMyCells_fromSpecifiedMarkers_workflow(
@@ -493,17 +546,6 @@ workflow {
     molBc = standard_analysis_workflow.out.molBc
     // don't care about umi saturation histogram
     //umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
-    digitalAlleleFrequencies = standard_analysis_workflow.out.digitalAlleleFrequencies
-    donorAssignments = standard_analysis_workflow.out.donorAssignments
-    doubletAssignments = standard_analysis_workflow.out.doubletAssignments
-    donorList = standard_analysis_workflow.out.donorList
-    donorCellMap = standard_analysis_workflow.out.donorCellMap
-    donorAssignmentSummaryStats = standard_analysis_workflow.out.donorAssignmentSummaryStats
-    donorAssignmentTearSheet = standard_analysis_workflow.out.donorAssignmentTearSheet
-    donorCellBarcodes = standard_analysis_workflow.out.donorCellBarcodes
-    donorAssignmentPdf = standard_analysis_workflow.out.donorAssignmentPdf
-    donorDge = standard_analysis_workflow.out.donorDge
-    donorDgeSummary = standard_analysis_workflow.out.donorDgeSummary
     standardAnalysisCellMetadata = standard_analysis_workflow.out.cellMetadata
     metacells = standard_analysis_workflow.out.metacells
     metacellMetrics = standard_analysis_workflow.out.metacellMetrics
@@ -518,6 +560,25 @@ workflow {
     sexCalls = standard_analysis_workflow.out.sexCalls
     sexPdf = standard_analysis_workflow.out.sexPdf
 
+    // dropulation outputs
+    dropulationProperties = dropulationProperties
+    digitalAlleleFrequencies = digitalAlleleFrequencies
+    donorAssignments = donorAssignments
+    doubletAssignments = doubletAssignments
+    donorList = donorList
+    donorCellMap = donorCellMap
+    donorAssignmentSummaryStats = donorAssignmentSummaryStats
+    donorAssignmentTearSheet = donorAssignmentTearSheet
+    donorCellBarcodes = donorCellBarcodes
+    donorAssignmentPdf = donorAssignmentPdf
+    donorDge = donorDge
+    donorDgeSummary = donorDgeSummary
+    donorCellMetadata = donorCellMetadata
+    donorSexCalls = donorSexCalls
+    donorSexPdf = donorSexPdf
+    donorMetacells = donorMetacells
+    donorMetacellMetrics = donorMetacellMetrics
+ 
     // MapMyCells outputs
     mapMyCellsJsonReport = mapMyCellsJsonReport
     mapMyCellsCsvReport = mapMyCellsCsvReport
@@ -684,45 +745,6 @@ output {
     molBc {
         path {x -> standardAnalysisDir(x)}
     }
-    // don't care about umi saturation histogram
-    /*
-    umiSaturationHistogram {
-        path {x -> standardAnalysisDir(x)}
-    }
-    */
-    digitalAlleleFrequencies {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorAssignments {
-        path {x -> standardAnalysisDir(x)}
-    }
-    doubletAssignments {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorList {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorCellMap {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorAssignmentSummaryStats {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorAssignmentTearSheet {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorCellBarcodes {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorAssignmentPdf {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorDge {
-        path {x -> standardAnalysisDir(x)}
-    }
-    donorDgeSummary {
-        path {x -> standardAnalysisDir(x)}
-    }
     metacells {
         path {x -> standardAnalysisDir(x)}
     }
@@ -761,6 +783,63 @@ output {
     }
     standardAnalysisCellMetadata {
         path {x -> standardAnalysisDir(x)}
+    }
+    // don't care about umi saturation histogram
+    /*
+    umiSaturationHistogram {
+        path {x -> standardAnalysisDir(x)}
+    }
+    */
+    digitalAlleleFrequencies {
+        path {x -> dropulationDir(x)}
+    }
+    donorMetacells {
+        path {x -> dropulationDir(x)}
+    }
+    donorMetacellMetrics {
+        path {x -> dropulationDir(x)}
+    }
+    donorAssignments {
+        path {x -> dropulationDir(x)}
+    }
+    doubletAssignments {
+        path {x -> dropulationDir(x)}
+    }
+    donorList {
+        path {x -> dropulationDir(x)}
+    }
+    donorCellMap {
+        path {x -> dropulationDir(x)}
+    }
+    donorAssignmentSummaryStats {
+        path {x -> dropulationDir(x)}
+    }
+    donorAssignmentTearSheet {
+        path {x -> dropulationDir(x)}
+    }
+    donorCellBarcodes {
+        path {x -> dropulationDir(x)}
+    }
+    donorAssignmentPdf {
+        path {x -> dropulationDir(x)}
+    }
+    donorDge {
+        path {x -> dropulationDir(x)}
+    }
+    donorDgeSummary {
+        path {x -> dropulationDir(x)}
+    }
+    donorCellMetadata {
+        path {x -> dropulationDir(x)}
+    }
+    donorSexCalls {
+        path {x -> dropulationDir(x)}
+    }
+    donorSexPdf {
+        path {x -> dropulationDir(x)}
+    }
+    dropulationProperties {
+        path {x -> dropulationDir(x)}
     }
     mapMyCellsJsonReport {
         path {x -> mapMyCellsDir(x)}

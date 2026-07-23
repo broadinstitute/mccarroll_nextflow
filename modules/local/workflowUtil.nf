@@ -1,3 +1,5 @@
+include { hasExtension; withoutExtension } from './FileUtil.nf'
+
 // Collect a channel of tuple(meta, value) in which meta.collectIndex is an integer on which to sort.
 // Return the collected values in order by collectIndex.  Return value is a channel containing a single list item.
 def collectInOrder(inChannel) {
@@ -60,4 +62,24 @@ def getUserName() {
     } else {
         return "unknown"
     }
+}
+
+def makeDropulationlabel(vcf, donorFile) {
+    if (hasExtension(vcf, 'gz')) {
+        vcf = withoutExtension(vcf, 'gz')
+    }
+    if (hasExtension(vcf, 'vcf')) {
+        vcf = withoutExtension(vcf, 'vcf')
+    }
+    if (hasExtension(vcf, 'bcf')) {
+        vcf = withoutExtension(vcf, 'bcf')
+    }
+    if (hasExtension(donorFile, 'txt')) {
+        donorFile = withoutExtension(donorFile, 'txt')
+    }
+    if (hasExtension(donorFile, 'donors')) {
+        donorFile = withoutExtension(donorFile, 'donors')
+    }
+
+    return "${vcf.getFileName()}.${donorFile.getFileName()}"
 }
