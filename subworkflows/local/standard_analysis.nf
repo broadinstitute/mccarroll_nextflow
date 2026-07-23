@@ -8,12 +8,7 @@ include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE } from '../../modules/local/chi
 include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
 include { GATHER_DIGITAL_ALLELE_COUNTS } from '../../modules/local/gatherDigitalAlleleCounts.nf'
 include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
-include { ASSIGN_CELLS_TO_SAMPLES } from '../../modules/local/assignCellsToSamples.nf'
-include { DETECT_DOUBLETS } from '../../modules/local/detectDoublets.nf'
 include { withExtension } from '../../modules/local/FileUtil.nf'
-include { MERGE_CELL_TO_SAMPLE_ASSIGNMENTS } from '../../modules/local/mergeCellToSampleAssignments.nf'
-include { MERGE_DOUBLET_ASSIGNMENTS } from '../../modules/local/mergeDoubletAssignments.nf'
-include { DONOR_ASSIGNMENT_QC } from '../../modules/local/donorAssignmentQC.nf'
 include { CREATE_METACELLS } from '../../modules/local/createMetacells.nf'
 include { DISCOVER_META_GENES } from '../../modules/local/discoverMetaGenes.nf'
 include { MERGE_META_GENE_REPORTS } from '../../modules/local/mergeMetaGeneReports.nf'
@@ -36,7 +31,6 @@ workflow standard_analysis_workflow {
     bams
     chimericTranscripts
     cbrbCellFeatures
-    readsPerCell
 
     main    :
     metagene_infix = ".metagene"
@@ -111,92 +105,22 @@ workflow standard_analysis_workflow {
         submitter: getUserName(),
         metaGeneDgeFunctionalStrategy: functionalStrategy
     ]
-    if (params.vcf) {
-        workflowProperties.vcf = params.vcf.toUriString()
-        workflowProperties.donorFile = params.donorFile.toUriString()
-        bcf = params.cloudVcf ?: params.vcf
-        nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
-        GATHER_DIGITAL_ALLELE_COUNTS(bams, noChannelSelectedCells, 
-        params.donorFile, params.vcf, params.locusFunction, params.strandStrategy, nonAutosomes)
-        MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES(params.library, collectInOrder(GATHER_DIGITAL_ALLELE_COUNTS.out.digitalAlleleFrequencies))
-        digitalAlleleFrequencies = combineIntoTupleChannel(meta, MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies)
-        ASSIGN_CELLS_TO_SAMPLES(
-            bams, 
-            bcf, 
-            withExtension(bcf, 'idx'),
-            noChannelSelectedCells, 
-            noMetaChannelHelper(cbrbCellFeatures).collect(), 
-            MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
-            params.strandStrategy, functionalStrategy, params.cellBarcodeTag, params.molecularBarcodeTag, params.locusFunction, nonAutosomes
-        )
-        dd_channel = bams.join(ASSIGN_CELLS_TO_SAMPLES.out.vcf).join(ASSIGN_CELLS_TO_SAMPLES.out.vcfIndex).join(ASSIGN_CELLS_TO_SAMPLES.out.donorAssignments)
-        DETECT_DOUBLETS(
-            dd_channel, 
-            noChannelSelectedCells, 
-            params.donorFile, 
-            noMetaChannelHelper(cbrbCellFeatures).collect(), 
-            MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
-            params.strandStrategy, params.locusFunction, nonAutosomes
-        )
-        MERGE_CELL_TO_SAMPLE_ASSIGNMENTS(params.library, collectInOrder(ASSIGN_CELLS_TO_SAMPLES.out.donorAssignments))
-        donorAssignments = combineIntoTupleChannel(meta, MERGE_CELL_TO_SAMPLE_ASSIGNMENTS.out.donorAssignments)
-        MERGE_DOUBLET_ASSIGNMENTS(params.library, collectInOrder(DETECT_DOUBLETS.out.doublets))
-        doubletAssignments = combineIntoTupleChannel(meta, MERGE_DOUBLET_ASSIGNMENTS.out.doublets)
-        DONOR_ASSIGNMENT_QC(
-            params.library, 
-            MERGE_CELL_TO_SAMPLE_ASSIGNMENTS.out.donorAssignments.collect(),
-            MERGE_DOUBLET_ASSIGNMENTS.out.doublets.collect(),
-            noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(), 
-            noMetaChannelHelper(dgeSummary).collect(), 
-            noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(), 
-            readsPerCell.collect(),
-            params.donorFile)
-        donorList = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.donorList)
-        donorCellMap = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.donorCellMap)
-        donorAssignmentSummaryStats = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.summaryStats)
-        donorAssignmentTearSheet = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.tearSheetPdf)
-        donorCellBarcodes = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.cellBarcodes) 
-        donorAssignmentPdf = combineIntoTupleChannel(meta, DONOR_ASSIGNMENT_QC.out.pdf) 
-        FILTER_DONOR_DGE(donorCellBarcodes.map{m, f -> tuple(m + [id: m.id + ".donors"], f)}, 
-        noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(), noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
-        CREATE_METACELLS(donorAssignments.map{m, f -> tuple(m + [id: m.id + ".donors"], f, [])}, 
-                noMetaChannelHelper(FILTER_DONOR_DGE.out.filteredDge).collect())
+    if (params.donor) {
+        CREATE_METACELLS(meta.map { m -> tuple(m, [], params.donor) }, 
+            noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect())
         metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
         metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
-
-        donorDge = FILTER_DONOR_DGE.out.filteredDge
-        donorDgeSummary = FILTER_DONOR_DGE.out.filteredDgeSummary
-        goodBarcodes = donorCellBarcodes
+        workflowProperties.donor = params.donor
     } else {
-        digitalAlleleFrequencies = channel.empty()
-        donorAssignments = channel.empty()
-        doubletAssignments = channel.empty()
-        donorList = channel.empty()
-        donorCellMap = channel.empty()
-        donorAssignmentSummaryStats = channel.empty()
-        donorAssignmentTearSheet = channel.empty()
-        donorCellBarcodes = channel.empty()
-        donorAssignmentPdf = channel.empty()
-        donorDge = channel.empty()
-        donorDgeSummary = channel.empty()
-        if (params.donor) {
-           CREATE_METACELLS(meta.map { m -> tuple(m, [], params.donor) }, 
-                noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect())
-            metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
-            metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
-            workflowProperties.donor = params.donor
-        } else {
-            metacells = channel.empty()
-            metacellMetrics = channel.empty()
-        }
-        goodBarcodes = selectedCells
+        metacells = channel.empty()
+        metacellMetrics = channel.empty()
     }
-    FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(goodBarcodes).collect())
+    FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(selectedCells).collect())
     JOIN_CELL_METADATA(params.library, FILTER_CELL_METADATA.out,
-        noMetaChannelHelper(donorCellMap).collect().ifEmpty([]), params.donor ?: '',
+        [], params.donor ?: '',
         noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
     cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
-    if ((params.vcf || params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
+    if ((params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
         CALL_SEX_FROM_METACELLS(params.library, referenceMetadataLocator.xipherConfig, 
         CREATE_METACELLS.out.metacells.collect(), CREATE_METACELLS.out.metacellMetrics.collect())
         sexCalls = combineIntoTupleChannel(meta, CALL_SEX_FROM_METACELLS.out.sexCalls)
@@ -217,20 +141,8 @@ workflow standard_analysis_workflow {
     umiReadIntervals = MERGE_UMI_READ_INTERVALS.out.umiReadIntervals
     molBc = CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc
     umiSaturationHistogram = DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES.out.umiSaturationHistogram
-    digitalAlleleFrequencies = digitalAlleleFrequencies
-    donorAssignments = donorAssignments
-    doubletAssignments = doubletAssignments
-    donorList = donorList
-    donorCellMap = donorCellMap
-    donorAssignmentSummaryStats = donorAssignmentSummaryStats
-    donorAssignmentTearSheet = donorAssignmentTearSheet
-    donorCellBarcodes = donorCellBarcodes
-    donorAssignmentPdf = donorAssignmentPdf
-    donorDge = donorDge
-    donorDgeSummary = donorDgeSummary
     metacells = metacells
     metacellMetrics = metacellMetrics
-    standardAnalysisProperties = standardAnalysisProperties
     metageneReport = metageneReport
     metageneDge = metageneDge
     metageneDgeSummary = metageneDgeSummary
