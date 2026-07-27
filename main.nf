@@ -18,7 +18,7 @@ include { align_locus_function_workflow } from './subworkflows/local/align_locus
 include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
 include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
 include { standard_analysis_workflow } from './subworkflows/local/standard_analysis.nf'
-include { dropulation_workflow } from './subworkflows/local/dropulation_workflow.nf'
+include { dropulation_workflow } from './subworkflows/local/dropulation.nf'
 include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
 include { buildReferenceMetadataLocator } from './modules/local/ReferenceMetadataLocator.nf'
 include { buildRestartInputPaths; makeCellSelectionLabel; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
