@@ -224,10 +224,6 @@
     "version10X": {
       "type": ["number", "string"]
     },
-    "sampleType": {
-      "type": "string",
-      "enum": ["nuclei", "whole_cell"]
-    },
     "beadStructure": {
       "type": "string"
     },
@@ -345,5 +341,5 @@
       "type": "string"
     }
   },
-  "required": ["library", "sampleType", "outdir", "email"]
+  "required": ["library", "outdir", "email"]
 }
