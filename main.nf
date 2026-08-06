@@ -135,7 +135,6 @@ params {
     fastq_read2: List<String> = []
     rawBam: List<String> = []
     version10X: String
-    sampleType: String
     beadStructure: String
 
     // cbrb parameters
