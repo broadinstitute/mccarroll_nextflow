@@ -26,6 +26,7 @@ workflow dropulation_workflow {
         dgeSummary
         dgeSummaryRaw
         readsPerCell
+        doubletCalls
 
     main:
      workflowProperties = [
@@ -92,7 +93,8 @@ workflow dropulation_workflow {
     FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(donorCellBarcodes).collect())
     JOIN_CELL_METADATA(params.library, FILTER_CELL_METADATA.out,
         noMetaChannelHelper(donorCellMap).collect(), '',
-        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
+        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(),
+        noMetaChannelHelper(doubletCalls).collect())
     cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
     if (referenceMetadataLocator.xipherConfig.exists()) {
         CALL_SEX_FROM_METACELLS(params.library, referenceMetadataLocator.xipherConfig, 

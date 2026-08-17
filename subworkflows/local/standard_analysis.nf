@@ -22,6 +22,7 @@ include { CALL_SEX_FROM_METACELLS } from '../../modules/local/callSexFromMetacel
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 include { FILTER_CELL_METADATA } from '../../modules/local/filterCellMetadata.nf'
 include { JOIN_CELL_METADATA } from '../../modules/local/joinCellMetadata.nf'
+include { SC_DBL_FINDER } from '../../modules/local/scDblFinder.nf'
 
 workflow standard_analysis_workflow {
     take:
@@ -51,6 +52,8 @@ workflow standard_analysis_workflow {
         noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect(),
         noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect()
     )
+    SC_DBL_FINDER(noMetaChannelHelper(FILTER_DGE.out.filteredDge), []) // default random seed
+    doubletCalls = combineIntoTupleChannel(meta, SC_DBL_FINDER.out.doubletCalls)
     standardAnalysisPdf = combineIntoTupleChannel(meta, PLOT_STANDARD_ANALYSIS.out.pdf)
     umiSaturationMetrics = combineIntoTupleChannel(meta, PLOT_STANDARD_ANALYSIS.out.umi_saturation_metrics)
     DISCOVER_META_GENES(
@@ -118,7 +121,8 @@ workflow standard_analysis_workflow {
     FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(selectedCells).collect())
     JOIN_CELL_METADATA(params.library, FILTER_CELL_METADATA.out,
         [], params.donor ?: '',
-        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect())
+        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(),
+        SC_DBL_FINDER.out.doubletCalls.collect())
     cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
     if ((params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
         CALL_SEX_FROM_METACELLS(params.library, referenceMetadataLocator.xipherConfig, 
@@ -154,4 +158,5 @@ workflow standard_analysis_workflow {
     sexPdf = sexPdf
     umiSaturationMetrics = umiSaturationMetrics
     cellMetadata = cellMetadata
+    doubletCalls = doubletCalls
 }

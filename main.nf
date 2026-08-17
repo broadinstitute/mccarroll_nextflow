@@ -420,7 +420,8 @@ workflow {
             standard_analysis_workflow.out.dge,
             standard_analysis_workflow.out.dgeSummary,
             dgeSummary,
-            readsPerCell)
+            readsPerCell,
+            standard_analysis_workflow.out.doubletCalls)
         // dropulation outputs
         dropulationProperties = dropulation_workflow.out.dropulationProperties
         digitalAlleleFrequencies = dropulation_workflow.out.digitalAlleleFrequencies

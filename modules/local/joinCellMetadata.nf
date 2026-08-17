@@ -9,6 +9,7 @@ process JOIN_CELL_METADATA {
     path donor_cell_map
     val donor
     path dge_summary
+    path doublet_calls
 
     output:
     path "${output_file}"
@@ -25,6 +26,7 @@ process JOIN_CELL_METADATA {
         --input ${cell_metadata} --output ${output_file} \
         ${donor_args} \
         --join ${dge_summary} cell_barcode CELL_BARCODE \
+        --join ${doublet_calls} cell_barcode cell_barcode \
         --drop NUM_TRANSCRIPTS
     """
 }
