@@ -76,8 +76,8 @@ workflow align_locus_function_workflow {
         STAR_ALIGN.out.bam.map { meta, file -> tuple(meta + [id: meta.id + ".aligned_sorted"], file) },
         'queryname'
     )
-    // TODO: This isn't good.  It should retain most everything from the original meta rather than reconstructing.
-    // This magic is needed to make sure the right BAM files get merged together by GATK4_MERGEBAMALIGNMENT.  Join on bamBase.
+    // This magic is needed to make sure the right BAM files get merged together by GATK4_MERGEBAMALIGNMENT.  Join on bamBase
+    // and order by collectIndex, which is the integer after the last dot in the bamBase.
     ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> tuple(meta.bamBase, file) }
     ch_prealigned_bams = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, file -> tuple(meta.bamBase, file) }
     ch_aligned_sorted_bams.combine(ch_prealigned_bams, by:0).map { bamBase, alignedSortedBam, prealignedBam ->
@@ -274,7 +274,6 @@ workflow align_locus_function_workflow {
     properties = outputProperties
     alignedBam = alignedBams
     alignedBai = alignedBais
-    // TODO: These should be merged.
     chimericReadMetrics = chimericReadMetrics
     chimericTranscripts = chimericTranscripts
     sizeSelectedCells = sizeSelectedCells
