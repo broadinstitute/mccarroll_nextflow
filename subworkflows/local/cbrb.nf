@@ -48,6 +48,9 @@ workflow cbrb_workflow {
     // TODO: does it have to be this hard?
     cbrbArgsMeta = parsedCbrbArgsChannel.map { p -> [cbrb_args: p.argList]}
     metaWithArgs = meta.combine(cbrbArgsMeta).map { m, a -> m + a }
+    // Note that the directory containing sparse DGE file triplet is passed as the input to CBRB.  When running with fuse this shouldn't
+    // matter because only the relevant files will need to be read, but when running on my computer,
+    // the entire directory contents is pushed into the cloud to be available for CBRB.
     cbrbChannel = metaWithArgs.combine(sparseDgeMatrixNoMeta).map { 
         m, mat -> tuple(m, [mat.parent]) 
         }

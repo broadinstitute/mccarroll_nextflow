@@ -42,8 +42,6 @@ workflow tag_and_split_bam_workflow {
         localRawBam = PICARD_FASTQTOSAM.out.bam
     } else if (rawBam != null && rawBam.size() > 0) {
         workflowProperties.rawBam = rawBam
-        // TODO: This doesn't work.  COUNT_BARCODE_SEQUENCES create a command line without the directory,
-        //  which causes the process to fail because it can't find the BAM file.
         bamTuples = rawBam.withIndex().collect { bam, idx ->
             return [[id: library + "." + idx + ".raw", library: library, collectIndex: idx], bam]
         }

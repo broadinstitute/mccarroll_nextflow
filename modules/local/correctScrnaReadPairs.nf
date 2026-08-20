@@ -7,7 +7,8 @@ process CORRECT_SCRNA_READ_PAIRS {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     memory {
-        // TODO: It looks like this value is not being used based on looking at .command.run
+        // TODO: This code is not doing anthing because of process_single label,
+        // but leaving it here so that when we tune memory we'll have an idea of what Zamboni did.
         // 7e-8 is the MemoryReservationMbPerByte used by Zamboni
         long totalInputSizeBytes = bams.collect { bam -> bam.size() }.sum()
         long memoryMb = (long) (totalInputSizeBytes * 7e-8)
