@@ -1,5 +1,10 @@
 process SPLIT_BAM_BY_CELL {
-    label 'process_single'
+        cpus    { 1                   }
+        memory  {
+            int memoryMb = (taggedBams*.size().sum() * 7e-8 * task.attempt).intValue()
+            1.MB * Math.max(memoryMb, 8000)
+        }
+        time    { 4.h  * task.attempt }
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
@@ -18,8 +23,9 @@ process SPLIT_BAM_BY_CELL {
     report = "${libraryName}.split_bam_report"
     manifest = "${libraryName}.split_bam_manifest.gz"
     bam_list = "${libraryName}.unmapped.bam_list"
-    """
-    SplitBamByCell --VALIDATION_STRINGENCY SILENT \
+   def avail_mem = task.memory ? (task.memory.mega * 0.8).intValue() : 7000
+     """
+    SplitBamByCell -m ${avail_mem}M --VALIDATION_STRINGENCY SILENT \
         --OUTPUT ${libraryName}.__SPLITNUM__.unmapped.bam --INPUT ${taggedBams.join(' --INPUT ')} \
         --TARGET_BAM_SIZE ${targetBamSizeMBytes}M --REPORT ${report} --OUTPUT_MANIFEST ${manifest} \
         --OUTPUT_LIST ${bam_list}
