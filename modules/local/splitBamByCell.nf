@@ -1,6 +1,7 @@
 process SPLIT_BAM_BY_CELL {
         cpus    { 1                   }
         memory  {
+            taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
             int memoryMb = (taggedBams*.size().sum() * 7e-8 * task.attempt).intValue()
             1.MB * Math.max(memoryMb, 8000)
         }
