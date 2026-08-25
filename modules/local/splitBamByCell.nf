@@ -1,12 +1,14 @@
 process SPLIT_BAM_BY_CELL {
-        cpus    { 1                   }
-        memory  {
-            taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
-            // This is double the 7e-8 used by Zamboni, because for some reason there were stlll OOMs
-            int memoryMb = (taggedBams*.size().sum() * 14e-8 * task.attempt).intValue()
-            1.MB * Math.max(memoryMb, 8000)
-        }
-        time    { 4.h  * task.attempt }
+    errorStrategy 'retry'
+    maxRetries 3
+    cpus    { 1                   }
+    memory  {
+        taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
+        // This is triple the 7e-8 used by Zamboni, because for some reason there were stlll OOMs
+        int memoryMb = (taggedBams*.size().sum() * 21e-8 * task.attempt).intValue()
+        1.MB * Math.max(memoryMb, 8000)
+    }
+    time    { 4.h  * task.attempt }
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
