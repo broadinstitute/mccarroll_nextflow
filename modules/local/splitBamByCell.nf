@@ -4,8 +4,9 @@ process SPLIT_BAM_BY_CELL {
     cpus    { 1                   }
     memory  {
         taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
-        // This is triple the 7e-8 used by Zamboni, because for some reason there were stlll OOMs
-        int memoryMb = (taggedBams*.size().sum() * 21e-8 * task.attempt).intValue()
+        // A little more than 7e-8 used by Zamboni
+        int memoryMb = (taggedBams*.size().sum() * 9e-8 * task.attempt).intValue()
+        log.info "SPLIT_BAM_BY_CELL: calculated memoryMb=${memoryMb} for taggedBams=${taggedBams*.name} (attempt ${task.attempt})"
         1.MB * Math.max(memoryMb, 8000)
     }
     time    { 4.h  * task.attempt }
