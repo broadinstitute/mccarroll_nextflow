@@ -1,3 +1,24 @@
 reports:
-  samplesheet.csv:
-    display: "Auto-created samplesheet with collated metadata and FASTQ paths"
+  "*/*.alignment_summary.pdf":
+    display: "Alignment Summary"
+  "*/*/cbrb/*/*.cbrb_tearsheet.pdf":
+    display: "CBRB Tearsheet"
+  "*/*/cbrb/*/*.svm_cbrb_parameter_estimation.pdf":
+    display: "CBRB Parameter Estimation"
+  "*/*/cbrb/*/*.pdf": # unfortunate that this pattern is so broad.
+    display: "CBRB PDF" 
+  "*/*/cbrb/*/cell_selection/*/*.cell_selection_assignments.pdf":
+    display: "Cell Selection"
+  "*/*/cbrb/*/cell_selection/*/standard_analysis/*.standard_analysis.pdf":
+    display: "Standard Analysis"
+  "*/*/cbrb/*/cell_selection/*/standard_analysis/village/*/*.dropulation_report.pdf":
+    display: "Dropulation Report"
+  "*/*/cbrb/*/cell_selection/*/standard_analysis/village/*/*.dropulation_tearsheet.pdf":
+    display: "Dropulation Tearsheet"
+  "*/*/cbrb/*/cell_selection/*/standard_analysis/village/*/*.sex.pdf":
+    display: "Sex Report"
+  "*/*/cbrb/*/cell_selection/*/standard_analysis/*.sex.pdf":
+    display: "Sex Report"
+  
+  
+  
