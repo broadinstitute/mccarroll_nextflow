@@ -126,16 +126,16 @@ def restartAlignedBamChannel(pathPattern, boolean doBQSR, String referenceName) 
 }
 
 params {
-    allowedBarcodes: Path
+    allowedBarcodes: Path?
     library: String
-    experimentDate: String
-    reference: Path
-    cloudReference: Path
+    experimentDate: String?
+    reference: Path?
+    cloudReference: Path?
     fastq_read1: List<String> = []
     fastq_read2: List<String> = []
     rawBam: List<String> = []
-    version10X: String
-    beadStructure: String
+    version10X: String?
+    beadStructure: String?
 
     // cbrb parameters
     useSvmParameterEstimation: Boolean = true
@@ -143,23 +143,23 @@ params {
     cbrbArgs: String = ''
 
     // cell selection parameters
-    minUMIsPerCell: Integer
-    maxUMIsPerCell: Integer
-    minIntronicPerCell: Float
-    maxIntronicPerCell: Float
+    minUMIsPerCell: Integer?
+    maxUMIsPerCell: Integer?
+    minIntronicPerCell: Float?
+    maxIntronicPerCell: Float?
 
     // standard analysis parameters
-    vcf: Path
-    cloudVcf: Path
-    donorFile: Path
-    donor: String
+    vcf: Path?
+    cloudVcf: Path?
+    donorFile: Path?
+    donor: String?
     assignCellsToSamplesOptions: List<String> = []
     detectDoubletsOptions: List<String> = []
     computeCBRBAdjustedLikelihoods: Boolean = true
-    metaGeneDgeFunctionalStrategy: String
+    metaGeneDgeFunctionalStrategy: String?  // if null, set to value of dgeFunctionalStrategy
 
     // MapMyCells parameters 
-    mapMyCellsQueryMarkers: Path
+    mapMyCellsQueryMarkers: Path?
     mapMyCellsArgs: String = ''
 
     // defaults
