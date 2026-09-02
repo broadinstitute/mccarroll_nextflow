@@ -3,10 +3,10 @@ process SPLIT_BAM_BY_CELL {
     maxRetries 3
     cpus    { 1                   }
     memory  {
-        taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
+        //taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
         // A little more than 7e-8 used by Zamboni
         int memoryMb = (taggedBams*.size().sum() * 9e-8 * task.attempt).intValue()
-        log.info "SPLIT_BAM_BY_CELL: calculated memoryMb=${memoryMb} for taggedBams=${taggedBams*.name} (attempt ${task.attempt})"
+        //log.info "SPLIT_BAM_BY_CELL: calculated memoryMb=${memoryMb} for taggedBams=${taggedBams*.name} (attempt ${task.attempt})"
         1.MB * Math.max(memoryMb, 8000)
     }
     time    { 4.h  * task.attempt }
