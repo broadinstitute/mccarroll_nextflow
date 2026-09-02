@@ -30,6 +30,9 @@ include { MERGE_RNA_SEQ_METRICS } from '../../modules/local/mergeRnaSeqMetrics.n
 include { PLOT_ALIGNMENT_SUMMARY } from '../../modules/local/plotAlignmentSummary.nf'
 include { PICARD_COLLECTRNASEQMETRICS } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
 include { MERGE_CHIMERIC_READ_METRICS } from '../../modules/local/mergeChimericReadMetrics.nf'
+include { SEND_EMAIL } from '../../modules/local/sendEmail.nf'
+include { alignmentDir} from '../../modules/local/DirectoryUtil.nf'
+include { subpath} from '../../modules/local/FileUtil.nf'
 
 workflow align_locus_function_workflow {
     take:
@@ -232,6 +235,15 @@ workflow align_locus_function_workflow {
     )
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
+    alignmentSubDir = alignmentDir(tuple(finalMeta, []))
+    fullAlignmentDir = subpath(params.outdir, alignmentSubDir)
+    SEND_EMAIL(
+        "Alignment Summary for ${params.library}",
+        "Alignment for library ${params.library} in ${fullAlignmentDir}.",
+        params.email,
+        PLOT_ALIGNMENT_SUMMARY.out
+    )
+
     MAKE_SPARSE_DGE(
         MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
     )
