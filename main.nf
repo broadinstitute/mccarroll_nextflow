@@ -439,8 +439,17 @@ workflow {
         mapMyCellsCsvReport = channel.empty()
         mapMyCellsProperties = channel.empty()
     }
+    channel.topic('versions')
+        .map { process, name, version -> "${name}: ${version}" }
+        .unique()
+        .collectFile(
+            storeDir: "${params.outdir}/pipeline_info",
+            name: "software_versions_${params.trace_report_suffix}.yml",
+            newLine: true,
+            sort: true
+        )
 
-   //
+    //
     // SUBWORKFLOW: Run completion tasks
     //
     PIPELINE_COMPLETION (
