@@ -18,7 +18,7 @@ process DIGITAL_EXPRESSION {
     output:
     tuple val(meta), path("${output_file}"), emit: dge
     tuple val(meta), path("${summary_file}"), emit: dge_summary
-    //tuple val("${task.process}"), val('DigitalExpression'), eval("DigitalExpression --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DigitalExpression
+    tuple val("${task.process}"), val('DigitalExpression'), eval("DigitalExpression --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DigitalExpression
 
     script:
     output_file = "${meta.id}.digital_expression.txt.gz"
