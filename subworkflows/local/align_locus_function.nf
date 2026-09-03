@@ -31,8 +31,8 @@ include { PLOT_ALIGNMENT_SUMMARY } from '../../modules/local/plotAlignmentSummar
 include { PICARD_COLLECTRNASEQMETRICS } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
 include { MERGE_CHIMERIC_READ_METRICS } from '../../modules/local/mergeChimericReadMetrics.nf'
 include { SEND_EMAIL } from '../../modules/local/sendEmail.nf'
-include { alignmentDir} from '../../modules/local/DirectoryUtil.nf'
-include { subpath} from '../../modules/local/FileUtil.nf'
+include { alignmentDir } from '../../modules/local/DirectoryUtil.nf'
+include { subpath } from '../../modules/local/FileUtil.nf'
 
 workflow align_locus_function_workflow {
     take:

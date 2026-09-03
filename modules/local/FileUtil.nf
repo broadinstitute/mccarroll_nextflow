@@ -49,7 +49,7 @@ def subpath(dir, String child) {
     if (dir instanceof java.nio.file.Path) {
         return dir.resolve(child)
     } else {
-        return new File(dir, child)
+        return java.nio.file.Path.of(dir.toString()).resolve(child)
     }
 }
 
