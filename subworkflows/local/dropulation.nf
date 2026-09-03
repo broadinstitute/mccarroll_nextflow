@@ -16,7 +16,9 @@ include { FILTER_CELL_METADATA } from '../../modules/local/filterCellMetadata.nf
 include { JOIN_CELL_METADATA } from '../../modules/local/joinCellMetadata.nf'
 include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
 include { CALL_SEX_FROM_METACELLS } from '../../modules/local/callSexFromMetacells.nf'
-
+include { SEND_EMAIL } from '../../modules/local/sendEmail.nf'
+include { subpath } from '../../modules/local/FileUtil.nf'
+include { dropulationDir } from '../../modules/local/DirectoryUtil.nf'
 workflow dropulation_workflow {
     take:
         selectedCells
@@ -111,6 +113,13 @@ workflow dropulation_workflow {
     WRITE_PROPERTIES(workflowProperties)
     dropulationProperties = combineIntoTupleChannel(meta, WRITE_PROPERTIES.out)
 
+    fullDropulationDir = meta.map { m -> subpath(params.outdir, dropulationDir(tuple(m, []))) }
+    SEND_EMAIL(
+        "Dropulation summary for ${params.library}",
+        fullDropulationDir.map{ it -> "Dropulation summary for ${params.library} in ${it}"},
+        params.email,
+        noMetaChannelHelper(donorAssignmentTearSheet)
+    )
     emit:
     digitalAlleleFrequencies
     donorAssignments
