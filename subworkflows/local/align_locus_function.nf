@@ -222,7 +222,7 @@ workflow align_locus_function_workflow {
 
     MERGE_READ_QUALITY_METRICS(
         params.library,
-        collectInOrder(GATHER_READ_QUALITY_METRICS.out)
+        collectInOrder(GATHER_READ_QUALITY_METRICS.out.readQualityMetrics)
     )
     MERGE_RNA_SEQ_METRICS(
         params.library,
@@ -230,7 +230,7 @@ workflow align_locus_function_workflow {
     )
     PLOT_ALIGNMENT_SUMMARY(
         params.library,
-        MERGE_READ_QUALITY_METRICS.out,
+        MERGE_READ_QUALITY_METRICS.out.readQualityMetrics,
         MERGE_RNA_SEQ_METRICS.out
     )
 
