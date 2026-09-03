@@ -5,6 +5,7 @@ lib/*.jar
 .nextflow
 results*
 work*
+!workflows/
 report-*.html
 null
 .vscode
