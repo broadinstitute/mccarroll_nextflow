@@ -16,7 +16,8 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
         val nonAutosomes
     output:
     tuple val(meta), path("${output_file}"), emit: digitalAlleleFrequencies
-
+    //tuple val("${task.process}"), val('GatherDigitalAlleleCounts'), eval("GatherDigitalAlleleCounts --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_GatherDigitalAlleleCounts
+    
     script:
     output_file = "${meta.id}.allele_freq.txt"
     nonAutosomesString = nonAutosomes? nonAutosomes.collect{ seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''

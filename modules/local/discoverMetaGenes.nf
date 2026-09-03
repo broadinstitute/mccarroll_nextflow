@@ -13,7 +13,8 @@ process DISCOVER_META_GENES {
 
     output:
     tuple val(meta), path("${output_report}"), emit: metaGeneReport
-
+    //tuple val("${task.process}"), val('DiscoverMetaGenes'), eval("DiscoverMetaGenes --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DiscoverMetaGenes
+    
     script:
     output_report = "${meta.id}.metagene_report.txt"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)

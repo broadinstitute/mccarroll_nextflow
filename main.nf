@@ -440,7 +440,7 @@ workflow {
         mapMyCellsProperties = channel.empty()
     }
     channel.topic('versions')
-        .map { process, name, version -> "${name}: ${version}" }
+        .map { _process, name, version -> "${name}: ${version}" }
         .unique()
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",

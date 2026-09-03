@@ -16,7 +16,8 @@ process MARK_CHIMERIC_READS {
     tuple val(meta), path("${output_index}"), emit: bai, optional: true
     tuple val(meta), path("${output_metrics}"), emit: chimericReadMetrics    
     tuple val(meta), path("${output_chimeric_transcripts}"), emit: chimericTranscripts    
-
+    //tuple val("${task.process}"), val('MarkChimericReads'), eval("MarkChimericReads --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MarkChimericReads
+    
     script:
     output_file = meta.id + ".chimeric_marked.bam"
     if (createIndex) {

@@ -8,7 +8,8 @@ process MERGE_SPLIT_DGES {
 
     output:
     path "${output_file}", emit: dge
-
+    //tuple val("${task.process}"), val('MergeSplitDges'), eval("MergeSplitDges --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeSplitDges
+  
     script:
     output_file = "${library}.digital_expression.txt.gz"
      // --HEADER_STRINGENCY NONE because rules that each #LIBRARY in header has a prefix, and a unique UEI, are violated.

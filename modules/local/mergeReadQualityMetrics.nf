@@ -8,7 +8,8 @@ process MERGE_READ_QUALITY_METRICS {
 
     output:
     path "${output_file}"
-
+    //tuple val("${task.process}"), val('MergeReadQualityMetrics'), eval("MergeReadQualityMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeReadQualityMetrics
+    
     script:
     output_file = "${library}.ReadQualityMetrics.txt"
 

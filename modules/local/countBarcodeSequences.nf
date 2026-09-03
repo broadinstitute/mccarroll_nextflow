@@ -11,6 +11,7 @@ process COUNT_BARCODE_SEQUENCES {
 
     output:
     path "${output_file}", emit: barcodeCounts
+    tuple val("${task.process}"), val('CountBarcodeSequences'), eval("CountBarcodeSequences --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CountBarcodeSequences
 
     script:
     output_file = "${libraryName}.expected_barcode_metrics.gz"

@@ -8,7 +8,8 @@ process MERGE_DGE {
 
     output:
     path "$output_file", emit: dge
-
+    //tuple val("${task.process}"), val('MergeDge'), eval("MergeDge --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeDge
+    
     script:
     output_file = "${output_prefix}.digital_expression.txt.gz"
 

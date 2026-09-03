@@ -13,7 +13,8 @@ process GATHER_UMI_READ_INTERVALS {
 
     output:
     tuple val(meta), path("${output_file}"), emit: umiReadIntervals
-
+    //tuple val("${task.process}"), val('GatherUMIReadIntervals'), eval("GatherUMIReadIntervals --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_GatherUMIReadIntervals
+    
     script:
     output_file = meta.bamBase + ".umi_read_intervals.tsv.gz"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)

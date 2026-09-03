@@ -13,7 +13,8 @@ input:
 
 output:
     tuple val(meta), path("${output_file}"), emit: metrics
-
+    //tuple val("${task.process}"), val('SingleCellRnaSeqMetricsCollector'), eval("SingleCellRnaSeqMetricsCollector --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_SingleCellRnaSeqMetricsCollector
+    
 script:
     output_file = "${meta.id}.fracIntronicExonicPerCell.txt.gz"
     mtSequencesArgs = mtSequences.collect{ seq -> "--MT_SEQUENCE ${seq}" }

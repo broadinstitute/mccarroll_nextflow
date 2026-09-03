@@ -8,7 +8,8 @@ process MERGE_CHIMERIC_READ_METRICS {
 
     output:
     path "${output_file}"
-
+    //tuple val("${task.process}"), val('MergeChimericReadMetrics'), eval("MergeChimericReadMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeChimericReadMetrics
+    
     script:
     output_file = "${library}.chimeric_read_metrics"
 

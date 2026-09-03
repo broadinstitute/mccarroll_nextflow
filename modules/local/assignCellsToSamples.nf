@@ -22,7 +22,8 @@ process ASSIGN_CELLS_TO_SAMPLES {
         tuple val(meta), path("${donor_assignments}"), emit: donorAssignments
         tuple val(meta), path("${vcf}"), emit: vcf
         tuple val(meta), path("${vcfIndex}"), emit: vcfIndex
-
+        //tuple val("${task.process}"), val('AssignCellsToSamples'), eval("AssignCellsToSamples --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_AssignCellsToSamples
+    
     script:
     donor_assignments = "${meta.id}.donor_assignments.txt"
     vcf = "${meta.id}.vcf.gz"
