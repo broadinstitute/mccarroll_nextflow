@@ -7,8 +7,8 @@ process VALIDATE_ALIGNED_SAM {
         tuple val(meta), path(alignedBam)
 
     output:
-        val meta
-        //tuple val("${task.process}"), val('ValidateAlignedSam'), eval("ValidateAlignedSam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_ValidateAlignedSam
+        val meta, emit: meta
+        tuple val("${task.process}"), val('ValidateAlignedSam'), eval("ValidateAlignedSam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_ValidateAlignedSam
     
 
     script:
