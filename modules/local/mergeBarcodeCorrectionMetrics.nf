@@ -7,8 +7,8 @@ process MERGE_BARCODE_CORRECTION_METRICS {
     path metrics
 
     output:
-    path "${output_file}"
-    //tuple val("${task.process}"), val('MergeBarcodeCorrectionMetrics'), eval("MergeBarcodeCorrectionMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeBarcodeCorrectionMetrics
+    path "${output_file}", emit: mergedMetrics
+    tuple val("${task.process}"), val('MergeBarcodeCorrectionMetrics'), eval("MergeBarcodeCorrectionMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeBarcodeCorrectionMetrics
     
     script:
     output_file = "${library}.corrected_barcode_metrics"

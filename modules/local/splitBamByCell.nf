@@ -23,7 +23,7 @@ process SPLIT_BAM_BY_CELL {
     path "${report}", emit: splitBamReport
     path "${manifest}", emit: splitBamManifest
     path "${bam_list}", emit: bamList
-    //tuple val("${task.process}"), val('SplitBamByCell'), eval("SplitBamByCell --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_SplitBamByCell
+    tuple val("${task.process}"), val('SplitBamByCell'), eval("SplitBamByCell --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_SplitBamByCell
     
     script:
     report = "${libraryName}.split_bam_report"
