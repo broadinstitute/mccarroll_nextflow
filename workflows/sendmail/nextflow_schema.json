@@ -1,21 +1,22 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
-    "title": " pipeline parameters",
-    "description": "",
-    "type": "object",
-    "properties": {
-        "from_address": {
-            "type": "string"
-        },
-        "to_address": {
-            "type": "string"
-        },
-        "subject": {
-            "type": "string"
-        },
-        "text": {
-            "type": "string"
-        }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
+  "title": " pipeline parameters",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
     }
+  },
+  "required": ["from", "to", "subject", "text"]
 }

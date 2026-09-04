@@ -10,8 +10,8 @@ process TWILIO_EMAIL_SEND {
 
     input:
     record(
-        from_address: String,
-        to_address: String,
+        from: String,
+        to: String,
         subject: String,
         text: String
     )
@@ -29,8 +29,8 @@ process TWILIO_EMAIL_SEND {
         exit 1
     fi
     twilio email:send \\
-        --from "${from_address}" \\
-        --to "${to_address}" \\
+        --from "${from}" \\
+        --to "${to}" \\
         --subject "${subject}" \\
         --text "${text}" \\
         --no-attachment

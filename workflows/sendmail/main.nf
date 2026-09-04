@@ -6,29 +6,43 @@ nextflow.enable.types = true
 include { TWILIO_EMAIL_SEND } from '../../modules/local/twilioSendEmail.nf'
 
 params {
-    from_address: String
-    to_address: String
+    from: String
+    to: String
     subject: String
     text: String
 }
 
 workflow {
+
     main:
-    requests = channel.of(
+
+    def results_ch = TWILIO_EMAIL_SEND(
         record(
-            from_address: params.from_address,
-            to_address: params.to_address,
+            from: params.from,
+            to: params.to,
             subject: params.subject,
-            text: params.text
+            text: params.text + "\n\nvia twilio process",
         )
     )
 
-    results_ch = TWILIO_EMAIL_SEND(requests)
+    results_ch
+        .map { it -> it.done }
+        .subscribe { done ->
+            if (!workflow.stubRun) {
+                sendMail(
+                    from: params.from,
+                    to: params.to,
+                    subject: params.subject,
+                    text: params.text + "\n\nvia sendMail() with done=${done}",
+                )
+            }
+        }
 
     publish:
     results = results_ch
 }
 
 output {
-    results {}
+    results {
+    }
 }
