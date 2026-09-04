@@ -7,7 +7,7 @@ process MERGE_CHIMERIC_READ_METRICS {
     path metrics
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: mergedChimericReadMetrics
     //tuple val("${task.process}"), val('MergeChimericReadMetrics'), eval("MergeChimericReadMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeChimericReadMetrics
     
     script:

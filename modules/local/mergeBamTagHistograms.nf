@@ -8,7 +8,7 @@ process MERGE_BAM_TAG_HISTOGRAMS {
     val extension
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: mergedBamTagHistograms
     //tuple val("${task.process}"), val('MergeBamTagHistograms'), eval("MergeBamTagHistograms --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeBamTagHistograms
     
     script:

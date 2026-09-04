@@ -7,7 +7,7 @@ process MERGE_RNA_SEQ_METRICS {
     path metrics
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: mergedRnaSeqMetrics
     //tuple val("${task.process}"), val('MergeRnaSeqMetrics'), eval("MergeRnaSeqMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeRnaSeqMetrics
     
     script:
