@@ -9,7 +9,8 @@ process MAKE_SPARSE_DGE {
     tuple val(meta), path("${matrix}"), emit: matrix
     tuple val(meta), path("${features}"), emit: features
     tuple val(meta), path("${barcodes}"), emit: barcodes
-
+    tuple val("${task.process}"), val('MakeSparseDge'), eval("MergeDge --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MakeSparseDge
+    
     script:
     matrix = "matrix.mtx.gz"
     features = "features.tsv.gz"

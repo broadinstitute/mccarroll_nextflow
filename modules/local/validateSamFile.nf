@@ -9,6 +9,7 @@ process VALIDATE_SAM_FILE {
 
     output:
     path "${output_file}"
+    // TODO: emit version
 
     script:
     // By not using 'def', the output_file variable will be available in both the script and the output declaration.

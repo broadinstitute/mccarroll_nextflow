@@ -86,7 +86,7 @@ workflow standard_analysis_workflow {
     MERGE_DGE_SUMMARIES(params.library + metagene_infix, collectInOrder(DIGITAL_EXPRESSION.out.dge_summary), "")
     metageneReport = combineIntoTupleChannel(meta, MERGE_META_GENE_REPORTS.out.metaGeneReport)
     metageneDge = combineIntoTupleChannel(meta, MERGE_SPLIT_DGES.out.dge)
-    metageneDgeSummary = combineIntoTupleChannel(meta, MERGE_DGE_SUMMARIES.out)
+    metageneDgeSummary = combineIntoTupleChannel(meta, MERGE_DGE_SUMMARIES.out.mergedDgeSummaries)
 
     // GMG (gene + metagene) DGE: merge the selected-cells DGE with the metagene DGE into a single matrix.
     // Both inputs are single-item channels; combine() pairs them and map() packages them as a list
@@ -98,11 +98,11 @@ workflow standard_analysis_workflow {
 
     MERGE_GMG_DGE_SUMMARIES(params.library + gmg_infix,
         noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary)
-            .combine(MERGE_DGE_SUMMARIES.out)       // pair: [selectedCells_summary, metagene_summary]
+            .combine(MERGE_DGE_SUMMARIES.out.mergedDgeSummaries)       // pair: [selectedCells_summary, metagene_summary]
             .map { f1, f2 -> [f1, f2] },
         "--ACCUMULATE_CELL_BARCODE_METRICS true")
     gmgDge = combineIntoTupleChannel(meta, MERGE_DGE.out.dge)
-    gmgDgeSummary = combineIntoTupleChannel(meta, MERGE_GMG_DGE_SUMMARIES.out)
+    gmgDgeSummary = combineIntoTupleChannel(meta, MERGE_GMG_DGE_SUMMARIES.out.mergedDgeSummaries)
 
     workflowProperties = [
         submitter: getUserName(),

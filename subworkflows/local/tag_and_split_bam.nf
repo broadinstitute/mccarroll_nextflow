@@ -82,7 +82,7 @@ workflow tag_and_split_bam_workflow {
     emit:
     rawBam = localRawBam
     barcodeCounts = COUNT_BARCODE_SEQUENCES.out.barcodeCounts
-    correctedBarcodeMetrics = MERGE_BARCODE_CORRECTION_METRICS.out
+    correctedBarcodeMetrics = MERGE_BARCODE_CORRECTION_METRICS.out.mergedMetrics
     cbcCorrectedBam = CORRECT_SCRNA_READ_PAIRS.out.correctedBam
     splitBams = splitBams
     splitBamReport = SPLIT_BAM_BY_CELL.out.splitBamReport

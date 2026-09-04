@@ -8,7 +8,8 @@ process CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE {
 
     output:
     tuple val(meta), path("${output_file}"), emit: molBc
-
+    tuple val("${task.process}"), val('ChimericReportEditDistanceCollapse'), eval("ChimericReportEditDistanceCollapse --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_ChimericReportEditDistanceCollapse
+    
     script:
     output_file = meta.id + ".molBC.txt.gz"
 

@@ -15,6 +15,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
     output:
     tuple val(meta), path("${output_file}"), emit: taggedAndTrimmedBams
     // TODO: emit metrics
+    // TODO: emit versions -- see STAR_ALIGN for example of multiple s/w version outpus
 
     script:
     output_file = meta.id + "." + outputExtension

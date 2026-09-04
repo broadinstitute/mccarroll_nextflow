@@ -10,7 +10,8 @@ process BAM_TAG_HISTOGRAM {
         val extension
     output:
     tuple val(meta), path("${output_file}"), emit: histogram
-
+    tuple val("${task.process}"), val('BamTagHistogram'), eval("BamTagHistogram --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_BamTagHistogram
+    
     script:
     output_file = "${meta.id}.${extension}"
     """

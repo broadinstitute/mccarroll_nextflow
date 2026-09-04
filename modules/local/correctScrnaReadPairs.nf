@@ -28,6 +28,8 @@ process CORRECT_SCRNA_READ_PAIRS {
     output:
     tuple(val(meta), path("${output_file}"), emit: correctedBam)
     tuple(val(meta), path("${metrics_file}"), emit: correctedBarcodeMetrics)
+    tuple val("${task.process}"), val('CorrectScrnaReadPairs'), eval("CorrectScrnaReadPairs --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CorrectScrnaReadPairs
+
 
     script:
     if (!output_file.any()) {

@@ -222,7 +222,7 @@ workflow align_locus_function_workflow {
 
     MERGE_READ_QUALITY_METRICS(
         params.library,
-        collectInOrder(GATHER_READ_QUALITY_METRICS.out)
+        collectInOrder(GATHER_READ_QUALITY_METRICS.out.readQualityMetrics)
     )
     MERGE_RNA_SEQ_METRICS(
         params.library,
@@ -230,8 +230,8 @@ workflow align_locus_function_workflow {
     )
     PLOT_ALIGNMENT_SUMMARY(
         params.library,
-        MERGE_READ_QUALITY_METRICS.out,
-        MERGE_RNA_SEQ_METRICS.out
+        MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics,
+        MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics
     )
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
@@ -251,9 +251,9 @@ workflow align_locus_function_workflow {
     BUILD_CELL_FEATURES_SIMPLE(
         params.library,
         params.minimumTranscriptsPerCell,
-        MERGE_DGE_SUMMARIES.out,
-        MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out,
-        MERGE_BAM_TAG_HISTOGRAMS.out
+        MERGE_DGE_SUMMARIES.out.mergedDgeSummaries,
+        MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out.mergedSingleCellRnaSeqMetrics,
+        MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms,
     )
     workflowProperties = [
         submitter: getUserName(),
@@ -269,18 +269,18 @@ workflow align_locus_function_workflow {
     // Add meta for exporting
     sizeSelectedCells = addMeta(finalMeta, MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCells)
     sizeSelectedCellsMetrics = addMeta(finalMeta, MERGE_CELLS_BY_NUM_TRANSCRIPTS.out.mergedCellsMetrics)
-    dgeSummary = addMeta(finalMeta, MERGE_DGE_SUMMARIES.out)
+    dgeSummary = addMeta(finalMeta, MERGE_DGE_SUMMARIES.out.mergedDgeSummaries)
     dge = addMeta(finalMeta, MERGE_SPLIT_DGES.out.dge)
-    singleCellRnaSeqMetrics = addMeta(finalMeta, MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out)
+    singleCellRnaSeqMetrics = addMeta(finalMeta, MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out.mergedSingleCellRnaSeqMetrics)
     cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.map {f -> tuple(finalMeta, f) }
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
-    chimericReadMetrics = addMeta(finalMeta, MERGE_CHIMERIC_READ_METRICS.out)
+    chimericReadMetrics = addMeta(finalMeta, MERGE_CHIMERIC_READ_METRICS.out.mergedChimericReadMetrics)
     chimericTranscripts = addMeta(finalMeta, MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts)
     outputProperties = addMeta(finalMeta, WRITE_PROPERTIES.out)
-    readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out)
-    rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out)
+    readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics)
+    rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics)
     alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out)
     emit:
     properties = outputProperties
@@ -300,5 +300,5 @@ workflow align_locus_function_workflow {
     readQualityMetrics = readQualityMetrics
     rnaSeqMetrics = rnaSeqMetrics
     alignmentSummaryPdf = alignmentSummaryPdf
-    readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out
+    readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms
 }
