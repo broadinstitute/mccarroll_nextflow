@@ -8,7 +8,7 @@ process MERGE_UMI_READ_INTERVALS {
 
     output:
     tuple val(meta), path("${output_file}"), emit: umiReadIntervals
-    //tuple val("${task.process}"), val('MergeUMIReadIntervals'), eval("MergeUMIReadIntervals --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeUMIReadIntervals
+    tuple val("${task.process}"), val('MergeUMIReadIntervals'), eval("MergeUMIReadIntervals --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeUMIReadIntervals
     
     script:
     output_file = meta.id + ".umi_read_intervals.tsv.gz"

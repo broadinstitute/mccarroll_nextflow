@@ -8,7 +8,7 @@ process MERGE_DOUBLET_ASSIGNMENTS {
     path doublets
     output:
     path "${output_file}", emit: doublets
-    //tuple val("${task.process}"), val('MergeDoubletAssignments'), eval("MergeDoubletAssignments --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeDoubletAssignments
+    tuple val("${task.process}"), val('MergeDoubletAssignments'), eval("MergeDoubletAssignments --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeDoubletAssignments
     
     script:
     output_file = "${library}.doublets.txt"

@@ -17,7 +17,7 @@ process DETECT_DOUBLETS {
 
     output:
         tuple val(meta), path("${output_file}"), emit: doublets
-        //tuple val("${task.process}"), val('DetectDoublets'), eval("DetectDoublets --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DetectDoublets
+        tuple val("${task.process}"), val('DetectDoublets'), eval("DetectDoublets --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DetectDoublets
         
     script:
     output_file = "${meta.id}.doublets.txt"

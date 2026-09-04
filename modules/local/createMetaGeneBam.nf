@@ -14,7 +14,7 @@ process CREATE_META_GENE_BAM {
 
     output:
     tuple val(meta), path("${output_file}"), emit: bam
-    //tuple val("${task.process}"), val('CreateMetaGeneBam'), eval("DiscoverMetaGenes --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CreateMetaGeneBam
+    tuple val("${task.process}"), val('CreateMetaGeneBam'), eval("DiscoverMetaGenes --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CreateMetaGeneBam
     
     script:
     output_file = "${meta.id}.metagene.bam"

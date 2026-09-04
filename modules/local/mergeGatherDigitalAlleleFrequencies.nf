@@ -8,7 +8,7 @@ process MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES {
     path digitalAlleleCounts
     output:
     path "${output_file}", emit: digitalAlleleFrequencies
-    //tuple val("${task.process}"), val('MergeGatherDigitalAlleleFrequencies'), eval("MergeGatherDigitalAlleleFrequencies --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeGatherDigitalAlleleFrequencies
+    tuple val("${task.process}"), val('MergeGatherDigitalAlleleFrequencies'), eval("MergeGatherDigitalAlleleFrequencies --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeGatherDigitalAlleleFrequencies
     
     script:
     output_file = "${library}.allele_freq.txt"

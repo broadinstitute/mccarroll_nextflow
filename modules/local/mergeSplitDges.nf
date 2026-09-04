@@ -8,7 +8,7 @@ process MERGE_SPLIT_DGES {
 
     output:
     path "${output_file}", emit: dge
-    //tuple val("${task.process}"), val('MergeSplitDges'), eval("MergeSplitDges --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeSplitDges
+    tuple val("${task.process}"), val('MergeSplitDges'), eval("MergeSplitDges --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeSplitDges
   
     script:
     output_file = "${library}.digital_expression.txt.gz"

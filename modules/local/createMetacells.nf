@@ -12,7 +12,7 @@ process CREATE_METACELLS {
     output:
     path "${output_file}", emit: metacells
     path "${output_metrics}", emit: metacellMetrics
-    //tuple val("${task.process}"), val('CreateMetaCells'), eval("CreateMetaCells --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CreateMetaCells
+    tuple val("${task.process}"), val('CreateMetaCells'), eval("CreateMetaCells --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CreateMetaCells
     
     script:
     if (donor.size() > 0) {
