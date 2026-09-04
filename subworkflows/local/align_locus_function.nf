@@ -279,8 +279,8 @@ workflow align_locus_function_workflow {
     chimericReadMetrics = addMeta(finalMeta, MERGE_CHIMERIC_READ_METRICS.out.mergedChimericReadMetrics)
     chimericTranscripts = addMeta(finalMeta, MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE.out.chimericTranscripts)
     outputProperties = addMeta(finalMeta, WRITE_PROPERTIES.out)
-    readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out)
-    rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out)
+    readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics)
+    rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics)
     alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out)
     emit:
     properties = outputProperties
@@ -300,5 +300,5 @@ workflow align_locus_function_workflow {
     readQualityMetrics = readQualityMetrics
     rnaSeqMetrics = rnaSeqMetrics
     alignmentSummaryPdf = alignmentSummaryPdf
-    readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out
+    readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms
 }
