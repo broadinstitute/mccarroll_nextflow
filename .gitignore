@@ -11,3 +11,4 @@ null
 .nf-test*
 .sendmail_tmp.html
 .lineage
+!workflows/
