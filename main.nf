@@ -772,16 +772,13 @@ def alignmentDirFromParams() {
 
 def validateDropulationParams() {
     if (params.vcf && !params.donorFile) {
-        log.error("If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings.")
-        exit(1)
+        error("If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings.")
     }
     if (!params.vcf && params.donorFile) {
-        log.error("If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes.")
-        exit(1)
+        error("If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes.")
     }
     if (params.donorFile && params.donor) {
-        log.error("It does not make sense to provide both a donor file and a donor.")
-        exit(1)
+        error("It does not make sense to provide both a donor file and a donor.")
     }
 }
 
@@ -789,8 +786,7 @@ def validateStartAtParam() {
     def validStages = validStartAtStages()
 
     if (!validStages.contains(params.start_at)) {
-        log.error("--start_at must be one of: ${validStages.join(', ')}")
-        exit(1)
+        error("--start_at must be one of: ${validStages.join(', ')}")
     }
 }
 
