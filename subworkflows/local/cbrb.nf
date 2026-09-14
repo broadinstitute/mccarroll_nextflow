@@ -46,8 +46,8 @@ workflow cbrb_workflow {
     }
     else {
         parsedCbrbArgsChannel = channel.value(parsedCbrbArgs)
-        svmCbrbParameters = []
-        svmCbrbParameterEstimationPdf = []
+        svmCbrbParameters = channel.empty()
+        svmCbrbParameterEstimationPdf = channel.empty()
     }
     // TODO: does it have to be this hard?
     cbrbArgsMeta = parsedCbrbArgsChannel.map { p -> [cbrb_args: p.argList] }
