@@ -29,11 +29,8 @@ workflow cell_selection_workflow {
             naIfNull(params.minIntronicPerCell),
             naIfNull(params.maxIntronicPerCell),
         )
-        selectedCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.selectedCellBarcodes
-        ambientCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.ambientCellBarcodes
-        cellSelectionAssignmentsPdf = CALL_STAMPS_MANUAL_THRESHOLDS.out.cellSelectionAssignmentsPdf
-        cellSelectionAssignmentsSummary = CALL_STAMPS_MANUAL_THRESHOLDS.out.cellSelectionAssignmentsSummary
-        droppedNonEmpty = CALL_STAMPS_MANUAL_THRESHOLDS.out.droppedNonEmpty
+        selectionOutputs = CALL_STAMPS_MANUAL_THRESHOLDS.out
+
     }
     else {
         CALL_STAMPS_SVM_NUCLEI(
@@ -42,12 +39,13 @@ workflow cell_selection_workflow {
             noMetaChannelHelper(cbrbNonEmpties),
             cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
         )
-        selectedCellBarcodes = CALL_STAMPS_SVM_NUCLEI.out.selectedCellBarcodes
-        ambientCellBarcodes = CALL_STAMPS_SVM_NUCLEI.out.ambientCellBarcodes
-        cellSelectionAssignmentsPdf = CALL_STAMPS_SVM_NUCLEI.out.cellSelectionAssignmentsPdf
-        cellSelectionAssignmentsSummary = CALL_STAMPS_SVM_NUCLEI.out.cellSelectionAssignmentsSummary
-        droppedNonEmpty = CALL_STAMPS_SVM_NUCLEI.out.droppedNonEmpty
+        selectionOutputs = CALL_STAMPS_SVM_NUCLEI.out
     }
+    selectedCellBarcodes = selectionOutputs.selectedCellBarcodes
+    ambientCellBarcodes = selectionOutputs.ambientCellBarcodes
+    cellSelectionAssignmentsPdf = selectionOutputs.cellSelectionAssignmentsPdf
+    cellSelectionAssignmentsSummary = selectionOutputs.cellSelectionAssignmentsSummary
+    droppedNonEmpty = selectionOutputs.droppedNonEmpty
 
     workflowProperties = [
         submitter: getUserName(),
