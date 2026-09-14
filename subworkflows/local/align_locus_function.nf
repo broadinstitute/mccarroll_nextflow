@@ -133,7 +133,7 @@ workflow align_locus_function_workflow {
         ch_apply_bqsr = MARK_CHIMERIC_READS.out.chimericMarkedBam
             .combine(GATK4_GATHERBQSRREPORTS.out.table)
             .map { meta, bam, _meta, table ->
-                tuple(tuple(meta, bam, [], table, []))
+                tuple(meta, bam, [], table, [])
             }
         GATK4_APPLYBQSR(
             ch_apply_bqsr,
