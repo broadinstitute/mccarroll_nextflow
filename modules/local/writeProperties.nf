@@ -5,10 +5,10 @@ process WRITE_PROPERTIES {
     container 'quay.io/broadinstitute/drop-seq_r:current'
 
     input:
-        val properties
+    val properties
 
     output:
-        path "${output_file}"
+    path "${output_file}"
 
     script:
     output_file = "properties.yaml"

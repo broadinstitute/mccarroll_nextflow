@@ -11,26 +11,24 @@ def hasManualCellSelectionThresholds(params) {
 def makeManualCellSelectionLabel(params) {
     def labelComponents = []
 
-    if (params.minUMIsPerCell != null ||
-        params.maxUMIsPerCell != null) {
+    if (params.minUMIsPerCell != null || params.maxUMIsPerCell != null) {
 
         def minUmi = params.minUMIsPerCell ?: 1
-        def maxUmi = params.maxUMIsPerCell != null ?
-            params.maxUMIsPerCell.toString() :
-            'Inf'
+        def maxUmi = params.maxUMIsPerCell != null
+            ? params.maxUMIsPerCell.toString()
+            : 'Inf'
 
         labelComponents << "umi_${minUmi}-${maxUmi}"
     }
 
-    if (params.minIntronicPerCell != null ||
-        params.maxIntronicPerCell != null) {
+    if (params.minIntronicPerCell != null || params.maxIntronicPerCell != null) {
 
         def minIntronic = params.minIntronicPerCell ?: 0.0
         def maxIntronic = params.maxIntronicPerCell ?: 1.0
         labelComponents << String.format(
             'intronic_%.3f-%.3f',
             minIntronic as Float,
-            maxIntronic as Float
+            maxIntronic as Float,
         )
     }
 
@@ -42,15 +40,15 @@ def makeCellSelectionLabel(params) {
 }
 
 def makeCbrbLabel(params) {
-    return params.useSvmParameterEstimation && params.cbrbArgs.isEmpty() ?
-        'auto' :
-        String.format('%04x', params.cbrbArgs.hashCode())
+    return params.useSvmParameterEstimation && params.cbrbArgs.isEmpty()
+        ? 'auto'
+        : String.format('%04x', params.cbrbArgs.hashCode())
 }
 
 def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelectionLabel, doBQSR) {
-    def root = outdir instanceof java.nio.file.Path ?
-        outdir :
-        file(outdir)
+    def root = outdir instanceof java.nio.file.Path
+        ? outdir
+        : file(outdir)
 
     def alignmentDir = root.resolve(referenceName)
     def cbrbDir = alignmentDir.resolve('cbrb').resolve(cbrbLabel)

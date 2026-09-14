@@ -1,7 +1,7 @@
 include { readSingleRowTsv } from "./IoUtil.nf"
 
 // The arguments that we make decisions based on.
-def CBRB_ARGS() { 
+def CBRB_ARGS() {
     [
     expectedCells          : "--expected-cells",
     totalDropletsIncluded  : "--total-droplets-included",
@@ -34,7 +34,9 @@ def USUAL_ARGS() { [
 // To remove a default argument, pass --key=null.  For example, if you want to remove the default learning rate, you would pass --learning-rate=null.
 // Note that whitespace in values is not supported.
 def parseArgString(argString) {
-    if (!argString) return []
+    if (!argString) {
+        return []
+    }
 
     argString
         .trim()
@@ -44,7 +46,8 @@ def parseArgString(argString) {
             if (token.contains('=')) {
                 def (k, v) = token.split('=', 2)
                 [(k): v]
-            } else {
+            }
+            else {
                 token
             }
         }
@@ -64,7 +67,7 @@ def makeCbrbArgDict(argString) {
         }
         else if (arg instanceof Map) {
             arg.inject(acc) { a, k, v ->
-                    a + [(k): v]
+                a + [(k): v]
             }
         }
         else {
@@ -98,10 +101,10 @@ def parseCbrbYamlArgs(argString) {
     def argDict = makeCbrbArgDict(argString)
 
     [
-        argDict                : argDict,
-        argList                : makeCbrbArgList(argDict),
-        expectedCells          : argDict[CBRB_ARGS().expectedCells] as Integer,
-        totalDropletsIncluded  : argDict[CBRB_ARGS().totalDropletsIncluded] as Integer,
+        argDict: argDict,
+        argList: makeCbrbArgList(argDict),
+        expectedCells: argDict[CBRB_ARGS().expectedCells] as Integer,
+        totalDropletsIncluded: argDict[CBRB_ARGS().totalDropletsIncluded] as Integer,
     ]
 }
 
@@ -109,10 +112,10 @@ def parseCbrbYamlArgs(argString) {
 def addSvmEstimatedParameters(parsedYamlArgs, svmEstimatedParamsMap) {
     def argDict = svmEstimatedParamsMap + parsedYamlArgs.argDict
     [
-        argDict                : argDict,
-        argList                : makeCbrbArgList(argDict),
-        expectedCells          : argDict[CBRB_ARGS().expectedCells] as Integer,
-        totalDropletsIncluded  : argDict[CBRB_ARGS().totalDropletsIncluded] as Integer,
+        argDict: argDict,
+        argList: makeCbrbArgList(argDict),
+        expectedCells: argDict[CBRB_ARGS().expectedCells] as Integer,
+        totalDropletsIncluded: argDict[CBRB_ARGS().totalDropletsIncluded] as Integer,
     ]
 }
 

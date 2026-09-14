@@ -4,12 +4,11 @@ process VALIDATE_ALIGNED_SAM {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        tuple val(meta), path(alignedBam)
+    tuple val(meta), path(alignedBam)
 
     output:
-        val meta, emit: meta
-        tuple val("${task.process}"), val('ValidateAlignedSam'), eval("ValidateAlignedSam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_ValidateAlignedSam
-    
+    val meta, emit: meta
+    tuple val("${task.process}"), val('ValidateAlignedSam'), eval("ValidateAlignedSam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_ValidateAlignedSam
 
     script:
     """

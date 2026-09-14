@@ -6,21 +6,22 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        // Although the BAM doesn't have the most complete meta, it's used here because this is run on split BAMs so the output files need to be named appropriately.
-        tuple val(meta), path(bam)
-        path selectedCells
-        path donorFile
-        path bcf
-        val locusFunction
-        val strandStrategy
-        val nonAutosomes
+    // Although the BAM doesn't have the most complete meta, it's used here because this is run on split BAMs so the output files need to be named appropriately.
+    tuple val(meta), path(bam)
+    path selectedCells
+    path donorFile
+    path bcf
+    val locusFunction
+    val strandStrategy
+    val nonAutosomes
+
     output:
     tuple val(meta), path("${output_file}"), emit: digitalAlleleFrequencies
     tuple val("${task.process}"), val('GatherDigitalAlleleCounts'), eval("GatherDigitalAlleleCounts --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_GatherDigitalAlleleCounts
-    
+
     script:
     output_file = "${meta.id}.allele_freq.txt"
-    nonAutosomesString = nonAutosomes? nonAutosomes.collect{ seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
+    nonAutosomesString = nonAutosomes ? nonAutosomes.collect { seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
 
     """

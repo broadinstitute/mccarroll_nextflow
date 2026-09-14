@@ -5,11 +5,11 @@ process MAPMYCELLS_FROMSPECIFIEDMARKERS {
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
 
     input:
-        val library
-        path query_markers_json
-        path precomputed_stats_h5ad
-        path dge_h5ad
-        val mmc_args
+    val library
+    path query_markers_json
+    path precomputed_stats_h5ad
+    path dge_h5ad
+    val mmc_args
 
     output:
     path "${json_report}", emit: json_report

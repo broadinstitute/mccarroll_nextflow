@@ -13,83 +13,18 @@
 */
 nextflow.enable.strict = true
 
-include { tag_and_split_bam_workflow } from './subworkflows/local/tag_and_split_bam.nf'
-include { align_locus_function_workflow } from './subworkflows/local/align_locus_function.nf'
-include { cbrb_workflow } from './subworkflows/local/cbrb.nf'
-include { cell_selection_workflow } from './subworkflows/local/cell_selection.nf'
-include { standard_analysis_workflow } from './subworkflows/local/standard_analysis.nf'
-include { dropulation_workflow } from './subworkflows/local/dropulation.nf'
+include { tag_and_split_bam_workflow               } from './subworkflows/local/tag_and_split_bam.nf'
+include { align_locus_function_workflow            } from './subworkflows/local/align_locus_function.nf'
+include { cbrb_workflow                            } from './subworkflows/local/cbrb.nf'
+include { cell_selection_workflow                  } from './subworkflows/local/cell_selection.nf'
+include { standard_analysis_workflow               } from './subworkflows/local/standard_analysis.nf'
+include { dropulation_workflow                     } from './subworkflows/local/dropulation.nf'
 include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
-include { buildReferenceMetadataLocator } from './modules/local/ReferenceMetadataLocator.nf'
-include { buildRestartInputPaths; makeCellSelectionLabel; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
-include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
-include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
-include { alignmentDir; cbrbDir; cellSelectionDir; standardAnalysisDir; dropulationDir; mapMyCellsDir } from './modules/local/DirectoryUtil.nf'
-    
-def alignmentDirFromParams() {
-    return buildReferenceMetadataLocator(params.reference).referenceName + "/"
-}
-
-def validateDropulationParams() {
-    if (params.vcf && !params.donorFile) {
-        log.error "If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings."
-        exit 1
-    }
-    if (!params.vcf && params.donorFile) {
-        log.error "If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes."
-        exit 1
-    }
-    if (params.donorFile && params.donor) {
-        log.error "It does not make sense to provide both a donor file and a donor."
-        exit 1
-    }
-}
-
-def validateStartAtParam() {
-    def validStages = validStartAtStages()
-
-    if (!validStages.contains(params.start_at)) {
-        log.error "--start_at must be one of: ${validStages.join(', ')}"
-        exit 1
-    }
-}
-
-def validStartAtStages() {
-    ['beginning', 'cell_selection', 'standard_analysis']
-}
-
-def stageRank(String stageName) {
-    validStartAtStages().indexOf(stageName)
-}
-
-// A stage should run when execution starts at that stage or any earlier stage.
-def shouldRunStage(String startAt, String stageName) {
-    stageRank(startAt) <= stageRank(stageName)
-}
-
-def restartTupleChannel(pathPattern, meta) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
-        .map { inputFile -> tuple(meta, inputFile) }
-}
-
-def restartPathChannel(pathPattern) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
-}
-
-def restartAlignedBamChannel(pathPattern, boolean doBQSR, String referenceName) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
-        .map { bam ->
-            def bamBase = doBQSR ?
-                bam.getName().replaceFirst(/\.bam$/, '') :
-                bam.getName().replaceFirst(/\.chimeric_marked\.bam$/, '')
-            def indexStr = bamBase.replaceFirst(/.*\./, '')
-            if (!indexStr.isInteger()) {
-                error "Cannot parse numeric collectIndex from BAM filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].bam"
-            }
-            def collectIndex = indexStr as Integer
-            tuple([id: bamBase, bamBase: bamBase, collectIndex: collectIndex, referenceName: referenceName], bam)
-        }
-}
+include { buildReferenceMetadataLocator            } from './modules/local/ReferenceMetadataLocator.nf'
+include { buildRestartInputPaths ; makeCellSelectionLabel ; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
+include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
+include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
+include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mapMyCellsDir } from './modules/local/DirectoryUtil.nf'
 
 params {
     allowedBarcodes: Path?
@@ -122,19 +57,21 @@ params {
     assignCellsToSamplesOptions: List<String> = []
     detectDoubletsOptions: List<String> = []
     computeCBRBAdjustedLikelihoods: Boolean = true
-    metaGeneDgeFunctionalStrategy: String?  // if null, set to value of dgeFunctionalStrategy
+    // if null, set to value of dgeFunctionalStrategy
+    metaGeneDgeFunctionalStrategy: String?
+    
 
     // MapMyCells parameters 
     mapMyCellsQueryMarkers: Path?
     mapMyCellsArgs: String = ''
 
     // defaults
-    cellBarcodeTag: String          = 'XC'
-    molecularBarcodeTag: String     = 'XM'
-    targetBamSizeMBytes: Integer    = 2048
-    fivePrimeAdapter: String        = 'AAGCAGTGGTATCAACGCAGAGTACATGGG'
-    strandStrategy: String          = 'SENSE'
-    locusFunction: String           = 'EXONIC_INTRONIC'
+    cellBarcodeTag: String = 'XC'
+    molecularBarcodeTag: String = 'XM'
+    targetBamSizeMBytes: Integer = 2048
+    fivePrimeAdapter: String = 'AAGCAGTGGTATCAACGCAGAGTACATGGG'
+    strandStrategy: String = 'SENSE'
+    locusFunction: String = 'EXONIC_INTRONIC'
     minimumTranscriptsPerCell: Integer = 20
     dgeMinReadMq: Integer = 10
     dgeFunctionalStrategy: String = 'DROPSEQ'
@@ -164,7 +101,7 @@ workflow {
     //
     // SUBWORKFLOW: Run initialisation tasks
     //
-    PIPELINE_INITIALISATION (
+    PIPELINE_INITIALISATION(
         params.version,
         params.validate_params,
         params.monochrome_logs,
@@ -172,7 +109,7 @@ workflow {
         params.outdir,
         params.help,
         params.help_full,
-        params.show_hidden
+        params.show_hidden,
     )
 
     validateDropulationParams()
@@ -187,14 +124,16 @@ workflow {
     def finalMeta = [id: params.library, library: params.library, referenceName: referenceName]
     def cbrbMeta = finalMeta + [cbrb_label: cbrbLabel]
     def selectedCellsMeta = cbrbMeta + [cell_selection_label: cellSelectionLabel]
-    def restartInputs = startAt == 'beginning' ? null : buildRestartInputPaths(
-        params.outdir,
-        referenceName,
-        params.library,
-        cbrbLabel,
-        cellSelectionLabel,
-        doBQSR
-    )
+    def restartInputs = startAt == 'beginning'
+        ? null
+        : buildRestartInputPaths(
+            params.outdir,
+            referenceName,
+            params.library,
+            cbrbLabel,
+            cellSelectionLabel,
+            doBQSR,
+        )
 
     // Default all stage outputs to empty; each block below overwrites the channels it produces.
     // When adding outputs to a stage, add the corresponding channel.empty() initializer here.
@@ -260,11 +199,11 @@ workflow {
             params.rawBam,
             params.library,
             params.beadStructure,
-            params.allowedBarcodes
+            params.allowedBarcodes,
         )
         align_locus_function_workflow(
             tag_and_split_bam_workflow.out.splitBams,
-            params.beadStructure
+            params.beadStructure,
         )
         cbrb_workflow(
             align_locus_function_workflow.out.sparseDgeMatrix,
@@ -272,7 +211,7 @@ workflow {
             align_locus_function_workflow.out.sparseDgeBarcodes,
             align_locus_function_workflow.out.cellFeatures,
             align_locus_function_workflow.out.dge,
-            align_locus_function_workflow.out.readQualityMetrics
+            align_locus_function_workflow.out.readQualityMetrics,
         )
 
         unmappedBam = tag_and_split_bam_workflow.out.splitBams
@@ -313,7 +252,6 @@ workflow {
         cbrbCellFeatures = cbrb_workflow.out.cellFeatures
         cbrbProperties = cbrb_workflow.out.properties
         cbrbTearSheet = cbrb_workflow.out.cbrbTearSheet
-
     }
 
     // Stage boundary: prepare cell-selection inputs.
@@ -341,7 +279,7 @@ workflow {
             sparseDgeBarcodes,
             cellFeatures,
             cbrbBarcodes,
-            cbrbNumTranscripts
+            cbrbNumTranscripts,
         )
 
         selectedCellBarcodes = cell_selection_workflow.out.selectedCellBarcodes
@@ -375,7 +313,7 @@ workflow {
             dgeSummary,
             alignedBam,
             chimericTranscripts,
-            cbrbCellFeatures
+            cbrbCellFeatures,
         )
     }
     if (params.vcf) {
@@ -387,7 +325,8 @@ workflow {
             standard_analysis_workflow.out.dgeSummary,
             dgeSummary,
             readsPerCell,
-            standard_analysis_workflow.out.doubletCalls)
+            standard_analysis_workflow.out.doubletCalls,
+        )
         // dropulation outputs
         dropulationProperties = dropulation_workflow.out.dropulationProperties
         digitalAlleleFrequencies = dropulation_workflow.out.digitalAlleleFrequencies
@@ -406,7 +345,8 @@ workflow {
         donorMetacellMetrics = dropulation_workflow.out.metacellMetrics
         donorSexCalls = dropulation_workflow.out.donorSexCalls
         donorSexPdf = dropulation_workflow.out.donorSexPdf
-    } else {
+    }
+    else {
         dropulationProperties = channel.empty()
         digitalAlleleFrequencies = channel.empty()
         donorAssignments = channel.empty()
@@ -429,12 +369,13 @@ workflow {
         MapMyCells_fromSpecifiedMarkers_workflow(
             standard_analysis_workflow.out.sparseDgeMatrix,
             standard_analysis_workflow.out.sparseDgeFeatures,
-            standard_analysis_workflow.out.sparseDgeBarcodes
+            standard_analysis_workflow.out.sparseDgeBarcodes,
         )
         mapMyCellsJsonReport = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
         mapMyCellsCsvReport = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
         mapMyCellsProperties = MapMyCells_fromSpecifiedMarkers_workflow.out.properties
-    } else {
+    }
+    else {
         mapMyCellsJsonReport = channel.empty()
         mapMyCellsCsvReport = channel.empty()
         mapMyCellsProperties = channel.empty()
@@ -446,13 +387,13 @@ workflow {
             storeDir: "${params.outdir}/pipeline_info",
             name: "software_versions_${params.trace_report_suffix}.yml",
             newLine: true,
-            sort: true
+            sort: true,
         )
 
     //
     // SUBWORKFLOW: Run completion tasks
     //
-    PIPELINE_COMPLETION (
+    PIPELINE_COMPLETION(
         params.email,
         params.email_on_fail,
         params.plaintext_email,
@@ -462,137 +403,135 @@ workflow {
 
     publish:
     // unmapped BAM outputs
-    unmappedBam = unmappedBam
-    splitBamManifest = splitBamManifest
-    correctedBarcodeMetrics = correctedBarcodeMetrics
-    barcodeCounts = barcodeCounts
-    unmappedProperties = unmappedProperties
+    unmappedBam                     = unmappedBam
+    splitBamManifest                = splitBamManifest
+    correctedBarcodeMetrics         = correctedBarcodeMetrics
+    barcodeCounts                   = barcodeCounts
+    unmappedProperties              = unmappedProperties
 
     // aligned BAM outputs
-    alignedBam = alignedBam
-    alignedBai = alignedBai
-    sizeSelectedCells = sizeSelectedCells
-    sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
-    dgeSummary = dgeSummary
-    chimericTranscripts = chimericTranscripts
-    chimericReadMetrics = chimericReadMetrics
+    alignedBam                      = alignedBam
+    alignedBai                      = alignedBai
+    sizeSelectedCells               = sizeSelectedCells
+    sizeSelectedCellsMetrics        = sizeSelectedCellsMetrics
+    dgeSummary                      = dgeSummary
+    chimericTranscripts             = chimericTranscripts
+    chimericReadMetrics             = chimericReadMetrics
     // These two are published only for the purpose of start_at != beginning
-    readsPerCell = readsPerCell
-    dge = dge
-    singleCellRnaSeqMetrics = singleCellRnaSeqMetrics
-    sparseDgeMatrix = sparseDgeMatrix
-    sparseDgeFeatures = sparseDgeFeatures
-    sparseDgeBarcodes = sparseDgeBarcodes
-    cellFeatures = cellFeatures
-    alignmentProperties = alignmentProperties
-    readQualityMetrics = readQualityMetrics
-    rnaSeqMetrics = rnaSeqMetrics
-    alignmentSummaryPdf = alignmentSummaryPdf
-
-    cbrbH5 = cbrbH5
-    cbrbBarcodes = cbrbBarcodes
-    cbrbMetrics = cbrbMetrics
-    cbrbReport = cbrbReport
-    cbrbPdf = cbrbPdf
-    cbrbLog = cbrbLog
-    cbrbCheckpoint = cbrbCheckpoint
-    svmCbrbParameters = svmCbrbParameters
-    svmCbrbParameterEstimationPdf = svmCbrbParameterEstimationPdf
-    cbrbDge = cbrbDge
-    cbrbNumTranscripts = cbrbNumTranscripts
-    cbrbCellFeatures = cbrbCellFeatures
-    cbrbTearSheet = cbrbTearSheet
-    cbrbProperties = cbrbProperties
-
-    selectedCellBarcodes = selectedCellBarcodes
-    ambientCellBarcodes = ambientCellBarcodes
-    cellSelectionAssignmentsPdf = cellSelectionAssignmentsPdf
+    readsPerCell                    = readsPerCell
+    dge                             = dge
+    singleCellRnaSeqMetrics         = singleCellRnaSeqMetrics
+    sparseDgeMatrix                 = sparseDgeMatrix
+    sparseDgeFeatures               = sparseDgeFeatures
+    sparseDgeBarcodes               = sparseDgeBarcodes
+    cellFeatures                    = cellFeatures
+    alignmentProperties             = alignmentProperties
+    readQualityMetrics              = readQualityMetrics
+    rnaSeqMetrics                   = rnaSeqMetrics
+    alignmentSummaryPdf             = alignmentSummaryPdf
+    cbrbH5                          = cbrbH5
+    cbrbBarcodes                    = cbrbBarcodes
+    cbrbMetrics                     = cbrbMetrics
+    cbrbReport                      = cbrbReport
+    cbrbPdf                         = cbrbPdf
+    cbrbLog                         = cbrbLog
+    cbrbCheckpoint                  = cbrbCheckpoint
+    svmCbrbParameters               = svmCbrbParameters
+    svmCbrbParameterEstimationPdf   = svmCbrbParameterEstimationPdf
+    cbrbDge                         = cbrbDge
+    cbrbNumTranscripts              = cbrbNumTranscripts
+    cbrbCellFeatures                = cbrbCellFeatures
+    cbrbTearSheet                   = cbrbTearSheet
+    cbrbProperties                  = cbrbProperties
+    selectedCellBarcodes            = selectedCellBarcodes
+    ambientCellBarcodes             = ambientCellBarcodes
+    cellSelectionAssignmentsPdf     = cellSelectionAssignmentsPdf
     cellSelectionAssignmentsSummary = cellSelectionAssignmentsSummary
-    droppedNonEmpty = droppedNonEmpty
-    cellSelectionProperties = cellSelectionProperties
+    droppedNonEmpty                 = droppedNonEmpty
+    cellSelectionProperties         = cellSelectionProperties
 
     // standrd analysis outputs that we care about
-    selectedDge = standard_analysis_workflow.out.dge
-    selectedDgeSummary = standard_analysis_workflow.out.dgeSummary
-    selectedSparseDgeMatrix = standard_analysis_workflow.out.sparseDgeMatrix
-    selectedSparseDgeFeatures = standard_analysis_workflow.out.sparseDgeFeatures
-    selectedSparseDgeBarcodes = standard_analysis_workflow.out.sparseDgeBarcodes
-    umiReadIntervals = standard_analysis_workflow.out.umiReadIntervals
-    molBc = standard_analysis_workflow.out.molBc
+    selectedDge                     = standard_analysis_workflow.out.dge
+    selectedDgeSummary              = standard_analysis_workflow.out.dgeSummary
+    selectedSparseDgeMatrix         = standard_analysis_workflow.out.sparseDgeMatrix
+    selectedSparseDgeFeatures       = standard_analysis_workflow.out.sparseDgeFeatures
+    selectedSparseDgeBarcodes       = standard_analysis_workflow.out.sparseDgeBarcodes
+    umiReadIntervals                = standard_analysis_workflow.out.umiReadIntervals
+    molBc                           = standard_analysis_workflow.out.molBc
     // don't care about umi saturation histogram
     //umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
-    standardAnalysisCellMetadata = standard_analysis_workflow.out.cellMetadata
-    metacells = standard_analysis_workflow.out.metacells
-    metacellMetrics = standard_analysis_workflow.out.metacellMetrics
-    metageneReport = standard_analysis_workflow.out.metageneReport
-    metageneDge = standard_analysis_workflow.out.metageneDge
-    metageneDgeSummary = standard_analysis_workflow.out.metageneDgeSummary
-    gmgDge = standard_analysis_workflow.out.gmgDge
-    gmgDgeSummary = standard_analysis_workflow.out.gmgDgeSummary
-    standardAnalysisProperties = standard_analysis_workflow.out.properties
-    standardAnalysisPdf = standard_analysis_workflow.out.standardAnalysisPdf
-    umiSaturationMetrics = standard_analysis_workflow.out.umiSaturationMetrics
-    sexCalls = standard_analysis_workflow.out.sexCalls
-    sexPdf = standard_analysis_workflow.out.sexPdf
+    standardAnalysisCellMetadata    = standard_analysis_workflow.out.cellMetadata
+    metacells                       = standard_analysis_workflow.out.metacells
+    metacellMetrics                 = standard_analysis_workflow.out.metacellMetrics
+    metageneReport                  = standard_analysis_workflow.out.metageneReport
+    metageneDge                     = standard_analysis_workflow.out.metageneDge
+    metageneDgeSummary              = standard_analysis_workflow.out.metageneDgeSummary
+    gmgDge                          = standard_analysis_workflow.out.gmgDge
+    gmgDgeSummary                   = standard_analysis_workflow.out.gmgDgeSummary
+    standardAnalysisProperties      = standard_analysis_workflow.out.properties
+    standardAnalysisPdf             = standard_analysis_workflow.out.standardAnalysisPdf
+    umiSaturationMetrics            = standard_analysis_workflow.out.umiSaturationMetrics
+    sexCalls                        = standard_analysis_workflow.out.sexCalls
+    sexPdf                          = standard_analysis_workflow.out.sexPdf
 
     // dropulation outputs
-    dropulationProperties = dropulationProperties
-    digitalAlleleFrequencies = digitalAlleleFrequencies
-    donorAssignments = donorAssignments
-    doubletAssignments = doubletAssignments
-    donorList = donorList
-    donorCellMap = donorCellMap
-    donorAssignmentSummaryStats = donorAssignmentSummaryStats
-    donorAssignmentTearSheet = donorAssignmentTearSheet
-    donorCellBarcodes = donorCellBarcodes
-    donorAssignmentPdf = donorAssignmentPdf
-    donorDge = donorDge
-    donorDgeSummary = donorDgeSummary
-    donorCellMetadata = donorCellMetadata
-    donorSexCalls = donorSexCalls
-    donorSexPdf = donorSexPdf
-    donorMetacells = donorMetacells
-    donorMetacellMetrics = donorMetacellMetrics
+    dropulationProperties           = dropulationProperties
+    digitalAlleleFrequencies        = digitalAlleleFrequencies
+    donorAssignments                = donorAssignments
+    doubletAssignments              = doubletAssignments
+    donorList                       = donorList
+    donorCellMap                    = donorCellMap
+    donorAssignmentSummaryStats     = donorAssignmentSummaryStats
+    donorAssignmentTearSheet        = donorAssignmentTearSheet
+    donorCellBarcodes               = donorCellBarcodes
+    donorAssignmentPdf              = donorAssignmentPdf
+    donorDge                        = donorDge
+    donorDgeSummary                 = donorDgeSummary
+    donorCellMetadata               = donorCellMetadata
+    donorSexCalls                   = donorSexCalls
+    donorSexPdf                     = donorSexPdf
+    donorMetacells                  = donorMetacells
+    donorMetacellMetrics            = donorMetacellMetrics
  
     // MapMyCells outputs
-    mapMyCellsJsonReport = mapMyCellsJsonReport
-    mapMyCellsCsvReport = mapMyCellsCsvReport
-    mapMyCellsProperties = mapMyCellsProperties
+    mapMyCellsJsonReport            = mapMyCellsJsonReport
+    mapMyCellsCsvReport             = mapMyCellsCsvReport
+    mapMyCellsProperties            = mapMyCellsProperties
 }
 
 output {
     // unmapped outputs
-    unmappedBam{
+    unmappedBam {
     }
-    splitBamManifest{
+    splitBamManifest {
     }
-    correctedBarcodeMetrics {        
+    correctedBarcodeMetrics {
     }
     barcodeCounts {
     }
     unmappedProperties {
     }
     // alignment, locus function outputs
-    alignedBam{
-        path {x -> alignmentDir(x)}
+    alignedBam {
+        path { x -> alignmentDir(x) }
     }
-    alignedBai{
-        path {x -> alignmentDir(x)}
+    alignedBai {
+        path { x -> alignmentDir(x) }
     }
     sizeSelectedCells {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     sizeSelectedCellsMetrics {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     dgeSummary {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     chimericTranscripts {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     chimericReadMetrics {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     /*
      * published so that can start_at > beginning
@@ -604,160 +543,160 @@ output {
      * published so that can start_at > beginning
     */
     dge {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     singleCellRnaSeqMetrics {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     sparseDgeMatrix {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     sparseDgeFeatures {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     sparseDgeBarcodes {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     cellFeatures {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     alignmentProperties {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     readQualityMetrics {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     rnaSeqMetrics {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
     alignmentSummaryPdf {
-        path {x -> alignmentDir(x)}
+        path { x -> alignmentDir(x) }
     }
 
     // CBRB outputs
     cbrbH5 {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbBarcodes {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbMetrics {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbReport {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbPdf {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbLog {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbCheckpoint {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     svmCbrbParameters {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     svmCbrbParameterEstimationPdf {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbDge {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbNumTranscripts {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbCellFeatures {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbTearSheet {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
     cbrbProperties {
-        path {x -> cbrbDir(x)}
+        path { x -> cbrbDir(x) }
     }
 
     // cell selection outputs
     selectedCellBarcodes {
-        path {x -> cellSelectionDir(x)}
+        path { x -> cellSelectionDir(x) }
     }
     ambientCellBarcodes {
-        path {x -> cellSelectionDir(x)}
+        path { x -> cellSelectionDir(x) }
     }
     cellSelectionAssignmentsPdf {
-        path {x -> cellSelectionDir(x)}
+        path { x -> cellSelectionDir(x) }
     }
     cellSelectionAssignmentsSummary {
-        path {x -> cellSelectionDir(x)}
+        path { x -> cellSelectionDir(x) }
     }
     droppedNonEmpty {
-        path {x -> cellSelectionDir(x)}
+        path { x -> cellSelectionDir(x) }
     }
     cellSelectionProperties {
-        path {x -> cellSelectionDir(x)}
+        path { x -> cellSelectionDir(x) }
     }
 
     // standard analysis outputs
     selectedDge {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     selectedDgeSummary {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     selectedSparseDgeMatrix {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     selectedSparseDgeFeatures {
-        path {x -> standardAnalysisDir(x)}  
+        path { x -> standardAnalysisDir(x) }
     }
     selectedSparseDgeBarcodes {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     umiReadIntervals {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     molBc {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     metacells {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     metacellMetrics {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     metageneReport {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     metageneDge {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     metageneDgeSummary {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     gmgDge {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     gmgDgeSummary {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     standardAnalysisProperties {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     standardAnalysisPdf {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     umiSaturationMetrics {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     sexCalls {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     sexPdf {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     standardAnalysisCellMetadata {
-        path {x -> standardAnalysisDir(x)}
+        path { x -> standardAnalysisDir(x) }
     }
     // don't care about umi saturation histogram
     /*
@@ -766,69 +705,128 @@ output {
     }
     */
     digitalAlleleFrequencies {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorMetacells {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorMetacellMetrics {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorAssignments {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     doubletAssignments {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorList {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorCellMap {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorAssignmentSummaryStats {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorAssignmentTearSheet {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorCellBarcodes {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorAssignmentPdf {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorDge {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorDgeSummary {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorCellMetadata {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorSexCalls {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     donorSexPdf {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     dropulationProperties {
-        path {x -> dropulationDir(x)}
+        path { x -> dropulationDir(x) }
     }
     mapMyCellsJsonReport {
-        path {x -> mapMyCellsDir(x)}
+        path { x -> mapMyCellsDir(x) }
     }
     mapMyCellsCsvReport {
-        path {x -> mapMyCellsDir(x)}
+        path { x -> mapMyCellsDir(x) }
     }
     mapMyCellsProperties {
-        path {x -> mapMyCellsDir(x)}
+        path { x -> mapMyCellsDir(x) }
     }
 }
 
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    THE END
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+def alignmentDirFromParams() {
+    return buildReferenceMetadataLocator(params.reference).referenceName + "/"
+}
+
+def validateDropulationParams() {
+    if (params.vcf && !params.donorFile) {
+        log.error("If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings.")
+        exit(1)
+    }
+    if (!params.vcf && params.donorFile) {
+        log.error("If providing a donor file for demultiplexing, you must also provide a VCF file with genotypes.")
+        exit(1)
+    }
+    if (params.donorFile && params.donor) {
+        log.error("It does not make sense to provide both a donor file and a donor.")
+        exit(1)
+    }
+}
+
+def validateStartAtParam() {
+    def validStages = validStartAtStages()
+
+    if (!validStages.contains(params.start_at)) {
+        log.error("--start_at must be one of: ${validStages.join(', ')}")
+        exit(1)
+    }
+}
+
+def validStartAtStages() {
+    ['beginning', 'cell_selection', 'standard_analysis']
+}
+
+def stageRank(stageName: String) {
+    validStartAtStages().indexOf(stageName)
+}
+
+// A stage should run when execution starts at that stage or any earlier stage.
+def shouldRunStage(startAt: String, stageName: String) {
+    stageRank(startAt) <= stageRank(stageName)
+}
+
+def restartTupleChannel(pathPattern, meta) {
+    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+        .map { inputFile -> tuple(meta, inputFile) }
+}
+
+def restartPathChannel(pathPattern) {
+    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+}
+
+def restartAlignedBamChannel(pathPattern, doBQSR: boolean, referenceName: String) {
+    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+        .map { bam ->
+            def bamBase = doBQSR
+                ? bam.getName().replaceFirst(/\.bam$/, '')
+                : bam.getName().replaceFirst(/\.chimeric_marked\.bam$/, '')
+            def indexStr = bamBase.replaceFirst(/.*\./, '')
+            if (!indexStr.isInteger()) {
+                error("Cannot parse numeric collectIndex from BAM filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].bam")
+            }
+            def collectIndex = indexStr as Integer
+            tuple([id: bamBase, bamBase: bamBase, collectIndex: collectIndex, referenceName: referenceName], bam)
+        }
+}

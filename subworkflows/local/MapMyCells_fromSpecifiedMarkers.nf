@@ -1,20 +1,20 @@
 include { MAPMYCELLS_FROMSPECIFIEDMARKERS } from '../../modules/local/MapMyCells_fromSpecifiedMarkers.nf'
 include { MTX_TO_H5AD                     } from '../../modules/local/mtx_to_h5ad.nf'
-include {buildMapMyCellsModelLocator} from '../../modules/local/MapMyCellsModelLocator.nf'
-include { noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel; getUserName } from '../../modules/local/workflowUtil.nf'
-include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
+include { buildMapMyCellsModelLocator     } from '../../modules/local/MapMyCellsModelLocator.nf'
+include { noMetaChannelHelper ; metaOnlyChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
+include { WRITE_PROPERTIES                } from '../../modules/local/writeProperties.nf'
 
-workflow MapMyCells_fromSpecifiedMarkers_workflow  {
+workflow MapMyCells_fromSpecifiedMarkers_workflow {
     take:
-        matrix_mtx
-        features_tsv
-        barcodes_tsv
+    matrix_mtx
+    features_tsv
+    barcodes_tsv
 
     main:
-    
-    MTX_TO_H5AD(params.library,noMetaChannelHelper(matrix_mtx),noMetaChannelHelper(features_tsv),noMetaChannelHelper(barcodes_tsv))
+
+    MTX_TO_H5AD(params.library, noMetaChannelHelper(matrix_mtx), noMetaChannelHelper(features_tsv), noMetaChannelHelper(barcodes_tsv))
     modelLocator = buildMapMyCellsModelLocator(params.mapMyCellsQueryMarkers)
-    
+
     MAPMYCELLS_FROMSPECIFIEDMARKERS(
         params.library,
         modelLocator.queryMarkers,
@@ -32,9 +32,9 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow  {
     json_report = combineIntoTupleChannel(outMeta, MAPMYCELLS_FROMSPECIFIEDMARKERS.out.json_report)
     csv_report = combineIntoTupleChannel(outMeta, MAPMYCELLS_FROMSPECIFIEDMARKERS.out.csv_report)
     mapMyCellsProperties = combineIntoTupleChannel(outMeta, WRITE_PROPERTIES.out)
+
     emit:
     json_report = json_report
-    csv_report = csv_report
-    properties = mapMyCellsProperties
+    csv_report  = csv_report
+    properties  = mapMyCellsProperties
 }
-

@@ -11,7 +11,7 @@ process MAKE_TRIPLET_DGE {
     tuple val(meta), path("${features}"), emit: features
     tuple val(meta), path("${barcodes}"), emit: barcodes
     tuple val("${task.process}"), val('MakeTripletDge'), eval("MakeTripletDge --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MakeTripletDge
-    
+
     script:
     matrix = "matrix.mtx.gz"
     features = "features.tsv.gz"

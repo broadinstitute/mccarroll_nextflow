@@ -4,14 +4,15 @@ process BAM_TAG_HISTOGRAM {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        tuple val(meta), path(inputBam)
-        val tag
-        val readQuality
-        val extension
+    tuple val(meta), path(inputBam)
+    val tag
+    val readQuality
+    val extension
+
     output:
     tuple val(meta), path("${output_file}"), emit: histogram
     tuple val("${task.process}"), val('BamTagHistogram'), eval("BamTagHistogram --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_BamTagHistogram
-    
+
     script:
     output_file = "${meta.id}.${extension}"
     """

@@ -6,23 +6,23 @@ process DETECT_DOUBLETS {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        tuple val(meta), path(inputBam), path(vcf), path(vcfIndex), path(donorAssignments)
-        path selectedCells
-        path donorFile
-        path cbrbCellSelectionReport
-        path alleleFrequency
-        val strandStrategy
-        val locusFunction
-        val nonAutosomes
+    tuple val(meta), path(inputBam), path(vcf), path(vcfIndex), path(donorAssignments)
+    path selectedCells
+    path donorFile
+    path cbrbCellSelectionReport
+    path alleleFrequency
+    val strandStrategy
+    val locusFunction
+    val nonAutosomes
 
     output:
-        tuple val(meta), path("${output_file}"), emit: doublets
-        tuple val("${task.process}"), val('DetectDoublets'), eval("DetectDoublets --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DetectDoublets
-        
+    tuple val(meta), path("${output_file}"), emit: doublets
+    tuple val("${task.process}"), val('DetectDoublets'), eval("DetectDoublets --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_DetectDoublets
+
     script:
     output_file = "${meta.id}.doublets.txt"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
-    nonAutosomesString = nonAutosomes? nonAutosomes.collect{ seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
+    nonAutosomesString = nonAutosomes ? nonAutosomes.collect { seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
     """
     DetectDoublets -m 30g \
         --INPUT_BAM ${inputBam} \

@@ -1,14 +1,15 @@
 process PLOT_ALIGNMENT_SUMMARY {
     label 'process_low'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_r:current'
+
     input:
     val library
-        path readQualityMetrics
-        path rnaSeqMetrics
-
+    path readQualityMetrics
+    path rnaSeqMetrics
 
     output:
-        path "$output_file"
+    path "${output_file}"
+
     script:
     output_file = "${library}.alignment_summary.pdf"
     """

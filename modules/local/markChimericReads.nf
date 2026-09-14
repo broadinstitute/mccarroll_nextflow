@@ -1,5 +1,5 @@
 include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf'
-include { replaceExtension } from '../../modules/local/FileUtil.nf'
+include { replaceExtension          } from '../../modules/local/FileUtil.nf'
 
 process MARK_CHIMERIC_READS {
     label 'process_low'
@@ -7,22 +7,24 @@ process MARK_CHIMERIC_READS {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        tuple val(meta), path(inputBam)
-        val strandStrategy
-        val locusFunction
-        val createIndex
+    tuple val(meta), path(inputBam)
+    val strandStrategy
+    val locusFunction
+    val createIndex
+
     output:
     tuple val(meta), path("${output_file}"), emit: chimericMarkedBam
     tuple val(meta), path("${output_index}"), emit: bai, optional: true
-    tuple val(meta), path("${output_metrics}"), emit: chimericReadMetrics    
-    tuple val(meta), path("${output_chimeric_transcripts}"), emit: chimericTranscripts    
+    tuple val(meta), path("${output_metrics}"), emit: chimericReadMetrics
+    tuple val(meta), path("${output_chimeric_transcripts}"), emit: chimericTranscripts
     tuple val("${task.process}"), val('MarkChimericReads'), eval("MarkChimericReads --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MarkChimericReads
-    
+
     script:
     output_file = meta.id + ".chimeric_marked.bam"
     if (createIndex) {
         output_index = replaceExtension(output_file, "bam", "bai")
-    } else {
+    }
+    else {
         output_index = []
     }
     output_metrics = meta.id + ".chimeric_read_metrics"

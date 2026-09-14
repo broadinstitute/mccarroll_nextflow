@@ -11,16 +11,16 @@
 def readSingleRowTsv(tsvFile) {
     def lines = tsvFile.readLines()
 
-    assert lines.size() == 2 :
-        "Expected exactly 2 lines in ${tsvFile}, found ${lines.size()}"
+    assert lines.size() == 2 : "Expected exactly 2 lines in ${tsvFile}, found ${lines.size()}"
 
     def header = lines[0].split('\t', -1)
     def values = lines[1].split('\t', -1)
 
-    assert header.size() == values.size() :
-        "Header/value column count mismatch in ${tsvFile}"
+    assert header.size() == values.size() : "Header/value column count mismatch in ${tsvFile}"
 
-    return [header, values].transpose().collectEntries { k, v ->
-        [(k): v]
-    }
+    return [header, values]
+        .transpose()
+        .collectEntries { k, v ->
+            [(k): v]
+        }
 }

@@ -9,8 +9,9 @@ process CALL_SEX_FROM_METACELLS {
     path metacellMetrics
 
     output:
-        path "$output_file", emit: sexCalls
-        path "$output_pdf", emit: pdf
+    path "${output_file}", emit: sexCalls
+    path "${output_pdf}", emit: pdf
+
     script:
     output_file = "${library}.sex.txt"
     output_pdf = "${library}.sex.pdf"
@@ -20,5 +21,4 @@ process CALL_SEX_FROM_METACELLS {
     -e 'callSexFromMetacells(outputSexCallFile="${output_file}",analysisIdentifier="${library}",sexCallerConfigYamlFile="${sexCallerConfigYaml}",inputMetacellFile="${metacells}",ouputHistPdfFile="${output_pdf}",inputMetacellMetricsFile="${metacellMetrics}")' \
     -e 'message(date(), " Done ", "callSexFromMetacells")' 
    """
-
 }

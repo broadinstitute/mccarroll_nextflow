@@ -9,7 +9,7 @@ def locusFunctionClpArguments(locusFunction) {
     ]
     def clpValues = locusFunctionClpMap[locusFunction]
     if (clpValues == null) {
-        error "Invalid locus function: ${locusFunction}.  Valid options are: ${locusFunctionClpMap.keySet().join(', ')}"
+        error("Invalid locus function: ${locusFunction}.  Valid options are: ${locusFunctionClpMap.keySet().join(', ')}")
     }
     return clpValues.collect { value -> "--LOCUS_FUNCTION_LIST ${value}" }.join(' ')
 }

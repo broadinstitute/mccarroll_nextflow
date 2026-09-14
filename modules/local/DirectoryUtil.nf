@@ -23,7 +23,7 @@ def standardAnalysisDir(tuple) {
 def dropulationDir(tuple) {
     def (meta, _file) = tuple
     if (!meta.containsKey('dropulation_label')) {
-        error "dropulationDir() called with meta that does not contain dropulation_label: ${meta}"
+        error("dropulationDir() called with meta that does not contain dropulation_label: ${meta}")
     }
     return standardAnalysisDir(tuple) + "village/" + meta.dropulation_label + "/"
 }
@@ -32,4 +32,3 @@ def mapMyCellsDir(tuple) {
     def (meta, _file) = tuple
     return standardAnalysisDir(tuple) + "map_my_cells/" + meta.mmcModel + "/"
 }
-

@@ -2,7 +2,7 @@ process SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR {
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
-input:
+    input:
     tuple val(meta), path(inputBam), path(selectedCells)
     path referenceFasta
     path gtf
@@ -11,13 +11,13 @@ input:
     val mtSequences
     val cellBarcodeTag
 
-output:
+    output:
     tuple val(meta), path("${output_file}"), emit: metrics
     tuple val("${task.process}"), val('SingleCellRnaSeqMetricsCollector'), eval("SingleCellRnaSeqMetricsCollector --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_SingleCellRnaSeqMetricsCollector
-    
-script:
+
+    script:
     output_file = "${meta.id}.fracIntronicExonicPerCell.txt.gz"
-    mtSequencesArgs = mtSequences.collect{ seq -> "--MT_SEQUENCE ${seq}" }
+    mtSequencesArgs = mtSequences.collect { seq -> "--MT_SEQUENCE ${seq}" }
     //  There is much sloppiness in GTF.  --VALIDATION_STRINGENCY SILENT causes problematic genes to be skipped.
     """
     SingleCellRnaSeqMetricsCollector \
@@ -31,5 +31,4 @@ script:
         ${mtSequencesArgs.join(' ')} \
         --VALIDATION_STRINGENCY SILENT
     """
-
 }

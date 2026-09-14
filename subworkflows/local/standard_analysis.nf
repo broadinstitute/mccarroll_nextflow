@@ -1,28 +1,28 @@
-include { noMetaChannelHelper; collectInOrder; metaOnlyChannelHelper; combineIntoTupleChannel; getUserName } from '../../modules/local/workflowUtil.nf'
-include { buildReferenceMetadataLocator; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
-include {FILTER_DGE; FILTER_DGE as FILTER_DONOR_DGE} from '../../modules/local/filterDge.nf'
-include {MAKE_TRIPLET_DGE} from '../../modules/local/makeTripletDge.nf'
-include { GATHER_UMI_READ_INTERVALS } from '../../modules/local/gatherUMIReadIntervals.nf'
-include { MERGE_UMI_READ_INTERVALS } from '../../modules/local/mergeUMIReadIntervals.nf'
-include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE } from '../../modules/local/chimericReportEditDistanceCollapse.nf'
-include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
-include { GATHER_DIGITAL_ALLELE_COUNTS } from '../../modules/local/gatherDigitalAlleleCounts.nf'
-include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
-include { withExtension } from '../../modules/local/FileUtil.nf'
-include { CREATE_METACELLS } from '../../modules/local/createMetacells.nf'
-include { DISCOVER_META_GENES } from '../../modules/local/discoverMetaGenes.nf'
-include { MERGE_META_GENE_REPORTS } from '../../modules/local/mergeMetaGeneReports.nf'
-include { CREATE_META_GENE_BAM } from '../../modules/local/createMetaGeneBam.nf'
-include { DIGITAL_EXPRESSION } from '../../modules/local/digitalExpression.nf'
-include { MERGE_SPLIT_DGES } from '../../modules/local/mergeSplitDges.nf'
-include { MERGE_DGE_SUMMARIES; MERGE_DGE_SUMMARIES as MERGE_GMG_DGE_SUMMARIES } from '../../modules/local/mergeDgeSummaries.nf'
-include { MERGE_DGE} from '../../modules/local/mergeDge.nf'
-include { PLOT_STANDARD_ANALYSIS } from '../../modules/local/plotStandardAnalysis.nf'
-include { CALL_SEX_FROM_METACELLS } from '../../modules/local/callSexFromMetacells.nf'
-include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
-include { FILTER_CELL_METADATA } from '../../modules/local/filterCellMetadata.nf'
-include { JOIN_CELL_METADATA } from '../../modules/local/joinCellMetadata.nf'
-include { SC_DBL_FINDER } from '../../modules/local/scDblFinder.nf'
+include { noMetaChannelHelper ; collectInOrder ; metaOnlyChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
+include { buildReferenceMetadataLocator ; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
+include { FILTER_DGE ; FILTER_DGE as FILTER_DONOR_DGE } from '../../modules/local/filterDge.nf'
+include { MAKE_TRIPLET_DGE                               } from '../../modules/local/makeTripletDge.nf'
+include { GATHER_UMI_READ_INTERVALS                      } from '../../modules/local/gatherUMIReadIntervals.nf'
+include { MERGE_UMI_READ_INTERVALS                       } from '../../modules/local/mergeUMIReadIntervals.nf'
+include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE         } from '../../modules/local/chimericReportEditDistanceCollapse.nf'
+include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES           } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
+include { GATHER_DIGITAL_ALLELE_COUNTS                   } from '../../modules/local/gatherDigitalAlleleCounts.nf'
+include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES        } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
+include { withExtension                                  } from '../../modules/local/FileUtil.nf'
+include { CREATE_METACELLS                               } from '../../modules/local/createMetacells.nf'
+include { DISCOVER_META_GENES                            } from '../../modules/local/discoverMetaGenes.nf'
+include { MERGE_META_GENE_REPORTS                        } from '../../modules/local/mergeMetaGeneReports.nf'
+include { CREATE_META_GENE_BAM                           } from '../../modules/local/createMetaGeneBam.nf'
+include { DIGITAL_EXPRESSION                             } from '../../modules/local/digitalExpression.nf'
+include { MERGE_SPLIT_DGES                               } from '../../modules/local/mergeSplitDges.nf'
+include { MERGE_DGE_SUMMARIES ; MERGE_DGE_SUMMARIES as MERGE_GMG_DGE_SUMMARIES } from '../../modules/local/mergeDgeSummaries.nf'
+include { MERGE_DGE                                      } from '../../modules/local/mergeDge.nf'
+include { PLOT_STANDARD_ANALYSIS                         } from '../../modules/local/plotStandardAnalysis.nf'
+include { CALL_SEX_FROM_METACELLS                        } from '../../modules/local/callSexFromMetacells.nf'
+include { WRITE_PROPERTIES                               } from '../../modules/local/writeProperties.nf'
+include { FILTER_CELL_METADATA                           } from '../../modules/local/filterCellMetadata.nf'
+include { JOIN_CELL_METADATA                             } from '../../modules/local/joinCellMetadata.nf'
+include { SC_DBL_FINDER                                  } from '../../modules/local/scDblFinder.nf'
 
 workflow standard_analysis_workflow {
     take:
@@ -33,11 +33,11 @@ workflow standard_analysis_workflow {
     chimericTranscripts
     cbrbCellFeatures
 
-    main    :
+    main:
     metagene_infix = ".metagene"
-    gmg_infix      = ".gmg"
+    gmg_infix = ".gmg"
     functionalStrategy = params.metaGeneDgeFunctionalStrategy ?: params.dgeFunctionalStrategy
-    FILTER_DGE(selectedCells.map{m, f -> tuple(m + [id: m.id + ".selected"], f)}, noMetaChannelHelper(dgeMatrix), noMetaChannelHelper(dgeSummary))
+    FILTER_DGE(selectedCells.map { m, f -> tuple(m + [id: m.id + ".selected"], f) }, noMetaChannelHelper(dgeMatrix), noMetaChannelHelper(dgeSummary))
     referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     MAKE_TRIPLET_DGE(FILTER_DGE.out.filteredDge, referenceMetadataLocator.reducedGtf)
     noChannelSelectedCells = noMetaChannelHelper(selectedCells).collect()
@@ -50,39 +50,39 @@ workflow standard_analysis_workflow {
         params.library,
         noMetaChannelHelper(DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES.out.umiSaturationHistogram).collect(),
         noMetaChannelHelper(CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc).collect(),
-        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect()
+        noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(),
     )
     SC_DBL_FINDER(noMetaChannelHelper(FILTER_DGE.out.filteredDge), []) // default random seed
     doubletCalls = combineIntoTupleChannel(meta, SC_DBL_FINDER.out.doubletCalls)
     standardAnalysisPdf = combineIntoTupleChannel(meta, PLOT_STANDARD_ANALYSIS.out.pdf)
     umiSaturationMetrics = combineIntoTupleChannel(meta, PLOT_STANDARD_ANALYSIS.out.umi_saturation_metrics)
     DISCOVER_META_GENES(
-        bams, 
+        bams,
         noChannelSelectedCells,
-        params.locusFunction, 
-        functionalStrategy
+        params.locusFunction,
+        functionalStrategy,
     )
     MERGE_META_GENE_REPORTS(params.library, collectInOrder(DISCOVER_META_GENES.out.metaGeneReport))
     CREATE_META_GENE_BAM(
-        bams, 
-        noChannelSelectedCells, 
-        MERGE_META_GENE_REPORTS.out.metaGeneReport.collect(), 
-        params.locusFunction, 
-        functionalStrategy
+        bams,
+        noChannelSelectedCells,
+        MERGE_META_GENE_REPORTS.out.metaGeneReport.collect(),
+        params.locusFunction,
+        functionalStrategy,
     )
     // Run DigitalExpression on all the metagene BAMs, but append ".metagene" to meta.id
     DIGITAL_EXPRESSION(
-        CREATE_META_GENE_BAM.out.bam.map{m, f -> tuple(m + [id: m.id + metagene_infix], f)}.combine(noMetaChannelHelper(selectedCells)), 
-        params.locusFunction, 
+        CREATE_META_GENE_BAM.out.bam.map { m, f -> tuple(m + [id: m.id + metagene_infix], f) }.combine(noMetaChannelHelper(selectedCells)),
+        params.locusFunction,
         params.library,
-        params.strandStrategy, 
+        params.strandStrategy,
         0,
         functionalStrategy,
         params.cellBarcodeTag,
         params.molecularBarcodeTag,
         true // doMetaGenes
     )
-    MERGE_SPLIT_DGES(params.library + metagene_infix, collectInOrder(DIGITAL_EXPRESSION.out.dge)) 
+    MERGE_SPLIT_DGES(params.library + metagene_infix, collectInOrder(DIGITAL_EXPRESSION.out.dge))
     MERGE_DGE_SUMMARIES(params.library + metagene_infix, collectInOrder(DIGITAL_EXPRESSION.out.dge_summary), "")
     metageneReport = combineIntoTupleChannel(meta, MERGE_META_GENE_REPORTS.out.metaGeneReport)
     metageneDge = combineIntoTupleChannel(meta, MERGE_SPLIT_DGES.out.dge)
@@ -109,27 +109,39 @@ workflow standard_analysis_workflow {
         metaGeneDgeFunctionalStrategy: functionalStrategy
     ]
     if (params.donor) {
-        CREATE_METACELLS(meta.map { m -> tuple(m, [], params.donor) }, 
-            noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect())
+        CREATE_METACELLS(
+            meta.map { m -> tuple(m, [], params.donor) },
+            noMetaChannelHelper(FILTER_DGE.out.filteredDge).collect(),
+        )
         metacells = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacells)
         metacellMetrics = combineIntoTupleChannel(meta, CREATE_METACELLS.out.metacellMetrics)
         workflowProperties.donor = params.donor
-    } else {
+    }
+    else {
         metacells = channel.empty()
         metacellMetrics = channel.empty()
     }
     FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(selectedCells).collect())
-    JOIN_CELL_METADATA(params.library, FILTER_CELL_METADATA.out,
-        [], params.donor ?: '',
+    JOIN_CELL_METADATA(
+        params.library,
+        FILTER_CELL_METADATA.out,
+        [],
+        params.donor ?: '',
         noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(),
-        SC_DBL_FINDER.out.doubletCalls.collect())
+        SC_DBL_FINDER.out.doubletCalls.collect(),
+    )
     cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
     if ((params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
-        CALL_SEX_FROM_METACELLS(params.library, referenceMetadataLocator.xipherConfig, 
-        CREATE_METACELLS.out.metacells.collect(), CREATE_METACELLS.out.metacellMetrics.collect())
+        CALL_SEX_FROM_METACELLS(
+            params.library,
+            referenceMetadataLocator.xipherConfig,
+            CREATE_METACELLS.out.metacells.collect(),
+            CREATE_METACELLS.out.metacellMetrics.collect(),
+        )
         sexCalls = combineIntoTupleChannel(meta, CALL_SEX_FROM_METACELLS.out.sexCalls)
         sexPdf = combineIntoTupleChannel(meta, CALL_SEX_FROM_METACELLS.out.pdf)
-    } else {
+    }
+    else {
         sexCalls = channel.empty()
         sexPdf = channel.empty()
     }
@@ -137,26 +149,26 @@ workflow standard_analysis_workflow {
     standardAnalysisProperties = combineIntoTupleChannel(meta, WRITE_PROPERTIES.out)
 
     emit:
-    dge = FILTER_DGE.out.filteredDge
-    dgeSummary = FILTER_DGE.out.filteredDgeSummary
-    sparseDgeMatrix = MAKE_TRIPLET_DGE.out.matrix
-    sparseDgeFeatures = MAKE_TRIPLET_DGE.out.features
-    sparseDgeBarcodes = MAKE_TRIPLET_DGE.out.barcodes
-    umiReadIntervals = MERGE_UMI_READ_INTERVALS.out.umiReadIntervals
-    molBc = CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc
+    dge                    = FILTER_DGE.out.filteredDge
+    dgeSummary             = FILTER_DGE.out.filteredDgeSummary
+    sparseDgeMatrix        = MAKE_TRIPLET_DGE.out.matrix
+    sparseDgeFeatures      = MAKE_TRIPLET_DGE.out.features
+    sparseDgeBarcodes      = MAKE_TRIPLET_DGE.out.barcodes
+    umiReadIntervals       = MERGE_UMI_READ_INTERVALS.out.umiReadIntervals
+    molBc                  = CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE.out.molBc
     umiSaturationHistogram = DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES.out.umiSaturationHistogram
-    metacells = metacells
-    metacellMetrics = metacellMetrics
-    metageneReport = metageneReport
-    metageneDge = metageneDge
-    metageneDgeSummary = metageneDgeSummary
-    gmgDge = gmgDge
-    gmgDgeSummary = gmgDgeSummary
-    properties = standardAnalysisProperties
-    standardAnalysisPdf = standardAnalysisPdf
-    sexCalls = sexCalls
-    sexPdf = sexPdf
-    umiSaturationMetrics = umiSaturationMetrics
-    cellMetadata = cellMetadata
-    doubletCalls = doubletCalls
+    metacells              = metacells
+    metacellMetrics        = metacellMetrics
+    metageneReport         = metageneReport
+    metageneDge            = metageneDge
+    metageneDgeSummary     = metageneDgeSummary
+    gmgDge                 = gmgDge
+    gmgDgeSummary          = gmgDgeSummary
+    properties             = standardAnalysisProperties
+    standardAnalysisPdf    = standardAnalysisPdf
+    sexCalls               = sexCalls
+    sexPdf                 = sexPdf
+    umiSaturationMetrics   = umiSaturationMetrics
+    cellMetadata           = cellMetadata
+    doubletCalls           = doubletCalls
 }

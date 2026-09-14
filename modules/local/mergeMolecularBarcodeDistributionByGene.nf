@@ -1,6 +1,6 @@
 process MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE {
     label 'process_low'
-     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_java:current'
+    container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_java:current'
 
     input:
     val library
@@ -9,7 +9,7 @@ process MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE {
     output:
     path "${output_file}", emit: chimericTranscripts
     tuple val("${task.process}"), val('MergeMolecularBarcodeDistributionByGene'), eval("MergeMolecularBarcodeDistributionByGene --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeMolecularBarcodeDistributionByGene
-    
+
     script:
     output_file = library + ".chimeric_transcripts.txt.gz"
 

@@ -1,17 +1,17 @@
-
 process PREALIGNMENT_TAG_AND_TRIM {
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        tuple val(meta), path(inputBam)
-        val fivePrimeAdapter
-        val beadStructure
-        val cellularBarcodeTag
-        val molecularBarcodeTag
-        path allowedBarcodes
-        val outputExtension
+    tuple val(meta), path(inputBam)
+    val fivePrimeAdapter
+    val beadStructure
+    val cellularBarcodeTag
+    val molecularBarcodeTag
+    path allowedBarcodes
+    val outputExtension
+
     output:
     tuple val(meta), path("${output_file}"), emit: taggedAndTrimmedBams
     // TODO: emit metrics

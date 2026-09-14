@@ -3,13 +3,14 @@ process MERGE_UMI_READ_INTERVALS {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-    val meta // the perBamUMIReadIntervals have a less-complete meta, so pass it separately
+    // the perBamUMIReadIntervals have a less-complete meta, so pass it separately
+    val meta
     path perBamUMIReadIntervals
 
     output:
     tuple val(meta), path("${output_file}"), emit: umiReadIntervals
     tuple val("${task.process}"), val('MergeUMIReadIntervals'), eval("MergeUMIReadIntervals --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_MergeUMIReadIntervals
-    
+
     script:
     output_file = meta.id + ".umi_read_intervals.tsv.gz"
 

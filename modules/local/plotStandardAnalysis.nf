@@ -4,14 +4,14 @@ process PLOT_STANDARD_ANALYSIS {
 
     input:
     val library
-        path umiSaturationHistogram
-        path molecularBarcodeDistributionByGene
-        path digitalExpressionSummary
-
+    path umiSaturationHistogram
+    path molecularBarcodeDistributionByGene
+    path digitalExpressionSummary
 
     output:
-        path "$output_file", emit: pdf
-        path "$output_umi_saturation_metrics", emit: umi_saturation_metrics
+    path "${output_file}", emit: pdf
+    path "${output_umi_saturation_metrics}", emit: umi_saturation_metrics
+
     script:
     output_file = "${library}.standard_analysis.pdf"
     output_umi_saturation_metrics = "${library}.umi_saturation_metrics.txt"

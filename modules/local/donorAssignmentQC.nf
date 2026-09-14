@@ -12,6 +12,7 @@ process DONOR_ASSIGNMENT_QC {
     path dgeFile
     path readsPerCellFile
     path donorFile
+
     output:
     path "${output_donor_list}", emit: donorList
     path "${output_donor_cell_map}", emit: donorCellMap
