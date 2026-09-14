@@ -2,7 +2,7 @@ include { replaceExtension } from './FileUtil.nf'
 
 process SC_DBL_FINDER {
     label 'process_low'
-    
+
     container 'us.gcr.io/mccarroll-mocha/sc_dbl_finder:20260326'
 
     input:
@@ -10,11 +10,11 @@ process SC_DBL_FINDER {
     val random_seed
 
     output:
-    path "$output_file", emit: doubletCalls
+    path "${output_file}", emit: doubletCalls
 
     script:
     output_file = replaceExtension(dge, "digital_expression.txt.gz", "scDblFinder.tsv")
-    the_seed = (random_seed.size == 0? 1234: random_seed[0])
+    the_seed = (random_seed.size == 0 ? 1234 : random_seed[0])
 
     """
     #!/usr/bin/env Rscript

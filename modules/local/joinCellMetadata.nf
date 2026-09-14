@@ -1,5 +1,5 @@
 process JOIN_CELL_METADATA {
-   label 'process_low'
+    label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_python:current'
 

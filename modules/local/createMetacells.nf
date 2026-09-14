@@ -13,17 +13,19 @@ process CREATE_METACELLS {
     path "${output_file}", emit: metacells
     path "${output_metrics}", emit: metacellMetrics
     tuple val("${task.process}"), val('CreateMetaCells'), eval("CreateMetaCells --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CreateMetaCells
-    
+
     script:
     if (donor.size() > 0) {
         donor_arg = "--SINGLE_METACELL_LABEL ${donor}"
         if (assignments.size() > 0) {
             throw new IllegalArgumentException("Multiple donor assignment files provided for a single donor ${donor}")
         }
-    } else if (assignments.size() > 0) {
+    }
+    else if (assignments.size() > 0) {
         donor_arg = "--DONOR_MAP ${assignments}"
-    } else {
-            throw new IllegalArgumentException("Either single donor or donor assignment file must be provided")
+    }
+    else {
+        throw new IllegalArgumentException("Either single donor or donor assignment file must be provided")
     }
     output_file = "${meta.id}.metacells.txt"
     output_metrics = "${meta.id}.metacell_metrics"

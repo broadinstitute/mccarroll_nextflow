@@ -2,15 +2,15 @@
 // Helpers (FileUtil replacements)
 // -----------------------------
 
-def hasExtension(path, String ext) {
+def hasExtension(path, ext: String) {
     def name = path instanceof java.nio.file.Path ? path.getFileName().toString() : path.name
     return name.endsWith("." + ext)
 }
 
-def withoutExtension(path, String ext) {
-    def name = path instanceof java.nio.file.Path ?
-        path.getFileName().toString() :
-        path.name
+def withoutExtension(path, ext: String) {
+    def name = path instanceof java.nio.file.Path
+        ? path.getFileName().toString()
+        : path.name
 
     def suffix = "." + ext
 
@@ -22,34 +22,36 @@ def withoutExtension(path, String ext) {
 
     if (path instanceof java.nio.file.Path) {
         return path.resolveSibling(newName)
-    } else {
+    }
+    else {
         return new File(path.parent, newName)
     }
 }
 
-def withExtension(path, String ext) {
-    def name = path instanceof java.nio.file.Path ?
-        path.getFileName().toString() :
-        path.name
+def withExtension(path, ext: String) {
+    def name = path instanceof java.nio.file.Path
+        ? path.getFileName().toString()
+        : path.name
 
     def newName = name + "." + ext
 
     if (path instanceof java.nio.file.Path) {
         return path.resolveSibling(newName)
-    } else {
+    }
+    else {
         return new File(path.parent, newName)
     }
 }
 
-def replaceExtension(path, String oldExt, String newExt) {
+def replaceExtension(path, oldExt: String, newExt: String) {
     return withExtension(withoutExtension(path, oldExt), newExt)
 }
 
-def subpath(dir, String child) {
+def subpath(dir, child: String) {
     if (dir instanceof java.nio.file.Path) {
         return dir.resolve(child)
-    } else {
+    }
+    else {
         return java.nio.file.Path.of(dir.toString()).resolve(child)
     }
 }
-

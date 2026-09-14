@@ -1,6 +1,6 @@
 // Ported from Zamboni scala
 
-include { hasExtension; withoutExtension; withExtension; subpath } from './FileUtil.nf'
+include { hasExtension ; withoutExtension ; withExtension ; subpath } from './FileUtil.nf'
 
 def buildReferenceMetadataLocator(referenceFasta) {
     if (referenceFasta instanceof String) {
@@ -45,16 +45,14 @@ def buildReferenceMetadataLocator(referenceFasta) {
             "transcriptInfo.tab"
     ]
 
-    def BWA_EXTENSIONS = [
-            "64.amb", "64.ann", "64.bwt", "64.pac", "64.sa"
-    ]
+    def BWA_EXTENSIONS = ["64.amb", "64.ann", "64.bwt", "64.pac", "64.sa"]
 
     // -----------------------------
     // Normalize FASTA base
     // -----------------------------
-    def fastaNoGz = hasExtension(referenceFasta, "gz") ?
-            withoutExtension(referenceFasta, "gz") :
-            referenceFasta
+    def fastaNoGz = hasExtension(referenceFasta, "gz")
+        ? withoutExtension(referenceFasta, "gz")
+        : referenceFasta
 
     def matchedExt = FASTA_EXTENSIONS.find { ext -> hasExtension(fastaNoGz, ext) }
 
@@ -114,8 +112,8 @@ def buildReferenceMetadataLocator(referenceFasta) {
     // -----------------------------
     // Methods (as closures)
     // -----------------------------
-    meta.starDirectoryForVersion = { String version ->
-        def versionDir = subpath(subpath(dir, STAR_INDICES_SUBDIR),version)
+    meta.starDirectoryForVersion = { version: String ->
+        def versionDir = subpath(subpath(dir, STAR_INDICES_SUBDIR), version)
         versionDir.exists() ? versionDir : meta.starDirectory
     }
 
@@ -129,8 +127,8 @@ def getContigsWithLabel(contigGroupsFile, label) {
     def yaml = new org.yaml.snakeyaml.Yaml()
     def contigGroups = yaml.load(contigGroupsFile.text)
     def keys = contigGroups.findAll { _k, v ->
-            v == label || (v instanceof Collection && v.contains(label))
-        }.keySet() as List
+        v == label || (v instanceof Collection && v.contains(label))
+    }.keySet() as List
     return keys
 }
 

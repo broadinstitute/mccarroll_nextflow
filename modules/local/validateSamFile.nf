@@ -4,8 +4,8 @@ process VALIDATE_SAM_FILE {
     container 'docker.io/broadinstitute/picard:latest'
 
     input:
-        tuple val(meta), path(inputBam)
-        path reference
+    tuple val(meta), path(inputBam)
+    path reference
 
     output:
     path "${output_file}"
@@ -19,4 +19,3 @@ process VALIDATE_SAM_FILE {
         --OUTPUT '${output_file}' --REFERENCE_SEQUENCE '${reference}'
     """
 }
-

@@ -8,7 +8,7 @@ process GATHER_READ_QUALITY_METRICS {
     output:
     tuple val(meta), path("${output_file}"), emit: readQualityMetrics
     tuple val("${task.process}"), val('GatherReadQualityMetrics'), eval("GatherReadQualityMetrics --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_GatherReadQualityMetrics
-    
+
     script:
     output_file = meta.bamBase + ".ReadQualityMetrics.txt"
 

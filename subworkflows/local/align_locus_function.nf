@@ -1,58 +1,58 @@
-include {PREALIGNMENT_TAG_AND_TRIM} from '../../modules/local/preAlignmentTagAndTrim.nf'
-include { STAR_ALIGN } from '../../modules/nf-core/star/align/main'
-include { PICARD_SORTSAM } from '../../modules/nf-core/picard/sortsam/main'
-include { GATK4_MERGEBAMALIGNMENT } from '../../modules/nf-core/gatk4/mergebamalignment/main'
-include { GATK4_BASERECALIBRATOR } from '../../modules/nf-core/gatk4/baserecalibrator/main'
-include { GATK4_GATHERBQSRREPORTS } from '../../modules/nf-core/gatk4/gatherbqsrreports/main'
-include { GATK4_APPLYBQSR } from '../../modules/nf-core/gatk4/applybqsr/main'     
-include { buildReferenceMetadataLocator; loadMtSequences } from '../../modules/local/ReferenceMetadataLocator.nf'
-include {TAG_READ_WITH_GENE_FUNCTION} from '../../modules/local/tagReadWithGeneFunction.nf'
-include {MARK_CHIMERIC_READS} from '../../modules/local/markChimericReads.nf'
-include {VALIDATE_ALIGNED_SAM} from '../../modules/local/validateAlignedSam.nf'
-include {VALIDATE_SAM_FILE} from '../../modules/local/validateSamFile.nf'
-include {SELECT_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/selectCellsByNumTranscripts.nf'
-include {DIGITAL_EXPRESSION} from '../../modules/local/digitalExpression.nf'
-include {SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR} from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
-include {MERGE_CELLS_BY_NUM_TRANSCRIPTS} from '../../modules/local/mergeCellsByNumTranscripts.nf'
-include {MERGE_DGE_SUMMARIES} from '../../modules/local/mergeDgeSummaries.nf'
-include {collectInOrder; addMeta; getUserName} from '../../modules/local/workflowUtil.nf'
-include {MERGE_SPLIT_DGES} from '../../modules/local/mergeSplitDges.nf'
-include {MERGE_SINGLE_CELL_RNA_SEQ_METRICS} from '../../modules/local/mergeSingleCellRnaSeqMetrics.nf'
-include { MAKE_SPARSE_DGE } from '../../modules/local/makeSparseDge.nf'
-include { BAM_TAG_HISTOGRAM } from '../../modules/local/bamTagHistogram.nf'
-include { MERGE_BAM_TAG_HISTOGRAMS } from '../../modules/local/mergeBamTagHistograms.nf'
-include { BUILD_CELL_FEATURES_SIMPLE } from '../../modules/local/buildCellFeaturesSimple.nf'
+include { PREALIGNMENT_TAG_AND_TRIM                    } from '../../modules/local/preAlignmentTagAndTrim.nf'
+include { STAR_ALIGN                                   } from '../../modules/nf-core/star/align/main'
+include { PICARD_SORTSAM                               } from '../../modules/nf-core/picard/sortsam/main'
+include { GATK4_MERGEBAMALIGNMENT                      } from '../../modules/nf-core/gatk4/mergebamalignment/main'
+include { GATK4_BASERECALIBRATOR                       } from '../../modules/nf-core/gatk4/baserecalibrator/main'
+include { GATK4_GATHERBQSRREPORTS                      } from '../../modules/nf-core/gatk4/gatherbqsrreports/main'
+include { GATK4_APPLYBQSR                              } from '../../modules/nf-core/gatk4/applybqsr/main'
+include { buildReferenceMetadataLocator ; loadMtSequences } from '../../modules/local/ReferenceMetadataLocator.nf'
+include { TAG_READ_WITH_GENE_FUNCTION                  } from '../../modules/local/tagReadWithGeneFunction.nf'
+include { MARK_CHIMERIC_READS                          } from '../../modules/local/markChimericReads.nf'
+include { VALIDATE_ALIGNED_SAM                         } from '../../modules/local/validateAlignedSam.nf'
+include { VALIDATE_SAM_FILE                            } from '../../modules/local/validateSamFile.nf'
+include { SELECT_CELLS_BY_NUM_TRANSCRIPTS              } from '../../modules/local/selectCellsByNumTranscripts.nf'
+include { DIGITAL_EXPRESSION                           } from '../../modules/local/digitalExpression.nf'
+include { SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR        } from '../../modules/local/singleCellRnaSeqMetricsCollector.nf'
+include { MERGE_CELLS_BY_NUM_TRANSCRIPTS               } from '../../modules/local/mergeCellsByNumTranscripts.nf'
+include { MERGE_DGE_SUMMARIES                          } from '../../modules/local/mergeDgeSummaries.nf'
+include { collectInOrder ; addMeta ; getUserName } from '../../modules/local/workflowUtil.nf'
+include { MERGE_SPLIT_DGES                             } from '../../modules/local/mergeSplitDges.nf'
+include { MERGE_SINGLE_CELL_RNA_SEQ_METRICS            } from '../../modules/local/mergeSingleCellRnaSeqMetrics.nf'
+include { MAKE_SPARSE_DGE                              } from '../../modules/local/makeSparseDge.nf'
+include { BAM_TAG_HISTOGRAM                            } from '../../modules/local/bamTagHistogram.nf'
+include { MERGE_BAM_TAG_HISTOGRAMS                     } from '../../modules/local/mergeBamTagHistograms.nf'
+include { BUILD_CELL_FEATURES_SIMPLE                   } from '../../modules/local/buildCellFeaturesSimple.nf'
 include { MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE } from '../../modules/local/mergeMolecularBarcodeDistributionByGene.nf'
-include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
-include { GATHER_READ_QUALITY_METRICS } from '../../modules/local/gatherReadQualityMetrics.nf'
-include { MERGE_READ_QUALITY_METRICS } from '../../modules/local/mergeReadQualityMetrics.nf'
-include { MERGE_RNA_SEQ_METRICS } from '../../modules/local/mergeRnaSeqMetrics.nf'
-include { PLOT_ALIGNMENT_SUMMARY } from '../../modules/local/plotAlignmentSummary.nf'
-include { PICARD_COLLECTRNASEQMETRICS } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
-include { MERGE_CHIMERIC_READ_METRICS } from '../../modules/local/mergeChimericReadMetrics.nf'
-include { SEND_EMAIL } from '../../modules/local/sendEmail.nf'
-include { alignmentDir } from '../../modules/local/DirectoryUtil.nf'
-include { subpath } from '../../modules/local/FileUtil.nf'
+include { WRITE_PROPERTIES                             } from '../../modules/local/writeProperties.nf'
+include { GATHER_READ_QUALITY_METRICS                  } from '../../modules/local/gatherReadQualityMetrics.nf'
+include { MERGE_READ_QUALITY_METRICS                   } from '../../modules/local/mergeReadQualityMetrics.nf'
+include { MERGE_RNA_SEQ_METRICS                        } from '../../modules/local/mergeRnaSeqMetrics.nf'
+include { PLOT_ALIGNMENT_SUMMARY                       } from '../../modules/local/plotAlignmentSummary.nf'
+include { PICARD_COLLECTRNASEQMETRICS                  } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
+include { MERGE_CHIMERIC_READ_METRICS                  } from '../../modules/local/mergeChimericReadMetrics.nf'
+include { SEND_EMAIL                                   } from '../../modules/local/sendEmail.nf'
+include { alignmentDir                                 } from '../../modules/local/DirectoryUtil.nf'
+include { subpath                                      } from '../../modules/local/FileUtil.nf'
 
 workflow align_locus_function_workflow {
     take:
-        unmappedBams
-        beadStructure
+    unmappedBams
+    beadStructure
 
     main:
-    ch_unmapped_bams = unmappedBams.map { bam -> 
+    ch_unmapped_bams = unmappedBams.map { bam ->
         def bamBase = bam.getName().replaceFirst(/\.unmapped\.bam$/, '')
         def bamIndex = bamBase.replaceFirst(/.*\./, '') as Integer
         tuple([id: bamBase, bamBase: bamBase, collectIndex: bamIndex], bam)
     }
     PREALIGNMENT_TAG_AND_TRIM(
-            ch_unmapped_bams,
-            params.fivePrimeAdapter,
-            beadStructure,
-            params.cellBarcodeTag,
-            params.molecularBarcodeTag,
-            params.allowedBarcodes,
-            "unmapped_tagged_trimmed_filtered.bam"
+        ch_unmapped_bams,
+        params.fivePrimeAdapter,
+        beadStructure,
+        params.cellBarcodeTag,
+        params.molecularBarcodeTag,
+        params.allowedBarcodes,
+        "unmapped_tagged_trimmed_filtered.bam",
     )
     ch_star_input = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, bam ->
         tuple(meta + [single_end: true], bam)
@@ -69,10 +69,10 @@ workflow align_locus_function_workflow {
     genome_index_dir = file(reference).parent + "/STAR_indices/2.7.11a"
     null_file = tuple([], [])
     STAR_ALIGN(
-            ch_star_input,
-            tuple([], genome_index_dir),
-            null_file, // no GTF
-            true // ignore junctions
+        ch_star_input,
+        tuple([], genome_index_dir),
+        null_file, // no GTF
+        true // ignore junctions
     )
 
     PICARD_SORTSAM(
@@ -83,9 +83,12 @@ workflow align_locus_function_workflow {
     // and order by collectIndex, which is the integer after the last dot in the bamBase.
     ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> tuple(meta.bamBase, file) }
     ch_prealigned_bams = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, file -> tuple(meta.bamBase, file) }
-    ch_aligned_sorted_bams.combine(ch_prealigned_bams, by:0).map { bamBase, alignedSortedBam, prealignedBam ->
-        tuple([id: bamBase  + ".merged", bamBase: bamBase, collectIndex: bamBase.replaceFirst(/.*\./, '') as Integer], alignedSortedBam, prealignedBam)
-    }.set { ch_merge_input }
+    ch_aligned_sorted_bams
+        .combine(ch_prealigned_bams, by: 0)
+        .map { bamBase, alignedSortedBam, prealignedBam ->
+            tuple([id: bamBase + ".merged", bamBase: bamBase, collectIndex: bamBase.replaceFirst(/.*\./, '') as Integer], alignedSortedBam, prealignedBam)
+        }
+        .set { ch_merge_input }
 
     // Although GATK4_MERGEBAMALIGNMENT process code doesn't use the sequence dictionary explicitly, it is found
     // relative to the reference FASTA file and is required to be present in order for the process to run successfully.  
@@ -114,8 +117,9 @@ workflow align_locus_function_workflow {
     if (doBQSR) {
         dbsnpIntervals = referenceMetadataLocator.dbSnpIntervals.exists() ? referenceMetadataLocator.dbSnpIntervals : []
         GATK4_BASERECALIBRATOR(
-            TAG_READ_WITH_GENE_FUNCTION.out.taggedBam.map({ meta, file -> 
-            tuple(meta, file, [], dbsnpIntervals) }), // no index, no intervals
+            TAG_READ_WITH_GENE_FUNCTION.out.taggedBam.map { meta, file ->
+                tuple(meta, file, [], dbsnpIntervals) // no index
+            },
             tuple([], params.reference),
             tuple([], [referenceMetadataLocator.gzi, referenceMetadataLocator.fai]), // Apparently GATK4_BASERECALIBRATOR needs both the fai and gzi
             tuple([], referenceMetadataLocator.sequenceDictionary),
@@ -124,13 +128,14 @@ workflow align_locus_function_workflow {
         )
         // order the tables by collectIndex but give them all the same meta
         gatherMeta = [id: params.library]
-        GATK4_GATHERBQSRREPORTS(collectInOrder(GATK4_BASERECALIBRATOR.out.table).map({ file -> tuple(gatherMeta, file) }))
-        
+        GATK4_GATHERBQSRREPORTS(collectInOrder(GATK4_BASERECALIBRATOR.out.table).map { file -> tuple(gatherMeta, file) })
+
         // TODO: There has to be a simpler way, given that there is a single output table from GATK4_GATHERBQSRREPORTS.
-        ch_apply_bqsr = MARK_CHIMERIC_READS.out.chimericMarkedBam.combine(GATK4_GATHERBQSRREPORTS.out.table)
-        .map { meta, bam, _meta, table ->
-            tuple(tuple(meta, bam, [], table, []))
-        }
+        ch_apply_bqsr = MARK_CHIMERIC_READS.out.chimericMarkedBam
+            .combine(GATK4_GATHERBQSRREPORTS.out.table)
+            .map { meta, bam, _meta, table ->
+                tuple(tuple(meta, bam, [], table, []))
+            }
         GATK4_APPLYBQSR(
             ch_apply_bqsr,
             params.reference,
@@ -139,7 +144,8 @@ workflow align_locus_function_workflow {
         )
         alignedBams = GATK4_APPLYBQSR.out.bam
         alignedBais = GATK4_APPLYBQSR.out.bai
-    } else {
+    }
+    else {
         alignedBams = MARK_CHIMERIC_READS.out.chimericMarkedBam
         alignedBais = MARK_CHIMERIC_READS.out.bai
     }
@@ -204,34 +210,34 @@ workflow align_locus_function_workflow {
     )
     MERGE_SPLIT_DGES(
         params.library,
-        collectInOrder(DIGITAL_EXPRESSION.out.dge)
+        collectInOrder(DIGITAL_EXPRESSION.out.dge),
     )
     MERGE_SINGLE_CELL_RNA_SEQ_METRICS(
         params.library,
-        collectInOrder(SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR.out.metrics)
+        collectInOrder(SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR.out.metrics),
     )
-    MERGE_BAM_TAG_HISTOGRAMS(   
+    MERGE_BAM_TAG_HISTOGRAMS(
         params.library,
         collectInOrder(BAM_TAG_HISTOGRAM.out.histogram),
-        numReadsPerCellExtension
+        numReadsPerCellExtension,
     )
     MERGE_CHIMERIC_READ_METRICS(
         params.library,
-        collectInOrder(MARK_CHIMERIC_READS.out.chimericReadMetrics)
+        collectInOrder(MARK_CHIMERIC_READS.out.chimericReadMetrics),
     )
 
     MERGE_READ_QUALITY_METRICS(
         params.library,
-        collectInOrder(GATHER_READ_QUALITY_METRICS.out.readQualityMetrics)
+        collectInOrder(GATHER_READ_QUALITY_METRICS.out.readQualityMetrics),
     )
     MERGE_RNA_SEQ_METRICS(
         params.library,
-        collectInOrder(PICARD_COLLECTRNASEQMETRICS.out.metrics)
+        collectInOrder(PICARD_COLLECTRNASEQMETRICS.out.metrics),
     )
     PLOT_ALIGNMENT_SUMMARY(
         params.library,
         MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics,
-        MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics
+        MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics,
     )
 
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
@@ -241,13 +247,13 @@ workflow align_locus_function_workflow {
         "Alignment Summary for ${params.library}",
         "Alignment for library ${params.library} in ${fullAlignmentDir}.",
         params.email,
-        PLOT_ALIGNMENT_SUMMARY.out
+        PLOT_ALIGNMENT_SUMMARY.out,
     )
 
     MAKE_SPARSE_DGE(
-        MERGE_SPLIT_DGES.out.dge.map {f -> tuple(finalMeta, f) }
+        MERGE_SPLIT_DGES.out.dge.map { f -> tuple(finalMeta, f) }
     )
-    
+
     BUILD_CELL_FEATURES_SIMPLE(
         params.library,
         params.minimumTranscriptsPerCell,
@@ -272,7 +278,7 @@ workflow align_locus_function_workflow {
     dgeSummary = addMeta(finalMeta, MERGE_DGE_SUMMARIES.out.mergedDgeSummaries)
     dge = addMeta(finalMeta, MERGE_SPLIT_DGES.out.dge)
     singleCellRnaSeqMetrics = addMeta(finalMeta, MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out.mergedSingleCellRnaSeqMetrics)
-    cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.map {f -> tuple(finalMeta, f) }
+    cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.map { f -> tuple(finalMeta, f) }
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
@@ -282,23 +288,24 @@ workflow align_locus_function_workflow {
     readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics)
     rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics)
     alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out)
+
     emit:
-    properties = outputProperties
-    alignedBam = alignedBams
-    alignedBai = alignedBais
-    chimericReadMetrics = chimericReadMetrics
-    chimericTranscripts = chimericTranscripts
-    sizeSelectedCells = sizeSelectedCells
+    properties               = outputProperties
+    alignedBam               = alignedBams
+    alignedBai               = alignedBais
+    chimericReadMetrics      = chimericReadMetrics
+    chimericTranscripts      = chimericTranscripts
+    sizeSelectedCells        = sizeSelectedCells
     sizeSelectedCellsMetrics = sizeSelectedCellsMetrics
-    dgeSummary = dgeSummary
-    dge = dge
-    singleCellRnaSeqMetrics = singleCellRnaSeqMetrics
-    sparseDgeMatrix = sparseDgeMatrix
-    sparseDgeFeatures = sparseDgeFeatures
-    sparseDgeBarcodes = sparseDgeBarcodes
-    cellFeatures = cellFeatures
-    readQualityMetrics = readQualityMetrics
-    rnaSeqMetrics = rnaSeqMetrics
-    alignmentSummaryPdf = alignmentSummaryPdf
-    readsPerCell = MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms
+    dgeSummary               = dgeSummary
+    dge                      = dge
+    singleCellRnaSeqMetrics  = singleCellRnaSeqMetrics
+    sparseDgeMatrix          = sparseDgeMatrix
+    sparseDgeFeatures        = sparseDgeFeatures
+    sparseDgeBarcodes        = sparseDgeBarcodes
+    cellFeatures             = cellFeatures
+    readQualityMetrics       = readQualityMetrics
+    rnaSeqMetrics            = rnaSeqMetrics
+    alignmentSummaryPdf      = alignmentSummaryPdf
+    readsPerCell             = MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms
 }

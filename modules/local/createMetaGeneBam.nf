@@ -5,7 +5,7 @@ process CREATE_META_GENE_BAM {
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
-     input:
+    input:
     tuple val(meta), path(bam)
     path selectedCells
     path metaGeneReport
@@ -15,7 +15,7 @@ process CREATE_META_GENE_BAM {
     output:
     tuple val(meta), path("${output_file}"), emit: bam
     tuple val("${task.process}"), val('CreateMetaGeneBam'), eval("DiscoverMetaGenes --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CreateMetaGeneBam
-    
+
     script:
     output_file = "${meta.id}.metagene.bam"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)

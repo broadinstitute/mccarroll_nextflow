@@ -12,7 +12,6 @@ process FILTER_DGE {
     tuple val(meta), path("${output_file}"), emit: filteredDge
     tuple val(meta), path("${output_summary}"), emit: filteredDgeSummary
 
-
     script:
     output_file = "${meta.id}.digital_expression.txt.gz"
     output_summary = "${meta.id}.digital_expression_summary.txt"

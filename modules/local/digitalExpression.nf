@@ -26,7 +26,8 @@ process DIGITAL_EXPRESSION {
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
     if (doMetaGenes) {
         metagene_args = "--GENE_NAME_TAG mn --GENE_STRAND_TAG ms --GENE_FUNCTION_TAG mf"
-    } else {
+    }
+    else {
         metagene_args = ""
     }
     """

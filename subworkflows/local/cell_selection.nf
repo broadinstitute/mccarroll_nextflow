@@ -1,11 +1,11 @@
-include {CALL_STAMPS_SVM_NUCLEI} from '../../modules/local/callSTAMPsSvmNuclei.nf'
-include {CALL_STAMPS_MANUAL_THRESHOLDS} from '../../modules/local/callSTAMPsManualThresholds.nf'
-include {sparseMatrixChannelHelper; noMetaChannelHelper; metaOnlyChannelHelper; combineIntoTupleChannel; naIfNull; getUserName} from '../../modules/local/workflowUtil.nf'
-include { hasManualCellSelectionThresholds; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
-include { WRITE_PROPERTIES } from '../../modules/local/writeProperties.nf'
-include { SEND_EMAIL } from '../../modules/local/sendEmail.nf'
-include { cellSelectionDir } from '../../modules/local/DirectoryUtil.nf'
-include { subpath } from '../../modules/local/FileUtil.nf'
+include { CALL_STAMPS_SVM_NUCLEI           } from '../../modules/local/callSTAMPsSvmNuclei.nf'
+include { CALL_STAMPS_MANUAL_THRESHOLDS    } from '../../modules/local/callSTAMPsManualThresholds.nf'
+include { sparseMatrixChannelHelper ; noMetaChannelHelper ; metaOnlyChannelHelper ; combineIntoTupleChannel ; naIfNull ; getUserName } from '../../modules/local/workflowUtil.nf'
+include { hasManualCellSelectionThresholds ; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
+include { WRITE_PROPERTIES                 } from '../../modules/local/writeProperties.nf'
+include { SEND_EMAIL                       } from '../../modules/local/sendEmail.nf'
+include { cellSelectionDir                 } from '../../modules/local/DirectoryUtil.nf'
+include { subpath                          } from '../../modules/local/FileUtil.nf'
 
 workflow cell_selection_workflow {
     take:
@@ -19,25 +19,28 @@ workflow cell_selection_workflow {
     main:
     if (hasManualCellSelectionThresholds(params)) {
         cell_selection_label = makeManualCellSelectionLabel(params)
-        CALL_STAMPS_MANUAL_THRESHOLDS(noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
+        CALL_STAMPS_MANUAL_THRESHOLDS(
+            noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
             noMetaChannelHelper(cellFeatures),
             noMetaChannelHelper(cbrbNonEmpties),
             cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
             naIfNull(params.minUMIsPerCell),
             naIfNull(params.maxUMIsPerCell),
             naIfNull(params.minIntronicPerCell),
-            naIfNull(params.maxIntronicPerCell)
+            naIfNull(params.maxIntronicPerCell),
         )
         selectedCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.selectedCellBarcodes
         ambientCellBarcodes = CALL_STAMPS_MANUAL_THRESHOLDS.out.ambientCellBarcodes
         cellSelectionAssignmentsPdf = CALL_STAMPS_MANUAL_THRESHOLDS.out.cellSelectionAssignmentsPdf
         cellSelectionAssignmentsSummary = CALL_STAMPS_MANUAL_THRESHOLDS.out.cellSelectionAssignmentsSummary
         droppedNonEmpty = CALL_STAMPS_MANUAL_THRESHOLDS.out.droppedNonEmpty
-    } else {
-    CALL_STAMPS_SVM_NUCLEI(noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
-        noMetaChannelHelper(cellFeatures),
-        noMetaChannelHelper(cbrbNonEmpties),
-        cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) }
+    }
+    else {
+        CALL_STAMPS_SVM_NUCLEI(
+            noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
+            noMetaChannelHelper(cellFeatures),
+            noMetaChannelHelper(cbrbNonEmpties),
+            cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
         )
         selectedCellBarcodes = CALL_STAMPS_SVM_NUCLEI.out.selectedCellBarcodes
         ambientCellBarcodes = CALL_STAMPS_SVM_NUCLEI.out.ambientCellBarcodes
@@ -58,16 +61,16 @@ workflow cell_selection_workflow {
     fullCellSelectionDir = cellSelectionAssignmentsPdf.map { tup -> subpath(params.outdir, cellSelectionDir(tup)) }
     SEND_EMAIL(
         "Cell selection summary for ${params.library}",
-        fullCellSelectionDir.map{ it -> "Cell selection summary for ${params.library} in ${it}"},
+        fullCellSelectionDir.map { it -> "Cell selection summary for ${params.library} in ${it}" },
         params.email,
-        noMetaChannelHelper(cellSelectionAssignmentsPdf)
+        noMetaChannelHelper(cellSelectionAssignmentsPdf),
     )
 
     emit:
-    selectedCellBarcodes = selectedCellBarcodes
-    ambientCellBarcodes = ambientCellBarcodes
-    cellSelectionAssignmentsPdf = cellSelectionAssignmentsPdf
+    selectedCellBarcodes            = selectedCellBarcodes
+    ambientCellBarcodes             = ambientCellBarcodes
+    cellSelectionAssignmentsPdf     = cellSelectionAssignmentsPdf
     cellSelectionAssignmentsSummary = cellSelectionAssignmentsSummary
-    droppedNonEmpty = droppedNonEmpty
-    properties = cellSelectionProperties
+    droppedNonEmpty                 = droppedNonEmpty
+    properties                      = cellSelectionProperties
 }

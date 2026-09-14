@@ -4,8 +4,8 @@ process DUMP_ELBO_TABLE {
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_python:current'
 
     input:
-        val library
-        path h5
+    val library
+    path h5
 
     output:
     path "${output_file}"
@@ -16,5 +16,4 @@ process DUMP_ELBO_TABLE {
     dump_elbo_table --input '${h5}' \
         --output '${output_file}'
     """
-
 }

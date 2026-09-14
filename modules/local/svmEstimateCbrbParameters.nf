@@ -1,7 +1,7 @@
 process SVM_ESTIMATE_CBRB_PARAMETERS {
     label 'process_low'
 
-     container 'quay.io/broadinstitute/dropsift:current'
+    container 'quay.io/broadinstitute/dropsift:current'
 
     input:
     val library

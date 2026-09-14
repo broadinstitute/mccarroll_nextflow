@@ -6,30 +6,31 @@ process ASSIGN_CELLS_TO_SAMPLES {
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
-        tuple val(meta), path(inputBam)
-        path bcf
-        path bcfIndex
-        path selectedCells
-        path cbrbCellSelectionReport
-        path alleleFrequency
-        val strandStrategy
-        val functionalStrategy
-        val cellBarcodeTag
-        val molecularBarcodeTag
-        val locusFunction
-        val nonAutosomes
+    tuple val(meta), path(inputBam)
+    path bcf
+    path bcfIndex
+    path selectedCells
+    path cbrbCellSelectionReport
+    path alleleFrequency
+    val strandStrategy
+    val functionalStrategy
+    val cellBarcodeTag
+    val molecularBarcodeTag
+    val locusFunction
+    val nonAutosomes
+
     output:
-        tuple val(meta), path("${donor_assignments}"), emit: donorAssignments
-        tuple val(meta), path("${vcf}"), emit: vcf
-        tuple val(meta), path("${vcfIndex}"), emit: vcfIndex
-        tuple val("${task.process}"), val('AssignCellsToSamples'), eval("AssignCellsToSamples --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_AssignCellsToSamples
-    
+    tuple val(meta), path("${donor_assignments}"), emit: donorAssignments
+    tuple val(meta), path("${vcf}"), emit: vcf
+    tuple val(meta), path("${vcfIndex}"), emit: vcfIndex
+    tuple val("${task.process}"), val('AssignCellsToSamples'), eval("AssignCellsToSamples --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_AssignCellsToSamples
+
     script:
     donor_assignments = "${meta.id}.donor_assignments.txt"
     vcf = "${meta.id}.vcf.gz"
     vcfIndex = "${vcf}.tbi"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
-    nonAutosomesString = nonAutosomes? nonAutosomes.collect{ seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
+    nonAutosomesString = nonAutosomes ? nonAutosomes.collect { seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
     """
     AssignCellsToSamples  -m 30g \
           --INPUT_BAM ${inputBam} \

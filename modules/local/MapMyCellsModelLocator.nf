@@ -1,4 +1,4 @@
-include { withoutExtension; withExtension } from './FileUtil.nf'
+include { withoutExtension ; withExtension } from './FileUtil.nf'
 
 def buildMapMyCellsModelLocator(queryMarkers) {
     if (queryMarkers instanceof String) {

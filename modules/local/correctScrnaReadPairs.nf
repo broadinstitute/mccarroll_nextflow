@@ -1,4 +1,4 @@
-include {hasExtension; replaceExtension} from './FileUtil.nf'
+include { hasExtension ; replaceExtension } from './FileUtil.nf'
 
 
 process CORRECT_SCRNA_READ_PAIRS {
@@ -10,42 +10,46 @@ process CORRECT_SCRNA_READ_PAIRS {
         // TODO: This code is not doing anthing because of process_single label,
         // but leaving it here so that when we tune memory we'll have an idea of what Zamboni did.
         // 7e-8 is the MemoryReservationMbPerByte used by Zamboni
-        long totalInputSizeBytes = bams.collect { bam -> bam.size() }.sum()
-        long memoryMb = (long) (totalInputSizeBytes * 7e-8)
+        def totalInputSizeBytes: long = bams.collect { bam -> bam.size() }.sum()
+        def memoryMb: long = long.call(
+            totalInputSizeBytes * 7e-8
+        )
         // Set a minimum memory requirement to avoid issues with very small input files.
         1.MB * Math.max(memoryMb, 16000)
     }
 
     input:
-        tuple(val(meta), path (bams))
-        val beadStructure
-        val cellBarcodeTag
-        val libraryName
-        path allowedBarcodeCounts
-        val output_file
-        val tagBothReads
+    tuple val(meta), path(bams)
+    val beadStructure
+    val cellBarcodeTag
+    val libraryName
+    path allowedBarcodeCounts
+    val output_file
+    val tagBothReads
 
     output:
-    tuple(val(meta), path("${output_file}"), emit: correctedBam)
-    tuple(val(meta), path("${metrics_file}"), emit: correctedBarcodeMetrics)
+    tuple val(meta), path("${output_file}"), emit: correctedBam
+    tuple val(meta), path("${metrics_file}"), emit: correctedBarcodeMetrics
     tuple val("${task.process}"), val('CorrectScrnaReadPairs'), eval("CorrectScrnaReadPairs --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_CorrectScrnaReadPairs
-
 
     script:
     if (!output_file.any()) {
         def firstBam = bams.getAt(0)
         if (hasExtension(firstBam, "raw.bam")) {
             output_file = replaceExtension(firstBam, "raw.bam", "cbc_corrected.bam")
-        } else if (hasExtension(firstBam, "bam")) {
+        }
+        else if (hasExtension(firstBam, "bam")) {
             output_file = replaceExtension(firstBam, "bam", "cbc_corrected.bam")
-        } else  {
+        }
+        else {
             throw new RuntimeException("Unsupported BAM file extension: ${firstBam}")
         }
     }
     metrics_file = replaceExtension(output_file, "cbc_corrected.bam", "corrected_barcode_metrics")
     def parsedBeadStructure = new BeadStructure(beadStructure)
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Cellular)
-    def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1 // Convert from zero-based to one-based indexing for Java command line argument
+    def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1
+    // Convert from zero-based to one-based indexing for Java command line argument
     """
     CorrectScrnaReadPairs --INPUT ${bams.join(' --INPUT ')}  --BASE_RANGE '${baseRange}' \
         --BARCODED_READ '${barcodedRead}' \
