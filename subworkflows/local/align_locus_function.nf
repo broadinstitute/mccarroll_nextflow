@@ -83,12 +83,11 @@ workflow align_locus_function_workflow {
     // and order by collectIndex, which is the integer after the last dot in the bamBase.
     ch_aligned_sorted_bams = PICARD_SORTSAM.out.bam.map { meta, file -> tuple(meta.bamBase, file) }
     ch_prealigned_bams = PREALIGNMENT_TAG_AND_TRIM.out.taggedAndTrimmedBams.map { meta, file -> tuple(meta.bamBase, file) }
-    ch_aligned_sorted_bams
+    ch_merge_input = ch_aligned_sorted_bams
         .combine(ch_prealigned_bams, by: 0)
         .map { bamBase, alignedSortedBam, prealignedBam ->
             tuple([id: bamBase + ".merged", bamBase: bamBase, collectIndex: bamBase.replaceFirst(/.*\./, '') as Integer], alignedSortedBam, prealignedBam)
         }
-        .set { ch_merge_input }
 
     // Although GATK4_MERGEBAMALIGNMENT process code doesn't use the sequence dictionary explicitly, it is found
     // relative to the reference FASTA file and is required to be present in order for the process to run successfully.  
