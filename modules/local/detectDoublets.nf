@@ -23,8 +23,9 @@ process DETECT_DOUBLETS {
     output_file = "${meta.id}.doublets.txt"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
     nonAutosomesString = nonAutosomes ? nonAutosomes.collect { seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
-    """
-    DetectDoublets -m 30g \
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
+   """
+    DetectDoublets -m ${javaMemMb}m \
         --INPUT_BAM ${inputBam} \
         --VCF ${vcf} \
         --CELL_BC_FILE ${selectedCells} \

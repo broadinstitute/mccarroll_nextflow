@@ -31,6 +31,8 @@ process ASSIGN_CELLS_TO_SAMPLES {
     vcfIndex = "${vcf}.tbi"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
     nonAutosomesString = nonAutosomes ? nonAutosomes.collect { seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
+    
     """
     AssignCellsToSamples  -m 30g \
           --INPUT_BAM ${inputBam} \
