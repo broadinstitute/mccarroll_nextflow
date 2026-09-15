@@ -8,7 +8,6 @@ include { JOIN_CBRB_CELL_FEATURES      } from '../../modules/local/joinCbrbCellF
 include { WRITE_PROPERTIES             } from '../../modules/local/writeProperties.nf'
 include { DUMP_ELBO_TABLE              } from '../../modules/local/dumpElboTable.nf'
 include { PLOT_CBRB_TEAR_SHEET         } from '../../modules/local/plotCbrbTearSheet.nf'
-include { SEND_EMAIL                   } from '../../modules/local/sendEmail.nf'
 include { cbrbDir                      } from '../../modules/local/DirectoryUtil.nf'
 include { subpath                      } from '../../modules/local/FileUtil.nf'
 
@@ -92,12 +91,16 @@ workflow cbrb_workflow {
     cbrbTearSheet = combineIntoTupleChannel(metaWithArgs, PLOT_CBRB_TEAR_SHEET.out)
     // TODO: Is there an easier way?
     fullCbrbDir = meta.map { m -> subpath(params.outdir, cbrbDir(tuple(m, []))) }
-    SEND_EMAIL(
-        "CBRB summary for ${params.library}",
-        fullCbrbDir.map { it -> "CBRB summary for ${params.library} in ${it}" },
-        params.email,
-        PLOT_CBRB_TEAR_SHEET.out,
-    )
+    PLOT_CBRB_TEAR_SHEET.out.combine(fullCbrbDir).subscribe { file, dir ->
+        if (params.email) {
+            sendMail(
+                subject: "CBRB summary for ${params.library}",
+                body: "CBRB summary for ${params.library} in ${dir}",
+                to: params.email,
+                attach: file,
+            )
+        }
+    }
 
     emit:
     svmCbrbParameters             = svmCbrbParameters

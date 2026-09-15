@@ -3,7 +3,6 @@ include { CALL_STAMPS_MANUAL_THRESHOLDS    } from '../../modules/local/callSTAMP
 include { sparseMatrixChannelHelper ; noMetaChannelHelper ; metaOnlyChannelHelper ; combineIntoTupleChannel ; naIfNull ; getUserName } from '../../modules/local/workflowUtil.nf'
 include { hasManualCellSelectionThresholds ; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
 include { WRITE_PROPERTIES                 } from '../../modules/local/writeProperties.nf'
-include { SEND_EMAIL                       } from '../../modules/local/sendEmail.nf'
 include { cellSelectionDir                 } from '../../modules/local/DirectoryUtil.nf'
 include { subpath                          } from '../../modules/local/FileUtil.nf'
 
@@ -57,12 +56,16 @@ workflow cell_selection_workflow {
     WRITE_PROPERTIES(workflowProperties)
     cellSelectionProperties = combineIntoTupleChannel(metaOnlyChannelHelper(selectedCellBarcodes), WRITE_PROPERTIES.out)
     fullCellSelectionDir = cellSelectionAssignmentsPdf.map { tup -> subpath(params.outdir, cellSelectionDir(tup)) }
-    SEND_EMAIL(
-        "Cell selection summary for ${params.library}",
-        fullCellSelectionDir.map { it -> "Cell selection summary for ${params.library} in ${it}" },
-        params.email,
-        noMetaChannelHelper(cellSelectionAssignmentsPdf),
-    )
+    cellSelectionAssignmentsPdf.combine(fullCellSelectionDir).subscribe { file, dir ->
+        if (params.email) {
+            sendMail(
+                subject: "Cell selection summary for ${params.library}",
+                body: "Cell selection summary for ${params.library} in ${dir}",
+                to: params.email,
+                attach: file,
+            )
+        }
+    }
 
     emit:
     selectedCellBarcodes            = selectedCellBarcodes

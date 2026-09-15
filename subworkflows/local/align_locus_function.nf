@@ -30,7 +30,6 @@ include { MERGE_RNA_SEQ_METRICS                        } from '../../modules/loc
 include { PLOT_ALIGNMENT_SUMMARY                       } from '../../modules/local/plotAlignmentSummary.nf'
 include { PICARD_COLLECTRNASEQMETRICS                  } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
 include { MERGE_CHIMERIC_READ_METRICS                  } from '../../modules/local/mergeChimericReadMetrics.nf'
-include { SEND_EMAIL                                   } from '../../modules/local/sendEmail.nf'
 include { alignmentDir                                 } from '../../modules/local/DirectoryUtil.nf'
 include { subpath                                      } from '../../modules/local/FileUtil.nf'
 
@@ -90,7 +89,7 @@ workflow align_locus_function_workflow {
         }
 
     // Although GATK4_MERGEBAMALIGNMENT process code doesn't use the sequence dictionary explicitly, it is found
-    // relative to the reference FASTA file and is required to be present in order for the process to run successfully.  
+    // relative to the reference FASTA file and is required to be present in order for the process to run successfully.
     // Thus we need to build a locator for it and pass it in as an argument so that it is localized into the execution environment.
     referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     GATK4_MERGEBAMALIGNMENT(
@@ -242,12 +241,16 @@ workflow align_locus_function_workflow {
     finalMeta = [id: params.library, library: params.library, referenceName: referenceMetadataLocator.referenceName]
     alignmentSubDir = alignmentDir(tuple(finalMeta, []))
     fullAlignmentDir = subpath(params.outdir, alignmentSubDir)
-    SEND_EMAIL(
-        "Alignment Summary for ${params.library}",
-        "Alignment for library ${params.library} in ${fullAlignmentDir}.",
-        params.email,
-        PLOT_ALIGNMENT_SUMMARY.out,
-    )
+    PLOT_ALIGNMENT_SUMMARY.out.subscribe { file ->
+        if (params.email) {
+            sendMail(
+                subject: "Alignment Summary for ${params.library}",
+                body: "Alignment for library ${params.library} in ${fullAlignmentDir}.",
+                to: params.email,
+                attach: file,
+            )
+        }
+    }
 
     MAKE_SPARSE_DGE(
         MERGE_SPLIT_DGES.out.dge.map { f -> tuple(finalMeta, f) }
