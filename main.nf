@@ -25,6 +25,7 @@ include { buildRestartInputPaths ; makeCellSelectionLabel ; makeCbrbLabel } from
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mapMyCellsDir } from './modules/local/DirectoryUtil.nf'
+include { asListChannel } from './modules/local/workflowUtil.nf'
 
 params {
     allowedBarcodes: Path?
@@ -401,13 +402,14 @@ workflow {
         params.monochrome_logs,
     )
 
+    unmapped_ch = splitBamManifest.combine(correctedBarcodeMetrics).combine(barcodeCounts).combine(unmappedProperties).combine(asListChannel(unmappedBam)).map {
+         _splitBamManifest, _correctedBarcodeMetrics, _barcodeCounts, _unmappedProperties, _unmappedBamList ->
+        [splitBamManifest: _splitBamManifest, correctedBarcodeMetrics: _correctedBarcodeMetrics, barcodeCounts: _barcodeCounts, unmappedProperties: _unmappedProperties, unmappedBam: _unmappedBamList]
+    }
+
     publish:
     // unmapped BAM outputs
-    unmappedBam                     = unmappedBam
-    splitBamManifest                = splitBamManifest
-    correctedBarcodeMetrics         = correctedBarcodeMetrics
-    barcodeCounts                   = barcodeCounts
-    unmappedProperties              = unmappedProperties
+    unmapped_ch = unmapped_ch
 
     // aligned BAM outputs
     alignedBam                      = alignedBam
@@ -501,15 +503,10 @@ workflow {
 
 output {
     // unmapped outputs
-    unmappedBam {
-    }
-    splitBamManifest {
-    }
-    correctedBarcodeMetrics {
-    }
-    barcodeCounts {
-    }
-    unmappedProperties {
+    unmapped_ch {
+        index {
+            path 'manifest.yaml'
+        }
     }
     // alignment, locus function outputs
     alignedBam {
