@@ -509,9 +509,6 @@ output {
     // alignment, locus function outputs
     aligned_ch {
         path { x -> alignmentDir(x) }
-        index {
-            path 'manifest.yaml'
-        }
     }
 
     // CBRB outputs
