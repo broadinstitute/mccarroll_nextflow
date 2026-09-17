@@ -138,7 +138,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    if (shouldRunStage('beginning')) {
+    if (shouldRunStage(startAt, 'beginning')) {
         tag_and_split_bam_workflow(
             params.fastq_read1,
             params.fastq_read2,
@@ -160,7 +160,7 @@ workflow {
         correctedBarcodeMetrics = channel.empty()
         barcodeCounts = channel.empty()
     }
-    if (shouldRunStage('alignment')) {
+    if (shouldRunStage(startAt, 'alignment')) {
         align_locus_function_workflow(
             unmappedBam,
             params.beadStructure,
@@ -203,7 +203,7 @@ workflow {
         alignmentSummaryPdf = channel.empty()
         alignmentProperties = channel.empty()
     }
-    if (shouldRunStage('cbrb')) {
+    if (shouldRunStage(startAt, 'cbrb')) {
         cbrb_workflow(
             sparseDgeMatrix,
             sparseDgeFeatures,
