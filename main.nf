@@ -374,11 +374,13 @@ workflow {
         mapMyCellsJsonReport = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
         mapMyCellsCsvReport = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
         mapMyCellsProperties = MapMyCells_fromSpecifiedMarkers_workflow.out.properties
+        mapMyCellsCellTypeCounts = MapMyCells_fromSpecifiedMarkers_workflow.out.cellTypeCounts
     }
     else {
         mapMyCellsJsonReport = channel.empty()
         mapMyCellsCsvReport = channel.empty()
         mapMyCellsProperties = channel.empty()
+        mapMyCellsCellTypeCounts = channel.empty()
     }
     channel.topic('versions')
         .map { _process, name, version -> "${name}: ${version}" }
@@ -497,6 +499,7 @@ workflow {
     mapMyCellsJsonReport            = mapMyCellsJsonReport
     mapMyCellsCsvReport             = mapMyCellsCsvReport
     mapMyCellsProperties            = mapMyCellsProperties
+    mapMyCellsCellTypeCounts          = mapMyCellsCellTypeCounts
 }
 
 output {
@@ -762,6 +765,9 @@ output {
         path { x -> mapMyCellsDir(x) }
     }
     mapMyCellsProperties {
+        path { x -> mapMyCellsDir(x) }
+    }
+    mapMyCellsCellTypeCounts {
         path { x -> mapMyCellsDir(x) }
     }
 }

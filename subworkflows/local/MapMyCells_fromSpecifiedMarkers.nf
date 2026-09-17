@@ -3,6 +3,7 @@ include { MTX_TO_H5AD                     } from '../../modules/local/mtx_to_h5a
 include { buildMapMyCellsModelLocator     } from '../../modules/local/MapMyCellsModelLocator.nf'
 include { noMetaChannelHelper ; metaOnlyChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
 include { WRITE_PROPERTIES                } from '../../modules/local/writeProperties.nf'
+include { COUNT_MMC_CELL_TYPES } from '../../modules/local/countMmcCellTypes.nf'
 
 workflow MapMyCells_fromSpecifiedMarkers_workflow {
     take:
@@ -21,6 +22,7 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow {
         modelLocator.precomputedStats,
         MTX_TO_H5AD.out,
         params.mapMyCellsArgs)
+    COUNT_MMC_CELL_TYPES(params.library, MAPMYCELLS_FROMSPECIFIEDMARKERS.out.csv_report)
     workflowProperties = [
         submitter: getUserName(),
         queryMarkers: params.mapMyCellsQueryMarkers.toUriString(),
@@ -32,9 +34,11 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow {
     json_report = combineIntoTupleChannel(outMeta, MAPMYCELLS_FROMSPECIFIEDMARKERS.out.json_report)
     csv_report = combineIntoTupleChannel(outMeta, MAPMYCELLS_FROMSPECIFIEDMARKERS.out.csv_report)
     mapMyCellsProperties = combineIntoTupleChannel(outMeta, WRITE_PROPERTIES.out)
+    cellTypeCounts = combineIntoTupleChannel(outMeta, COUNT_MMC_CELL_TYPES.out.cellTypeCounts)
 
     emit:
     json_report = json_report
     csv_report  = csv_report
     properties  = mapMyCellsProperties
+    cellTypeCounts = cellTypeCounts
 }
