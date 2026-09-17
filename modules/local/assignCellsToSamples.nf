@@ -34,7 +34,7 @@ process ASSIGN_CELLS_TO_SAMPLES {
     def javaMemMb = (task.memory.toMega() * 0.8) as int
     
     """
-    AssignCellsToSamples  -m 30g \
+    AssignCellsToSamples  -m ${javaMemMb}m \
           --INPUT_BAM ${inputBam} \
           --VCF ${bcf} \
           --OUTPUT ${donor_assignments} \
