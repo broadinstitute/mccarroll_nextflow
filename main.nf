@@ -25,6 +25,7 @@ include { buildRestartInputPaths ; makeCellSelectionLabel ; makeCbrbLabel } from
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mapMyCellsDir } from './modules/local/DirectoryUtil.nf'
+include { asListChannel; noMetaChannelHelper; combineIntoTupleChannel; metaOnlyChannelHelper } from './modules/local/workflowUtil.nf'
 
 params {
     allowedBarcodes: Path?
@@ -401,34 +402,33 @@ workflow {
         params.monochrome_logs,
     )
 
-    publish:
     // unmapped BAM outputs
-    unmappedBam                     = unmappedBam
-    splitBamManifest                = splitBamManifest
-    correctedBarcodeMetrics         = correctedBarcodeMetrics
-    barcodeCounts                   = barcodeCounts
-    unmappedProperties              = unmappedProperties
-
+    unmapped_ch = splitBamManifest.combine(correctedBarcodeMetrics).combine(barcodeCounts).combine(unmappedProperties).combine(asListChannel(unmappedBam)).map {
+         _splitBamManifest, _correctedBarcodeMetrics, _barcodeCounts, _unmappedProperties, _unmappedBamList ->
+        [splitBamManifest: _splitBamManifest, correctedBarcodeMetrics: _correctedBarcodeMetrics, barcodeCounts: _barcodeCounts, unmappedProperties: _unmappedProperties, unmappedBam: _unmappedBamList]
+    }
     // aligned BAM outputs
-    alignedBam                      = alignedBam
-    alignedBai                      = alignedBai
-    sizeSelectedCells               = sizeSelectedCells
-    sizeSelectedCellsMetrics        = sizeSelectedCellsMetrics
-    dgeSummary                      = dgeSummary
-    chimericTranscripts             = chimericTranscripts
-    chimericReadMetrics             = chimericReadMetrics
-    // These two are published only for the purpose of start_at != beginning
-    readsPerCell                    = readsPerCell
-    dge                             = dge
-    singleCellRnaSeqMetrics         = singleCellRnaSeqMetrics
-    sparseDgeMatrix                 = sparseDgeMatrix
-    sparseDgeFeatures               = sparseDgeFeatures
-    sparseDgeBarcodes               = sparseDgeBarcodes
-    cellFeatures                    = cellFeatures
-    alignmentProperties             = alignmentProperties
-    readQualityMetrics              = readQualityMetrics
-    rnaSeqMetrics                   = rnaSeqMetrics
-    alignmentSummaryPdf             = alignmentSummaryPdf
+    // readsPerCell and dge are published only for the purpose of start_at != beginning
+    alignedBam.view()
+    // unbelievably annoying that all the metas need to be stripped and then added again.
+    aligned_ch = asListChannel(noMetaChannelHelper(alignedBam)).combine(asListChannel(noMetaChannelHelper(alignedBai))).combine(noMetaChannelHelper(sizeSelectedCells)).combine(noMetaChannelHelper(sizeSelectedCellsMetrics)).combine
+    (noMetaChannelHelper(dgeSummary)).combine(noMetaChannelHelper(chimericTranscripts)).combine(noMetaChannelHelper(chimericReadMetrics)).combine(noMetaChannelHelper(readsPerCell)).combine(noMetaChannelHelper(dge)).combine(noMetaChannelHelper(singleCellRnaSeqMetrics)).combine(noMetaChannelHelper(sparseDgeMatrix)).combine(noMetaChannelHelper(sparseDgeFeatures)).combine(noMetaChannelHelper(sparseDgeBarcodes)).combine(noMetaChannelHelper(cellFeatures)).combine(noMetaChannelHelper(alignmentProperties)).combine
+    (noMetaChannelHelper(readQualityMetrics)).combine(noMetaChannelHelper(rnaSeqMetrics)).combine(noMetaChannelHelper(alignmentSummaryPdf))
+    aligned_ch.view()
+    aligned_ch = aligned_ch.map {
+        _alignedBam, _alignedBai, _sizeSelectedCells, _sizeSelectedCellsMetrics, _dgeSummary, _chimericTranscripts, _chimericReadMetrics, _readsPerCell, _dge, _singleCellRnaSeqMetrics, _sparseDgeMatrix, _sparseDgeFeatures, _sparseDgeBarcodes, _cellFeatures, _alignmentProperties, _readQualityMetrics, _rnaSeqMetrics, _alignmentSummaryPdf ->
+        [alignedBam: _alignedBam, alignedBai: _alignedBai, sizeSelectedCells: _sizeSelectedCells, sizeSelectedCellsMetrics: _sizeSelectedCellsMetrics, dgeSummary: _dgeSummary, chimericTranscripts: _chimericTranscripts, chimericReadMetrics: _chimericReadMetrics, readsPerCell: _readsPerCell, dge: _dge, singleCellRnaSeqMetrics: _singleCellRnaSeqMetrics, sparseDgeMatrix: _sparseDgeMatrix, sparseDgeFeatures: _sparseDgeFeatures, sparseDgeBarcodes: _sparseDgeBarcodes, cellFeatures: _cellFeatures, alignmentProperties: _alignmentProperties, readQualityMetrics: _readQualityMetrics, rnaSeqMetrics: _rnaSeqMetrics, alignmentSummaryPdf: _alignmentSummaryPdf]
+    }
+    aligned_ch.view()
+    aligned_ch = combineIntoTupleChannel(metaOnlyChannelHelper(sizeSelectedCells), aligned_ch)
+    aligned_ch.view()
+
+    publish:
+    unmapped_ch = unmapped_ch
+    aligned_ch = aligned_ch
+
+
+    // cbrb outputs
     cbrbH5                          = cbrbH5
     cbrbBarcodes                    = cbrbBarcodes
     cbrbMetrics                     = cbrbMetrics
@@ -501,75 +501,13 @@ workflow {
 
 output {
     // unmapped outputs
-    unmappedBam {
-    }
-    splitBamManifest {
-    }
-    correctedBarcodeMetrics {
-    }
-    barcodeCounts {
-    }
-    unmappedProperties {
+    unmapped_ch {
+        index {
+            path 'manifest.yaml'
+        }
     }
     // alignment, locus function outputs
-    alignedBam {
-        path { x -> alignmentDir(x) }
-    }
-    alignedBai {
-        path { x -> alignmentDir(x) }
-    }
-    sizeSelectedCells {
-        path { x -> alignmentDir(x) }
-    }
-    sizeSelectedCellsMetrics {
-        path { x -> alignmentDir(x) }
-    }
-    dgeSummary {
-        path { x -> alignmentDir(x) }
-    }
-    chimericTranscripts {
-        path { x -> alignmentDir(x) }
-    }
-    chimericReadMetrics {
-        path { x -> alignmentDir(x) }
-    }
-    /*
-     * published so that can start_at > beginning
-    */
-    readsPerCell {
-        path { alignmentDirFromParams() }
-    }
-    /* 
-     * published so that can start_at > beginning
-    */
-    dge {
-        path { x -> alignmentDir(x) }
-    }
-    singleCellRnaSeqMetrics {
-        path { x -> alignmentDir(x) }
-    }
-    sparseDgeMatrix {
-        path { x -> alignmentDir(x) }
-    }
-    sparseDgeFeatures {
-        path { x -> alignmentDir(x) }
-    }
-    sparseDgeBarcodes {
-        path { x -> alignmentDir(x) }
-    }
-    cellFeatures {
-        path { x -> alignmentDir(x) }
-    }
-    alignmentProperties {
-        path { x -> alignmentDir(x) }
-    }
-    readQualityMetrics {
-        path { x -> alignmentDir(x) }
-    }
-    rnaSeqMetrics {
-        path { x -> alignmentDir(x) }
-    }
-    alignmentSummaryPdf {
+    aligned_ch {
         path { x -> alignmentDir(x) }
     }
 

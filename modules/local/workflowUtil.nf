@@ -49,6 +49,12 @@ def combineIntoTupleChannel(channel1, channel2) {
         }
 }
 
+// Convert a channel of items into a channel containing a single list of those items.
+// This is necessary when calling combine on channels that need to be treated as single items rather than flattened lists.
+def asListChannel(channel) {
+    return channel.collect().map { list -> [list] }
+}
+
 def addMeta(meta, channel) {
     return channel.map { file ->
         tuple(meta, file)
