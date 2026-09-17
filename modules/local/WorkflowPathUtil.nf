@@ -91,11 +91,13 @@ def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelect
         sparseDgeFeatures: "${alignmentDir}/features.tsv.gz",
         sparseDgeBarcodes: "${alignmentDir}/barcodes.tsv.gz",
         cellFeatures: "${alignmentDir}/${library}.cell_features.txt",
+        dge: "${alignmentDir}/${library}.digital_expression.txt.gz",
         dgeSummary: "${alignmentDir}/${library}.digital_expression_summary.txt",
         chimericTranscripts: "${alignmentDir}/${library}.chimeric_transcripts.txt.gz",
         readsPerCell: "${alignmentDir}/${library}.numReads_perCell.txt.gz",
         alignedBamPattern: "${alignmentDir}/${alignedBamPattern}",
         alignedBaiPattern: "${alignmentDir}/${alignedBaiPattern}",
+        readQualityMetrics: "${alignmentDir}/${library}.ReadQualityMetrics.txt",
         
         // cbrb outputs
         cbrbDir: cbrbDir,

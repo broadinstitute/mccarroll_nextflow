@@ -3,14 +3,14 @@
 // -----------------------------
 
 def hasExtension(path, ext: String) {
-    def name = path instanceof java.nio.file.Path ? path.getFileName().toString() : path.name
+    def name = path instanceof java.nio.file.Path ? path.getFileName().toString() : path.toString()
     return name.endsWith("." + ext)
 }
 
 def withoutExtension(path, ext: String) {
     def name = path instanceof java.nio.file.Path
         ? path.getFileName().toString()
-        : path.name
+        : path.toString()
 
     def suffix = "." + ext
 
@@ -24,14 +24,18 @@ def withoutExtension(path, ext: String) {
         return path.resolveSibling(newName)
     }
     else {
-        return new File(path.parent, newName)
+        path = path instanceof File ? path : new File(path.toString())
+        if (path.getParent() == null) {
+            return new File(newName)
+        }
+        return new File(path.getParent(), newName)
     }
 }
 
 def withExtension(path, ext: String) {
     def name = path instanceof java.nio.file.Path
         ? path.getFileName().toString()
-        : path.name
+        : path.toString()
 
     def newName = name + "." + ext
 
@@ -39,7 +43,11 @@ def withExtension(path, ext: String) {
         return path.resolveSibling(newName)
     }
     else {
-        return new File(path.parent, newName)
+        path = path instanceof File ? path : new File(path.toString())
+        if (path.getParent() == null) {
+            return new File(newName)
+        }
+        return new File(path.getParent(), newName)
     }
 }
 

@@ -826,16 +826,16 @@ def shouldRunStage(startAt: String, stageName: String) {
 }
 
 def restartTupleChannel(pathPattern, meta) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+    channel.fromPath(file(pathPattern).toUriString(), checkIfExists: true)
         .map { inputFile -> tuple(meta, inputFile) }
 }
 
 def restartPathChannel(pathPattern) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+    channel.fromPath(files(pathPattern), checkIfExists: true)
 }
 
 def restartAlignedBamChannel(pathPattern, referenceName: String) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+    channel.fromPath(files(pathPattern), checkIfExists: true)
         .map { bam ->
             def bamBase = bam.getName()
             if (hasExtension(bamBase, 'bam')) {
@@ -847,7 +847,7 @@ def restartAlignedBamChannel(pathPattern, referenceName: String) {
             if (hasExtension(bamBase, 'chimeric_marked')) {
                 bamBase = withoutExtension(bamBase, 'chimeric_marked')
             }
-            def indexStr = bamBase.replaceFirst(/.*\./, '')
+            def indexStr = bamBase.toString().replaceFirst(/.*\./, '')
             if (!indexStr.isInteger()) {
                 error("Cannot parse numeric collectIndex from BAM/BAI filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].ba[im]")
             }
