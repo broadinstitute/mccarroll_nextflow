@@ -62,7 +62,7 @@ def outdirToString(outdir) {
     return outdir.toString()
 }
 
-def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelectionLabel, doBQSR) {
+def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelectionLabel) {
     // Build paths via plain string concatenation so cloud URIs survive intact. Routing through
     // java.nio Paths/Path mangles them: Paths.get("gs://b/x") collapses the "//" into "gs:/b/x",
     // and a GCS Path's toString() drops the "gs://bucket" prefix entirely. Either way the
@@ -73,12 +73,20 @@ def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelect
     def alignmentDir = "${root}/${referenceName}"
     def cbrbDir = "${alignmentDir}/cbrb/${cbrbLabel}"
     def cellSelectionDir = "${cbrbDir}/cell_selection/${cellSelectionLabel}"
-    def alignedBamPattern = doBQSR ? "${library}.*.bam" : "${library}.*.chimeric_marked.bam"
+    def alignedBamPattern = "${library}.*.bam"
+    def alignedBaiPattern = "${library}.*.bai"
+    def standardAnalysisDir = "${cellSelectionDir}/standard_analysis"
 
     return [
+        // unmapped outputs
+        unmappedBamPattern: "${root}/${library}.*.unmapped.bam",
+        splitBamManifest: "${root}/${library}.split_bam_manifest.gz",
+        unmappedProperties: "${root}/properties.yaml",
+        correctedBarcodeMetrics: "${root}/${library}.corrected_barcode_metrics",
+        barcodeCounts: "${root}/${library}.expected_barcode_metrics.gz",
+
+        // alignment outputs
         alignmentDir: alignmentDir,
-        cbrbDir: cbrbDir,
-        cellSelectionDir: cellSelectionDir,
         sparseDgeMatrix: "${alignmentDir}/matrix.mtx.gz",
         sparseDgeFeatures: "${alignmentDir}/features.tsv.gz",
         sparseDgeBarcodes: "${alignmentDir}/barcodes.tsv.gz",
@@ -87,10 +95,26 @@ def buildRestartInputPaths(outdir, referenceName, library, cbrbLabel, cellSelect
         chimericTranscripts: "${alignmentDir}/${library}.chimeric_transcripts.txt.gz",
         readsPerCell: "${alignmentDir}/${library}.numReads_perCell.txt.gz",
         alignedBamPattern: "${alignmentDir}/${alignedBamPattern}",
+        alignedBaiPattern: "${alignmentDir}/${alignedBaiPattern}",
+        
+        // cbrb outputs
+        cbrbDir: cbrbDir,
         cbrbBarcodes: "${cbrbDir}/${library}_cell_barcodes.csv",
         cbrbNumTranscripts: "${cbrbDir}/${library}.cbrb.num_transcripts.txt",
         cbrbDge: "${cbrbDir}/${library}.cbrb.digital_expression.txt.gz",
         cbrbCellFeatures: "${cbrbDir}/${library}.cbrb.cell_features.txt",
-        selectedCellBarcodes: "${cellSelectionDir}/${library}.selectedCellBarcodes.txt"
+
+        // cell selection outputs
+        cellSelectionDir: cellSelectionDir,
+        selectedCellBarcodes: "${cellSelectionDir}/${library}.selectedCellBarcodes.txt",
+
+        // standard analysis outputs
+        standardAnalysisDir: standardAnalysisDir,
+        selectedDge: "${standardAnalysisDir}/${library}.selected.digital_expression.txt.gz",
+        selectedDgeSummary: "${standardAnalysisDir}/${library}.selected.digital_expression_summary.txt",
+        selectedSparseDgeMatrix: "${standardAnalysisDir}/matrix.mtx.gz",
+        selectedSparseDgeFeatures: "${standardAnalysisDir}/features.tsv.gz",
+        selectedSparseDgeBarcodes: "${standardAnalysisDir}/barcodes.tsv.gz",
+        doubletCalls: "${standardAnalysisDir}/${library}.selected.scDblFinder.tsv",
     ]
 }
