@@ -25,7 +25,7 @@ include { buildRestartInputPaths ; makeCellSelectionLabel ; makeCbrbLabel } from
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mapMyCellsDir } from './modules/local/DirectoryUtil.nf'
-
+include { hasExtension; withoutExtension } from './modules/local/FileUtil.nf'
 params {
     allowedBarcodes: Path?
     library: String
@@ -120,7 +120,6 @@ workflow {
     def referenceName = referenceMetadataLocator.referenceName
     def cbrbLabel = makeCbrbLabel(params)
     def cellSelectionLabel = makeCellSelectionLabel(params)
-    def doBQSR = referenceMetadataLocator.dbSnp.exists()
     def finalMeta = [id: params.library, library: params.library, referenceName: referenceName]
     def cbrbMeta = finalMeta + [cbrb_label: cbrbLabel]
     def selectedCellsMeta = cbrbMeta + [cell_selection_label: cellSelectionLabel]
@@ -132,67 +131,14 @@ workflow {
             params.library,
             cbrbLabel,
             cellSelectionLabel,
-            doBQSR,
         )
 
-    // Default all stage outputs to empty; each block below overwrites the channels it produces.
-    // When adding outputs to a stage, add the corresponding channel.empty() initializer here.
 
-    // tag_and_split outputs
-    unmappedBam = channel.empty()
-    splitBamManifest = channel.empty()
-    unmappedProperties = channel.empty()
-    correctedBarcodeMetrics = channel.empty()
-    barcodeCounts = channel.empty()
-
-    // align_locus_function outputs
-    alignedBam = channel.empty()
-    alignedBai = channel.empty()
-    sizeSelectedCells = channel.empty()
-    sizeSelectedCellsMetrics = channel.empty()
-    dgeSummary = channel.empty()
-    chimericTranscripts = channel.empty()
-    chimericReadMetrics = channel.empty()
-    readsPerCell = channel.empty()
-    singleCellRnaSeqMetrics = channel.empty()
-    dge = channel.empty()
-    sparseDgeMatrix = channel.empty()
-    sparseDgeFeatures = channel.empty()
-    sparseDgeBarcodes = channel.empty()
-    cellFeatures = channel.empty()
-    alignmentProperties = channel.empty()
-    alignmentSummaryPdf = channel.empty()
-    readQualityMetrics = channel.empty()
-    rnaSeqMetrics = channel.empty()
-
-    // cbrb outputs
-    cbrbH5 = channel.empty()
-    cbrbBarcodes = channel.empty()
-    cbrbMetrics = channel.empty()
-    cbrbReport = channel.empty()
-    cbrbPdf = channel.empty()
-    cbrbLog = channel.empty()
-    cbrbCheckpoint = channel.empty()
-    svmCbrbParameters = channel.empty()
-    svmCbrbParameterEstimationPdf = channel.empty()
-    cbrbDge = channel.empty()
-    cbrbNumTranscripts = channel.empty()
-    cbrbCellFeatures = channel.empty()
-    cbrbTearSheet = channel.empty()
-    cbrbProperties = channel.empty()
-
-    // cell_selection outputs
-    selectedCellBarcodes = channel.empty()
-    cellSelectionProperties = channel.empty()
-    ambientCellBarcodes = channel.empty()
-    cellSelectionAssignmentsPdf = channel.empty()
-    cellSelectionAssignmentsSummary = channel.empty()
-    droppedNonEmpty = channel.empty()
 
     //
     // WORKFLOW: Run main workflow
     //
-    if (startAt == 'beginning') {
+    if (shouldRunStage(startAt, 'beginning')) {
         tag_and_split_bam_workflow(
             params.fastq_read1,
             params.fastq_read2,
@@ -201,24 +147,24 @@ workflow {
             params.beadStructure,
             params.allowedBarcodes,
         )
-        align_locus_function_workflow(
-            tag_and_split_bam_workflow.out.splitBams,
-            params.beadStructure,
-        )
-        cbrb_workflow(
-            align_locus_function_workflow.out.sparseDgeMatrix,
-            align_locus_function_workflow.out.sparseDgeFeatures,
-            align_locus_function_workflow.out.sparseDgeBarcodes,
-            align_locus_function_workflow.out.cellFeatures,
-            align_locus_function_workflow.out.dge,
-            align_locus_function_workflow.out.readQualityMetrics,
-        )
-
         unmappedBam = tag_and_split_bam_workflow.out.splitBams
         splitBamManifest = tag_and_split_bam_workflow.out.splitBamManifest
         correctedBarcodeMetrics = tag_and_split_bam_workflow.out.correctedBarcodeMetrics
         barcodeCounts = tag_and_split_bam_workflow.out.barcodeCounts
         unmappedProperties = tag_and_split_bam_workflow.out.properties
+    } else {
+        unmappedBam = restartPathChannel(restartInputs.unmappedBamPattern)
+        // don't populate because not needed downstream
+        splitBamManifest = channel.empty()
+        unmappedProperties = channel.empty()
+        correctedBarcodeMetrics = channel.empty()
+        barcodeCounts = channel.empty()
+    }
+    if (shouldRunStage(startAt, 'alignment')) {
+        align_locus_function_workflow(
+            unmappedBam,
+            params.beadStructure,
+        )
         alignedBam = align_locus_function_workflow.out.alignedBam
         alignedBai = align_locus_function_workflow.out.alignedBai
         sizeSelectedCells = align_locus_function_workflow.out.sizeSelectedCells
@@ -237,6 +183,36 @@ workflow {
         rnaSeqMetrics = align_locus_function_workflow.out.rnaSeqMetrics
         alignmentSummaryPdf = align_locus_function_workflow.out.alignmentSummaryPdf
         alignmentProperties = align_locus_function_workflow.out.properties
+    } else {
+        alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, referenceName)
+        alignedBai = channel.empty()
+        sizeSelectedCells = channel.empty()
+        sizeSelectedCellsMetrics = channel.empty()
+        dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
+        chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
+        chimericReadMetrics = channel.empty()
+        readsPerCell = restartTupleChannel(restartInputs.readsPerCell, finalMeta)
+        singleCellRnaSeqMetrics = channel.empty()
+        dge = restartTupleChannel(restartInputs.dge, finalMeta)
+        sparseDgeMatrix = restartTupleChannel(restartInputs.sparseDgeMatrix, finalMeta)
+        sparseDgeFeatures = restartTupleChannel(restartInputs.sparseDgeFeatures, finalMeta)
+        sparseDgeBarcodes = restartTupleChannel(restartInputs.sparseDgeBarcodes, finalMeta)
+        cellFeatures = restartTupleChannel(restartInputs.cellFeatures, finalMeta)
+        readQualityMetrics = restartTupleChannel(restartInputs.readQualityMetrics, finalMeta)
+        rnaSeqMetrics = channel.empty()
+        alignmentSummaryPdf = channel.empty()
+        alignmentProperties = channel.empty()
+    }
+    if (shouldRunStage(startAt, 'cbrb')) {
+        cbrb_workflow(
+            sparseDgeMatrix,
+            sparseDgeFeatures,
+            sparseDgeBarcodes,
+            cellFeatures,
+            dge,
+            readQualityMetrics,
+        )
+
 
         cbrbH5 = cbrb_workflow.out.h5
         cbrbBarcodes = cbrb_workflow.out.barcodes
@@ -252,26 +228,26 @@ workflow {
         cbrbCellFeatures = cbrb_workflow.out.cellFeatures
         cbrbProperties = cbrb_workflow.out.properties
         cbrbTearSheet = cbrb_workflow.out.cbrbTearSheet
+    } else {
+        cbrbBarcodes = restartTupleChannel(restartInputs.cbrbBarcodes, cbrbMeta)
+        cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
+        cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
+        cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
+        cbrbH5 = channel.empty()
+        cbrbMetrics = channel.empty()
+        cbrbReport = channel.empty()
+        cbrbPdf = channel.empty()
+        cbrbLog = channel.empty()
+        cbrbCheckpoint = channel.empty()
+        svmCbrbParameters = channel.empty()
+        svmCbrbParameterEstimationPdf = channel.empty()
+        cbrbProperties = channel.empty()
+        cbrbTearSheet = channel.empty()
     }
 
     // Stage boundary: prepare cell-selection inputs.
     // Input source is either the canonical upstream channels or reconstructed files.
     if (shouldRunStage(startAt, 'cell_selection')) {
-        if (startAt == 'cell_selection') {
-            sparseDgeMatrix = restartTupleChannel(restartInputs.sparseDgeMatrix, finalMeta)
-            sparseDgeFeatures = restartTupleChannel(restartInputs.sparseDgeFeatures, finalMeta)
-            sparseDgeBarcodes = restartTupleChannel(restartInputs.sparseDgeBarcodes, finalMeta)
-            cellFeatures = restartTupleChannel(restartInputs.cellFeatures, finalMeta)
-            cbrbBarcodes = restartTupleChannel(restartInputs.cbrbBarcodes, cbrbMeta)
-            cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
-            cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
-            cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
-            dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
-            chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
-            readsPerCell = restartPathChannel(restartInputs.readsPerCell)
-            alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
-        }
-
         // Stage execution: run cell selection as soon as its inputs are wired.
         cell_selection_workflow(
             sparseDgeMatrix,
@@ -288,25 +264,16 @@ workflow {
         cellSelectionAssignmentsSummary = cell_selection_workflow.out.cellSelectionAssignmentsSummary
         droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
         cellSelectionProperties = cell_selection_workflow.out.properties
-
-        // The standard-analysis handoff stays on the canonical channels already assigned above.
+    } else {
+        selectedCellBarcodes = restartTupleChannel(restartInputs.selectedCellBarcodes, selectedCellsMeta)
+        ambientCellBarcodes = channel.empty()
+        cellSelectionAssignmentsPdf = channel.empty()
+        cellSelectionAssignmentsSummary = channel.empty()
+        droppedNonEmpty = channel.empty()
+        cellSelectionProperties = channel.empty()
     }
 
-    // Stage boundary: prepare standard-analysis inputs.
-    // Input source is either the canonical handoff channels or reconstructed files.
     if (shouldRunStage(startAt, 'standard_analysis')) {
-        if (startAt == 'standard_analysis') {
-            selectedCellBarcodes = restartTupleChannel(restartInputs.selectedCellBarcodes, selectedCellsMeta)
-            cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
-            cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
-            dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
-            chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
-            readsPerCell = restartPathChannel(restartInputs.readsPerCell)
-            alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, doBQSR, referenceName)
-        }
-
-        // Input: either post-cell-selection handoff channels or reconstructed restart files at the standard-analysis boundary.
-        // Emits: standard-analysis outputs and remains the single linear continuation point for later stages.
         standard_analysis_workflow(
             selectedCellBarcodes,
             cbrbDge,
@@ -315,17 +282,61 @@ workflow {
             chimericTranscripts,
             cbrbCellFeatures,
         )
+        selectedDge                     = standard_analysis_workflow.out.dge
+        selectedDgeSummary              = standard_analysis_workflow.out.dgeSummary
+        selectedSparseDgeMatrix         = standard_analysis_workflow.out.sparseDgeMatrix
+        selectedSparseDgeFeatures       = standard_analysis_workflow.out.sparseDgeFeatures
+        selectedSparseDgeBarcodes       = standard_analysis_workflow.out.sparseDgeBarcodes
+        umiReadIntervals                = standard_analysis_workflow.out.umiReadIntervals
+        molBc                           = standard_analysis_workflow.out.molBc
+        doubletCalls                    = standard_analysis_workflow.out.doubletCalls
+        standardAnalysisCellMetadata    = standard_analysis_workflow.out.cellMetadata
+        metacells                       = standard_analysis_workflow.out.metacells
+        metacellMetrics                 = standard_analysis_workflow.out.metacellMetrics
+        metageneReport                  = standard_analysis_workflow.out.metageneReport
+        metageneDge                     = standard_analysis_workflow.out.metageneDge
+        metageneDgeSummary              = standard_analysis_workflow.out.metageneDgeSummary
+        gmgDge                          = standard_analysis_workflow.out.gmgDge
+        gmgDgeSummary                   = standard_analysis_workflow.out.gmgDgeSummary
+        standardAnalysisProperties      = standard_analysis_workflow.out.properties
+        standardAnalysisPdf             = standard_analysis_workflow.out.standardAnalysisPdf
+        umiSaturationMetrics            = standard_analysis_workflow.out.umiSaturationMetrics
+        sexCalls                        = standard_analysis_workflow.out.sexCalls
+        sexPdf                          = standard_analysis_workflow.out.sexPdf
+
+    } else {
+        selectedDge = restartTupleChannel(restartInputs.selectedDge, selectedCellsMeta)
+        selectedDgeSummary = restartTupleChannel(restartInputs.selectedDgeSummary, selectedCellsMeta)
+        doubletCalls = restartTupleChannel(restartInputs.doubletCalls, selectedCellsMeta)
+        selectedSparseDgeMatrix = restartTupleChannel(restartInputs.selectedSparseDgeMatrix, selectedCellsMeta)
+        selectedSparseDgeFeatures = restartTupleChannel(restartInputs.selectedSparseDgeFeatures, selectedCellsMeta)
+        selectedSparseDgeBarcodes = restartTupleChannel(restartInputs.selectedSparseDgeBarcodes, selectedCellsMeta)
+        umiReadIntervals                = channel.empty()
+        molBc                           = channel.empty()
+        standardAnalysisCellMetadata    = channel.empty()
+        metacells                       = channel.empty()
+        metacellMetrics                 = channel.empty()
+        metageneReport                  = channel.empty()
+        metageneDge                     = channel.empty()
+        metageneDgeSummary              = channel.empty()
+        gmgDge                          = channel.empty()
+        gmgDgeSummary                   = channel.empty()
+        standardAnalysisProperties      = channel.empty()
+        standardAnalysisPdf             = channel.empty()
+        umiSaturationMetrics            = channel.empty()
+        sexCalls                        = channel.empty()
+        sexPdf                          = channel.empty()
     }
-    if (params.vcf) {
+    if (params.vcf && shouldRunStage(startAt, 'dropulation')) {
         dropulation_workflow(
             selectedCellBarcodes,
             alignedBam,
             cbrbCellFeatures,
-            standard_analysis_workflow.out.dge,
-            standard_analysis_workflow.out.dgeSummary,
+            selectedDge,
+            selectedDgeSummary,
             dgeSummary,
             readsPerCell,
-            standard_analysis_workflow.out.doubletCalls,
+            doubletCalls,
         )
         // dropulation outputs
         dropulationProperties = dropulation_workflow.out.dropulationProperties
@@ -365,11 +376,11 @@ workflow {
         donorSexCalls = channel.empty()
         donorSexPdf = channel.empty()
     }
-    if (params.mapMyCellsQueryMarkers) {
+    if (params.mapMyCellsQueryMarkers && shouldRunStage(startAt, 'mmc')) {
         MapMyCells_fromSpecifiedMarkers_workflow(
-            standard_analysis_workflow.out.sparseDgeMatrix,
-            standard_analysis_workflow.out.sparseDgeFeatures,
-            standard_analysis_workflow.out.sparseDgeBarcodes,
+            selectedSparseDgeMatrix,
+            selectedSparseDgeFeatures,
+            selectedSparseDgeBarcodes,
         )
         mapMyCellsJsonReport = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
         mapMyCellsCsvReport = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
@@ -453,28 +464,29 @@ workflow {
     cellSelectionProperties         = cellSelectionProperties
 
     // standrd analysis outputs that we care about
-    selectedDge                     = standard_analysis_workflow.out.dge
-    selectedDgeSummary              = standard_analysis_workflow.out.dgeSummary
-    selectedSparseDgeMatrix         = standard_analysis_workflow.out.sparseDgeMatrix
-    selectedSparseDgeFeatures       = standard_analysis_workflow.out.sparseDgeFeatures
-    selectedSparseDgeBarcodes       = standard_analysis_workflow.out.sparseDgeBarcodes
-    umiReadIntervals                = standard_analysis_workflow.out.umiReadIntervals
-    molBc                           = standard_analysis_workflow.out.molBc
+    selectedDge                     = selectedDge
+    selectedDgeSummary              = selectedDgeSummary
+    selectedSparseDgeMatrix         = selectedSparseDgeMatrix
+    selectedSparseDgeFeatures       = selectedSparseDgeFeatures
+    selectedSparseDgeBarcodes       = selectedSparseDgeBarcodes
+    umiReadIntervals                = umiReadIntervals
+    molBc                           = molBc
+    doubletCalls                     = doubletCalls
     // don't care about umi saturation histogram
     //umiSaturationHistogram = standard_analysis_workflow.out.umiSaturationHistogram
-    standardAnalysisCellMetadata    = standard_analysis_workflow.out.cellMetadata
-    metacells                       = standard_analysis_workflow.out.metacells
-    metacellMetrics                 = standard_analysis_workflow.out.metacellMetrics
-    metageneReport                  = standard_analysis_workflow.out.metageneReport
-    metageneDge                     = standard_analysis_workflow.out.metageneDge
-    metageneDgeSummary              = standard_analysis_workflow.out.metageneDgeSummary
-    gmgDge                          = standard_analysis_workflow.out.gmgDge
-    gmgDgeSummary                   = standard_analysis_workflow.out.gmgDgeSummary
-    standardAnalysisProperties      = standard_analysis_workflow.out.properties
-    standardAnalysisPdf             = standard_analysis_workflow.out.standardAnalysisPdf
-    umiSaturationMetrics            = standard_analysis_workflow.out.umiSaturationMetrics
-    sexCalls                        = standard_analysis_workflow.out.sexCalls
-    sexPdf                          = standard_analysis_workflow.out.sexPdf
+    standardAnalysisCellMetadata    = standardAnalysisCellMetadata
+    metacells                       = metacells
+    metacellMetrics                 = metacellMetrics
+    metageneReport                  = metageneReport
+    metageneDge                     = metageneDge
+    metageneDgeSummary              = metageneDgeSummary
+    gmgDge                          = gmgDge
+    gmgDgeSummary                   = gmgDgeSummary
+    standardAnalysisProperties      = standardAnalysisProperties
+    standardAnalysisPdf             = standardAnalysisPdf
+    umiSaturationMetrics            = umiSaturationMetrics
+    sexCalls                        = sexCalls
+    sexPdf                          = sexPdf
 
     // dropulation outputs
     dropulationProperties           = dropulationProperties
@@ -662,6 +674,10 @@ output {
     molBc {
         path { x -> standardAnalysisDir(x) }
     }
+    doubletCalls {
+        // only published because needed for downstream analysis
+        path { x -> standardAnalysisDir(x) }
+    }
     metacells {
         path { x -> standardAnalysisDir(x) }
     }
@@ -797,7 +813,7 @@ def validateStartAtParam() {
 }
 
 def validStartAtStages() {
-    ['beginning', 'cell_selection', 'standard_analysis']
+    ['beginning', 'alignment', 'cbrb', 'cell_selection', 'standard_analysis', 'dropulation', 'mmc']
 }
 
 def stageRank(stageName: String) {
@@ -810,25 +826,33 @@ def shouldRunStage(startAt: String, stageName: String) {
 }
 
 def restartTupleChannel(pathPattern, meta) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+    channel.fromPath(file(pathPattern).toUriString(), checkIfExists: true)
         .map { inputFile -> tuple(meta, inputFile) }
 }
 
 def restartPathChannel(pathPattern) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+    channel.fromPath(files(pathPattern), checkIfExists: true)
 }
 
-def restartAlignedBamChannel(pathPattern, doBQSR: boolean, referenceName: String) {
-    channel.fromPath(pathPattern.toUriString(), checkIfExists: true)
+def restartAlignedBamChannel(pathPattern, referenceName: String) {
+    channel.fromPath(files(pathPattern), checkIfExists: true)
         .map { bam ->
-            def bamBase = doBQSR
-                ? bam.getName().replaceFirst(/\.bam$/, '')
-                : bam.getName().replaceFirst(/\.chimeric_marked\.bam$/, '')
-            def indexStr = bamBase.replaceFirst(/.*\./, '')
+            def bamBase = bam.getName()
+            if (hasExtension(bamBase, 'bam')) {
+                bamBase = withoutExtension(bamBase, 'bam')
+            }
+            if (hasExtension(bamBase, 'bai')) {
+                bamBase = withoutExtension(bamBase, 'bai')
+            }
+            if (hasExtension(bamBase, 'chimeric_marked')) {
+                bamBase = withoutExtension(bamBase, 'chimeric_marked')
+            }
+            def indexStr = bamBase.toString().replaceFirst(/.*\./, '')
             if (!indexStr.isInteger()) {
-                error("Cannot parse numeric collectIndex from BAM filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].bam")
+                error("Cannot parse numeric collectIndex from BAM/BAI filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].ba[im]")
             }
             def collectIndex = indexStr as Integer
             tuple([id: bamBase, bamBase: bamBase, collectIndex: collectIndex, referenceName: referenceName], bam)
         }
 }
+

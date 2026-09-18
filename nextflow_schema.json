@@ -327,7 +327,15 @@
       "type": "string",
       "description": "Pipeline stage where execution should start. Use 'beginning' for a full run, or reconstruct inputs from published results at a later stage.",
       "default": "beginning",
-      "enum": ["beginning", "cell_selection", "standard_analysis"]
+      "enum": [
+        "beginning",
+        "alignment",
+        "cbrb",
+        "cell_selection",
+        "standard_analysis",
+        "dropulation",
+        "mmc"
+      ]
     },
     "cloudVcf": {
       "type": "string",
