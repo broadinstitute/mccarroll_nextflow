@@ -552,7 +552,7 @@ output {
      * published so that can start_at > beginning
     */
     readsPerCell {
-        path { alignmentDirFromParams() }
+        path { x -> alignmentDir(x) }
     }
     /* 
      * published so that can start_at > beginning

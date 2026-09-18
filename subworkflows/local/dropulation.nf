@@ -91,7 +91,7 @@ workflow dropulation_workflow {
         noMetaChannelHelper(dgeSummary).collect(),
         noMetaChannelHelper(dgeSummaryRaw).collect(),
         noMetaChannelHelper(dge).collect(),
-        readsPerCell.collect(),
+        noMetaChannelHelper(readsPerCell).collect(),
         params.donorFile,
     )
 
