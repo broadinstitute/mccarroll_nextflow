@@ -847,7 +847,8 @@ def restartAlignedBamChannel(pathPattern, referenceName: String) {
             if (hasExtension(bamBase, 'chimeric_marked')) {
                 bamBase = withoutExtension(bamBase, 'chimeric_marked')
             }
-            def indexStr = bamBase.toString().replaceFirst(/.*\./, '')
+            bamBase = bamBase.toString()
+            def indexStr = bamBase.replaceFirst(/.*\./, '')
             if (!indexStr.isInteger()) {
                 error("Cannot parse numeric collectIndex from BAM/BAI filename '${bam.getName()}'. Expected format: <name>.<index>[.chimeric_marked].ba[im]")
             }
