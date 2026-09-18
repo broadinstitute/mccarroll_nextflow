@@ -287,6 +287,7 @@ workflow align_locus_function_workflow {
     readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics)
     rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics)
     alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out)
+    readsPerCell = addMeta(finalMeta, MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms)
 
     emit:
     properties               = outputProperties
@@ -306,5 +307,5 @@ workflow align_locus_function_workflow {
     readQualityMetrics       = readQualityMetrics
     rnaSeqMetrics            = rnaSeqMetrics
     alignmentSummaryPdf      = alignmentSummaryPdf
-    readsPerCell             = MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms
+    readsPerCell             = readsPerCell
 }
