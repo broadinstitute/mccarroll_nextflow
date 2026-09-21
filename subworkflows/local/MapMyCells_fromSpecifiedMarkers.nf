@@ -27,7 +27,8 @@ workflow MapMyCells_fromSpecifiedMarkers_workflow {
         submitter: getUserName(),
         queryMarkers: params.mapMyCellsQueryMarkers.toUriString(),
         mmcModel: modelLocator.modelName,
-        mapMyCellsArgs: params.mapMyCellsArgs
+        mapMyCellsArgs: params.mapMyCellsArgs,
+        stage: 'mmc'
     ]
     WRITE_PROPERTIES(workflowProperties)
     outMeta = metaOnlyChannelHelper(matrix_mtx).map { m -> m + [mmcModel: modelLocator.modelName] }

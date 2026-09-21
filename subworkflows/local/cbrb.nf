@@ -85,7 +85,8 @@ workflow cbrb_workflow {
         submitter: getUserName(),
         useSvmParameterEstimation: params.useSvmParameterEstimation,
         forceTwoClusterSolution: params.forceTwoClusterSolution,
-        cbrbArgs: params.cbrbArgs
+        cbrbArgs: params.cbrbArgs,
+        stage: 'cbrb'
     ]
     WRITE_PROPERTIES(workflowProperties)
     cbrbProperties = combineIntoTupleChannel(metaWithArgs, WRITE_PROPERTIES.out)

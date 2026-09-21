@@ -22,7 +22,9 @@ workflow tag_and_split_bam_workflow {
         version10X: params.version10X,
         beadStructure: beadStructure,
         allowedBarcodes: allowedBarcodes.toUriString(),
-        fivePrimeAdapter: params.fivePrimeAdapter
+        fivePrimeAdapter: params.fivePrimeAdapter,
+        cellBarcodeTag: params.cellBarcodeTag,
+        stage: 'beginning'
         ]
     if (fastq_read1 != null && fastq_read1.size() > 0) {
         // Check that read1 and read2 lists have the same length
@@ -67,7 +69,7 @@ workflow tag_and_split_bam_workflow {
     )
     CORRECT_SCRNA_READ_PAIRS(
         localRawBam,
-        params.beadStructure,
+        beadStructure,
         params.cellBarcodeTag,
         library,
         COUNT_BARCODE_SEQUENCES.out.barcodeCounts,

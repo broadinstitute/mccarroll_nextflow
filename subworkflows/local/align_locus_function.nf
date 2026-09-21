@@ -267,7 +267,9 @@ workflow align_locus_function_workflow {
         locusFunction: params.locusFunction,
         minReadMq: params.dgeMinReadMq,
         functionalStrategy: params.dgeFunctionalStrategy,
-        minTranscriptsPerCell: params.minimumTranscriptsPerCell
+        minTranscriptsPerCell: params.minimumTranscriptsPerCell,
+        molecularBarcodeTag: params.molecularBarcodeTag,
+        stage: 'alignment'
     ]
     WRITE_PROPERTIES(workflowProperties)
 

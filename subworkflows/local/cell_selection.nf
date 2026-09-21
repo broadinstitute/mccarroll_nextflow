@@ -52,7 +52,8 @@ workflow cell_selection_workflow {
         minUMIsPerCell: params.minUMIsPerCell,
         maxUMIsPerCell: params.maxUMIsPerCell,
         minIntronicPerCell: params.minIntronicPerCell,
-        maxIntronicPerCell: params.maxIntronicPerCell
+        maxIntronicPerCell: params.maxIntronicPerCell,
+        stage: 'cell_selection'
     ]
     WRITE_PROPERTIES(workflowProperties)
     cellSelectionProperties = combineIntoTupleChannel(metaOnlyChannelHelper(selectedCellBarcodes), WRITE_PROPERTIES.out)
