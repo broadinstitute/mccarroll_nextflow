@@ -23,6 +23,7 @@ workflow tag_and_split_bam_workflow {
         beadStructure: beadStructure,
         allowedBarcodes: allowedBarcodes.toUriString(),
         fivePrimeAdapter: params.fivePrimeAdapter,
+        cellBarcodeTag: params.cellBarcodeTag,
         stage: 'beginning'
         ]
     if (fastq_read1 != null && fastq_read1.size() > 0) {
