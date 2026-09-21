@@ -28,7 +28,7 @@ def dropulationDir(tuple) {
     return standardAnalysisDir(tuple) + "village/" + meta.dropulation_label + "/"
 }
 
-def mapMyCellsDir(tuple) {
+def mmcDir(tuple) {
     def (meta, _file) = tuple
-    return standardAnalysisDir(tuple) + "map_my_cells/" + meta.mmcModel + "/"
+    return standardAnalysisDir(tuple) + "mmc/" + meta.mmcModel + "/"
 }

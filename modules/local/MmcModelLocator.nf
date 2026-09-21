@@ -1,6 +1,6 @@
 include { withoutExtension ; withExtension } from './FileUtil.nf'
 
-def buildMapMyCellsModelLocator(queryMarkers) {
+def buildMmcModelLocator(queryMarkers) {
     if (queryMarkers instanceof String) {
         queryMarkers = file(queryMarkers)
     }

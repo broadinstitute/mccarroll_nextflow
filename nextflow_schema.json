@@ -341,11 +341,11 @@
       "type": "string",
       "format": "file-path"
     },
-    "mapMyCellsQueryMarkers": {
+    "mmcQueryMarkers": {
       "type": "string",
       "format": "file-path"
     },
-    "mapMyCellsArgs": {
+    "mmcArgs": {
       "type": "string"
     }
   },
