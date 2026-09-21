@@ -788,10 +788,6 @@ output {
     }
 }
 
-def alignmentDirFromParams() {
-    return buildReferenceMetadataLocator(params.reference).referenceName + "/"
-}
-
 def validateDropulationParams() {
     if (params.vcf && !params.donorFile) {
         error("If providing a VCF file for demultiplexing, you must also provide a donor file with sample-to-donor mappings.")
