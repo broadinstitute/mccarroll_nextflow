@@ -35,7 +35,8 @@ workflow dropulation_workflow {
         submitter: getUserName(),
         vcf: params.vcf.toUriString(),
         donorFile: params.donorFile.toUriString(),
-        dropulation_label: makeDropulationlabel(file(params.vcf), file(params.donorFile))
+        dropulation_label: makeDropulationlabel(file(params.vcf), file(params.donorFile)),
+        stage: 'dropulation'
     ]
     referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     bcf = params.cloudVcf ?: params.vcf

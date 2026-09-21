@@ -106,7 +106,8 @@ workflow standard_analysis_workflow {
 
     workflowProperties = [
         submitter: getUserName(),
-        metaGeneDgeFunctionalStrategy: functionalStrategy
+        metaGeneDgeFunctionalStrategy: functionalStrategy,
+        stage: 'standard_analysis'
     ]
     if (params.donor) {
         CREATE_METACELLS(
