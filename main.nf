@@ -19,12 +19,12 @@ include { cbrb_workflow                            } from './subworkflows/local/
 include { cell_selection_workflow                  } from './subworkflows/local/cell_selection.nf'
 include { standard_analysis_workflow               } from './subworkflows/local/standard_analysis.nf'
 include { dropulation_workflow                     } from './subworkflows/local/dropulation.nf'
-include { MapMyCells_fromSpecifiedMarkers_workflow } from './subworkflows/local/MapMyCells_fromSpecifiedMarkers.nf'
+include { MMC_fromSpecifiedMarkers_workflow } from './subworkflows/local/MMC_fromSpecifiedMarkers.nf'
 include { buildReferenceMetadataLocator            } from './modules/local/ReferenceMetadataLocator.nf'
 include { buildRestartInputPaths ; makeCellSelectionLabel ; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
-include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mapMyCellsDir } from './modules/local/DirectoryUtil.nf'
+include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mmcDir } from './modules/local/DirectoryUtil.nf'
 include { hasExtension; withoutExtension } from './modules/local/FileUtil.nf'
 params {
     allowedBarcodes: Path?
@@ -61,9 +61,9 @@ params {
     metaGeneDgeFunctionalStrategy: String?
     
 
-    // MapMyCells parameters 
-    mapMyCellsQueryMarkers: Path?
-    mapMyCellsArgs: String = ''
+    // MMC parameters 
+    mmcQueryMarkers: Path?
+    mmcArgs: String = ''
 
     // defaults
     cellBarcodeTag: String = 'XC'
@@ -376,22 +376,22 @@ workflow {
         donorSexCalls = channel.empty()
         donorSexPdf = channel.empty()
     }
-    if (params.mapMyCellsQueryMarkers && shouldRunStage(startAt, 'mmc')) {
-        MapMyCells_fromSpecifiedMarkers_workflow(
+    if (params.mmcQueryMarkers && shouldRunStage(startAt, 'mmc')) {
+        MMC_fromSpecifiedMarkers_workflow(
             selectedSparseDgeMatrix,
             selectedSparseDgeFeatures,
             selectedSparseDgeBarcodes,
         )
-        mapMyCellsJsonReport = MapMyCells_fromSpecifiedMarkers_workflow.out.json_report
-        mapMyCellsCsvReport = MapMyCells_fromSpecifiedMarkers_workflow.out.csv_report
-        mapMyCellsProperties = MapMyCells_fromSpecifiedMarkers_workflow.out.properties
-        mapMyCellsCellTypeCounts = MapMyCells_fromSpecifiedMarkers_workflow.out.cellTypeCounts
+        mmcJsonReport = MMC_fromSpecifiedMarkers_workflow.out.json_report
+        mmcCsvReport = MMC_fromSpecifiedMarkers_workflow.out.csv_report
+        mmcProperties = MMC_fromSpecifiedMarkers_workflow.out.properties
+        mmcCellTypeCounts = MMC_fromSpecifiedMarkers_workflow.out.cellTypeCounts
     }
     else {
-        mapMyCellsJsonReport = channel.empty()
-        mapMyCellsCsvReport = channel.empty()
-        mapMyCellsProperties = channel.empty()
-        mapMyCellsCellTypeCounts = channel.empty()
+        mmcJsonReport = channel.empty()
+        mmcCsvReport = channel.empty()
+        mmcProperties = channel.empty()
+        mmcCellTypeCounts = channel.empty()
     }
     channel.topic('versions')
         .map { _process, name, version -> "${name}: ${version}" }
@@ -507,11 +507,11 @@ workflow {
     donorMetacells                  = donorMetacells
     donorMetacellMetrics            = donorMetacellMetrics
  
-    // MapMyCells outputs
-    mapMyCellsJsonReport            = mapMyCellsJsonReport
-    mapMyCellsCsvReport             = mapMyCellsCsvReport
-    mapMyCellsProperties            = mapMyCellsProperties
-    mapMyCellsCellTypeCounts          = mapMyCellsCellTypeCounts
+    // MMC outputs
+    mmcJsonReport            = mmcJsonReport
+    mmcCsvReport             = mmcCsvReport
+    mmcProperties            = mmcProperties
+    mmcCellTypeCounts          = mmcCellTypeCounts
 }
 
 output {
@@ -774,17 +774,17 @@ output {
     dropulationProperties {
         path { x -> dropulationDir(x) }
     }
-    mapMyCellsJsonReport {
-        path { x -> mapMyCellsDir(x) }
+    mmcJsonReport {
+        path { x -> mmcDir(x) }
     }
-    mapMyCellsCsvReport {
-        path { x -> mapMyCellsDir(x) }
+    mmcCsvReport {
+        path { x -> mmcDir(x) }
     }
-    mapMyCellsProperties {
-        path { x -> mapMyCellsDir(x) }
+    mmcProperties {
+        path { x -> mmcDir(x) }
     }
-    mapMyCellsCellTypeCounts {
-        path { x -> mapMyCellsDir(x) }
+    mmcCellTypeCounts {
+        path { x -> mmcDir(x) }
     }
 }
 

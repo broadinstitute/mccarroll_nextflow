@@ -1,4 +1,4 @@
-process MAPMYCELLS_FROMSPECIFIEDMARKERS {
+process MMC_FROMSPECIFIEDMARKERS {
     label 'process_single_medium'
     label 'error_retry'
 
