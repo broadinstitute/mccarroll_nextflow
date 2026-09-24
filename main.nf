@@ -48,6 +48,7 @@ params {
     maxUMIsPerCell: Integer?
     minIntronicPerCell: Float?
     maxIntronicPerCell: Float?
+    useCBRBInitialization: Boolean = true
 
     // standard analysis parameters
     vcf: Path?
