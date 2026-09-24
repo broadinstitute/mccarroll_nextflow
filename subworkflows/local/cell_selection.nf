@@ -38,6 +38,7 @@ workflow cell_selection_workflow {
             noMetaChannelHelper(cellFeatures),
             noMetaChannelHelper(cbrbNonEmpties),
             cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
+            params.useCBRBInitialization
         )
         selectionOutputs = CALL_STAMPS_SVM_NUCLEI.out
     }
@@ -53,6 +54,7 @@ workflow cell_selection_workflow {
         maxUMIsPerCell: params.maxUMIsPerCell,
         minIntronicPerCell: params.minIntronicPerCell,
         maxIntronicPerCell: params.maxIntronicPerCell,
+        useCBRBInitialization: params.useCBRBInitialization,
         stage: 'cell_selection'
     ]
     WRITE_PROPERTIES(workflowProperties)

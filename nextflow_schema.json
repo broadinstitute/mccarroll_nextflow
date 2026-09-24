@@ -288,6 +288,11 @@
       "type": "number",
       "description": "For manual cell selection"
     },
+    "useCBRBInitialization": {
+      "type": "boolean",
+      "description": "DropSift cell selection option",
+      "default": true
+    },
     "vcf": {
       "type": "string",
       "format": "file-path",
