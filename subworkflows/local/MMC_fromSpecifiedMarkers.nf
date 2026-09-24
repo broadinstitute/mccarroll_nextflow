@@ -25,7 +25,7 @@ workflow MMC_fromSpecifiedMarkers_workflow {
     COUNT_MMC_CELL_TYPES(params.library, MMC_FROMSPECIFIEDMARKERS.out.csv_report)
     workflowProperties = [
         submitter: getUserName(),
-        queryMarkers: params.mmcQueryMarkers.toUriString(),
+        mmcQueryMarkers: params.mmcQueryMarkers.toUriString(),
         mmcModel: modelLocator.modelName,
         mmcArgs: params.mmcArgs,
         stage: 'mmc'
