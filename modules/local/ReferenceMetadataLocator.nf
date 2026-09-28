@@ -76,8 +76,7 @@ def buildReferenceMetadataLocator(referenceFasta) {
 
         // directories
         starDirectory: subpath(dir, STAR_SUBDIR),
-        baseRefsDirectory: subpath(dir, BASE_REFS),
-
+        
         // interval + annotation files
         consensusIntronIntervals: withExtension(fastaBase, CONSENSUS_INTRONS),
         sequenceDictionary: withExtension(fastaBase, SEQ_DICT),
@@ -85,7 +84,6 @@ def buildReferenceMetadataLocator(referenceFasta) {
         geneIntervals: withExtension(fastaBase, GENE_INTERVALS),
         gtf: withExtension(fastaBase, GTF),
         intergenicIntervals: withExtension(fastaBase, INTERGENIC_INTERVALS),
-        starMemoryRequirementMB: withExtension(fastaBase, STAR_MEM),
         ribosomalIntervals: withExtension(fastaBase, RRNA_INTERVALS),
         reducedGtf: withExtension(fastaBase, REDUCED_GTF),
         refFlat: withExtension(fastaBase, REFFLAT),
@@ -102,21 +100,8 @@ def buildReferenceMetadataLocator(referenceFasta) {
 
         // xipher
         xipherConfig: withExtension(fastaBase, XIPHER_CONFIG),
-        xipherKnownVariants: withExtension(fastaBase, XIPHER_KNOWN),
 
-        // collections
-        bwaFiles: BWA_EXTENSIONS.collect {ext -> withExtension(referenceFasta, ext) },
-        starFiles: STAR_FILES.collect { ext -> subpath(subpath(dir, STAR_SUBDIR), ext) }
     ]
-
-    // -----------------------------
-    // Methods (as closures)
-    // -----------------------------
-    meta.starDirectoryForVersion = { version: String ->
-        def versionDir = subpath(subpath(dir, STAR_INDICES_SUBDIR), version)
-        versionDir.exists() ? versionDir : meta.starDirectory
-    }
-
     return meta
 }
 
