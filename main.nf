@@ -165,6 +165,7 @@ workflow {
         align_locus_function_workflow(
             unmappedBam,
             params.beadStructure,
+            referenceMetadataLocator,
         )
         alignedBam = align_locus_function_workflow.out.alignedBam
         alignedBai = align_locus_function_workflow.out.alignedBai
@@ -282,6 +283,7 @@ workflow {
             alignedBam,
             chimericTranscripts,
             cbrbCellFeatures,
+            referenceMetadataLocator,
         )
         selectedDge                     = standard_analysis_workflow.out.dge
         selectedDgeSummary              = standard_analysis_workflow.out.dgeSummary
@@ -338,6 +340,7 @@ workflow {
             dgeSummary,
             readsPerCell,
             doubletCalls,
+            referenceMetadataLocator,
         )
         // dropulation outputs
         dropulationProperties = dropulation_workflow.out.dropulationProperties

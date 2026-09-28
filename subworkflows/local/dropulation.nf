@@ -1,5 +1,5 @@
 include { noMetaChannelHelper ; collectInOrder ; metaOnlyChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
-include { buildReferenceMetadataLocator ; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
+include { loadNonAutosomes                        } from '../../modules/local/ReferenceMetadataLocator.nf'
 include { withExtension                           } from '../../modules/local/FileUtil.nf'
 include { makeDropulationlabel                    } from '../../modules/local/workflowUtil.nf'
 
@@ -29,6 +29,7 @@ workflow dropulation_workflow {
     dgeSummaryRaw
     readsPerCell
     doubletCalls
+    referenceMetadataLocator
 
     main:
      workflowProperties = [
@@ -38,7 +39,6 @@ workflow dropulation_workflow {
         dropulation_label: makeDropulationlabel(file(params.vcf), file(params.donorFile)),
         stage: 'dropulation'
     ]
-    referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     bcf = params.cloudVcf ?: params.vcf
     nonAutosomes = loadNonAutosomes(referenceMetadataLocator.contigGroups)
     noChannelSelectedCells = noMetaChannelHelper(selectedCells).collect()
