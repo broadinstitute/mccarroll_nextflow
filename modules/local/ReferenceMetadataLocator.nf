@@ -124,3 +124,16 @@ def loadMtSequences(contigGroupsFile) {
 def loadNonAutosomes(contigGroupsFile) {
     return getContigsWithLabel(contigGroupsFile, 'non-autosome')
 }
+
+def findReferenceFasta(referenceName, referenceMap) {
+    // if the reference name contains a slash, assume it's a path and return it.
+    // Otherwise, look up the reference in the reference map.
+    if (referenceName.toString().contains('/')) {
+        return file(referenceName)
+    } else if (referenceMap.containsKey(referenceName)) {
+        def path = file(referenceMap[referenceName])
+        return path
+    } else {
+        throw new IllegalArgumentException("Reference fasta not found for: " + referenceName)
+    }
+}
