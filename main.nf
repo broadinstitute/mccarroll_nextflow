@@ -30,7 +30,7 @@ params {
     allowedBarcodes: Path?
     library: String
     experimentDate: String?
-    reference: Path?
+    reference: String?
     cloudReference: Path?
     fastq_read1: List<String> = []
     fastq_read2: List<String> = []
