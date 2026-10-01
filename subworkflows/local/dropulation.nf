@@ -78,6 +78,7 @@ workflow dropulation_workflow {
         noMetaChannelHelper(cbrbCellFeatures).collect(),
         MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies.collect(),
         params.strandStrategy,
+        functionalStrategy,
         params.locusFunction,
         nonAutosomes,
     )
