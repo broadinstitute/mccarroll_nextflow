@@ -291,7 +291,7 @@
     "useCBRBInitialization": {
       "type": "boolean",
       "description": "DropSift cell selection option",
-      "default": true
+      "default": false
     },
     "vcf": {
       "type": "string",
