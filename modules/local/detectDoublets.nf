@@ -12,6 +12,7 @@ process DETECT_DOUBLETS {
     path cbrbCellSelectionReport
     path alleleFrequency
     val strandStrategy
+    val functionalStrategy
     val locusFunction
     val nonAutosomes
 
@@ -35,6 +36,7 @@ process DETECT_DOUBLETS {
         --FORCED_RATIO 0.8 \
         ${locusFunctionArgs} \
         --STRAND_STRATEGY ${strandStrategy} \
+        --FUNCTIONAL_STRATEGY ${functionalStrategy} \
         ${nonAutosomesString} \
           --CELL_CONTAMINATION_ESTIMATE_FILE ${cbrbCellSelectionReport} \
           --ALLELE_FREQUENCY_ESTIMATE_FILE ${alleleFrequency} 
