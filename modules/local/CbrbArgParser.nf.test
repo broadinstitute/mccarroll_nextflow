@@ -221,4 +221,136 @@ test("Test Function loadSvmEstimatedParameters") {
 
     }
 
+    test("Test Function makeCbrbLabel") {
+
+        function "makeCbrbLabel"
+
+        when {
+            function {
+                """
+                input[0] = [
+                    cbrbArgs: "--expected-cells=1000 --total-droplets-included=5000 --learning-rate=0.000005",
+                    useSvmParameterEstimation: true
+                ]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function makeCbrbLabel defaults only") {
+
+        function "makeCbrbLabel"
+
+        when {
+            function {
+                """
+                input[0] = [
+                    cbrbArgs: "",
+                    useSvmParameterEstimation: true
+                ]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function makeCbrbLabel expectedCells and totalDropletsIncluded only") {
+
+        function "makeCbrbLabel"
+
+        when {
+            function {
+                """
+                input[0] = [
+                    cbrbArgs: "--expected-cells=1000 --total-droplets-included=5000",
+                    useSvmParameterEstimation: true
+                ]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function makeCbrbLabel removing default") {
+
+        function "makeCbrbLabel"
+
+        when {
+            function {
+                """
+                input[0] = [
+                    cbrbArgs: "--learning-rate=null",
+                    useSvmParameterEstimation: true
+                ]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function makeCbrbLabel with useSvmParameterEstimation false") {
+
+        function "makeCbrbLabel"
+
+        when {
+            function {
+                """
+                input[0] = [
+                    cbrbArgs: "",
+                    useSvmParameterEstimation: false
+                ]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
+    test("Test Function makeCbrbLabel with extra args") {
+
+        function "makeCbrbLabel"
+
+        when {
+            function {
+                """
+                input[0] = [
+                    cbrbArgs: "--foo=1000 --bar=frob",
+                    useSvmParameterEstimation: true
+                ]
+                """
+            }
+        }
+
+        then {
+            assert function.success
+            assert snapshot(function.result).match()
+        }
+
+    }
+
 }

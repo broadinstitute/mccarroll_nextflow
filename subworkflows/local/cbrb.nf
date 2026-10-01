@@ -1,6 +1,5 @@
-include { parseCbrbYamlArgs ; addSvmEstimatedParameters ; loadSvmEstimatedParameters } from '../../modules/local/CbrbArgParser.nf'
+include { parseCbrbYamlArgs ; addSvmEstimatedParameters ; loadSvmEstimatedParameters ; makeCbrbLabel } from '../../modules/local/CbrbArgParser.nf'
 include { noMetaChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
-include { makeCbrbLabel                } from '../../modules/local/WorkflowPathUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND  } from '../../modules/nf-core/cellbender/removebackground/main.nf'
 include { HDF5_10X_TO_TEXT             } from '../../modules/local/hdf5_10X_to_text.nf'
