@@ -39,12 +39,6 @@ def makeCellSelectionLabel(params) {
     return hasManualCellSelectionThresholds(params) ? makeManualCellSelectionLabel(params) : 'auto'
 }
 
-def makeCbrbLabel(params) {
-    return params.useSvmParameterEstimation && params.cbrbArgs.isEmpty()
-        ? 'auto'
-        : String.format('%04x', params.cbrbArgs.hashCode())
-}
-
 /**
  * Render outdir as a full path string, whether it arrives as a String or a java.nio Path,
  * for a local or cloud (e.g. gs://) location.
