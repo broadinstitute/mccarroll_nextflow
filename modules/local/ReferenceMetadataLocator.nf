@@ -13,8 +13,6 @@ def buildReferenceMetadataLocator(referenceFasta) {
     def FASTA_EXTENSIONS = ["fasta", "fa"]
 
     def STAR_SUBDIR = "STAR"
-    def STAR_INDICES_SUBDIR = "STAR_indices"
-    def BASE_REFS = "baseRefs"
 
     def CONSENSUS_INTRONS = "consensus_introns.intervals"
     def SEQ_DICT = "dict"
@@ -23,7 +21,6 @@ def buildReferenceMetadataLocator(referenceFasta) {
     def MT_INTERVALS = "mt.intervals"
     def GTF = "gtf"
     def INTERGENIC_INTERVALS = "intergenic.intervals"
-    def STAR_MEM = "memory_requirement_mb.txt"
     def RRNA_INTERVALS = "rRNA.intervals"
     def REDUCED_GTF = "reduced.gtf"
     def REFFLAT = "refFlat"
@@ -35,17 +32,7 @@ def buildReferenceMetadataLocator(referenceFasta) {
     def DBSNP_INTERVALS = "dbsnp.intervals"
     def CONTIG_GROUPS = "contig_groups.yaml"
     def XIPHER_CONFIG = "xipher.yaml"
-    def XIPHER_KNOWN = "xipher.variants_table.txt.gz"
 
-    def STAR_FILES = [
-            "Genome", "SA", "SAindex", "chrLength.txt", "chrName.txt",
-            "chrNameLength.txt", "chrStart.txt", "exonInfo.tab",
-            "genomeParameters.txt", "sjdbInfo.txt",
-            "sjdbList.fromGTF.out.tab", "sjdbList.out.tab",
-            "transcriptInfo.tab"
-    ]
-
-    def BWA_EXTENSIONS = ["64.amb", "64.ann", "64.bwt", "64.pac", "64.sa"]
 
     // -----------------------------
     // Normalize FASTA base
