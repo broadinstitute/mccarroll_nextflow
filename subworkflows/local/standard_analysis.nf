@@ -1,6 +1,6 @@
 include { noMetaChannelHelper ; collectInOrder ; metaOnlyChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
-include { buildReferenceMetadataLocator ; loadNonAutosomes } from '../../modules/local/ReferenceMetadataLocator.nf'
-include { FILTER_DGE ; FILTER_DGE as FILTER_DONOR_DGE } from '../../modules/local/filterDge.nf'
+include { loadNonAutosomes                               } from '../../modules/local/ReferenceMetadataLocator.nf'
+include { FILTER_DGE ; FILTER_DGE as FILTER_DONOR_DGE    } from '../../modules/local/filterDge.nf'
 include { MAKE_TRIPLET_DGE                               } from '../../modules/local/makeTripletDge.nf'
 include { GATHER_UMI_READ_INTERVALS                      } from '../../modules/local/gatherUMIReadIntervals.nf'
 include { MERGE_UMI_READ_INTERVALS                       } from '../../modules/local/mergeUMIReadIntervals.nf'
@@ -32,13 +32,13 @@ workflow standard_analysis_workflow {
     bams
     chimericTranscripts
     cbrbCellFeatures
+    referenceMetadataLocator
 
     main:
     metagene_infix = ".metagene"
     gmg_infix = ".gmg"
     functionalStrategy = params.metaGeneDgeFunctionalStrategy ?: params.dgeFunctionalStrategy
     FILTER_DGE(selectedCells.map { m, f -> tuple(m + [id: m.id + ".selected"], f) }, noMetaChannelHelper(dgeMatrix), noMetaChannelHelper(dgeSummary))
-    referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
     MAKE_TRIPLET_DGE(FILTER_DGE.out.filteredDge, referenceMetadataLocator.reducedGtf)
     noChannelSelectedCells = noMetaChannelHelper(selectedCells).collect()
     GATHER_UMI_READ_INTERVALS(bams, noChannelSelectedCells, params.locusFunction, params.strandStrategy, functionalStrategy)

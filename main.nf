@@ -20,7 +20,7 @@ include { cell_selection_workflow                  } from './subworkflows/local/
 include { standard_analysis_workflow               } from './subworkflows/local/standard_analysis.nf'
 include { dropulation_workflow                     } from './subworkflows/local/dropulation.nf'
 include { MMC_fromSpecifiedMarkers_workflow } from './subworkflows/local/MMC_fromSpecifiedMarkers.nf'
-include { buildReferenceMetadataLocator            } from './modules/local/ReferenceMetadataLocator.nf'
+include { buildReferenceMetadataLocator; findReferenceFasta } from './modules/local/ReferenceMetadataLocator.nf'
 include { buildRestartInputPaths ; makeCellSelectionLabel ; makeCbrbLabel } from './modules/local/WorkflowPathUtil.nf'
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
@@ -30,7 +30,7 @@ params {
     allowedBarcodes: Path?
     library: String
     experimentDate: String?
-    reference: Path?
+    reference: String?
     cloudReference: Path?
     fastq_read1: List<String> = []
     fastq_read2: List<String> = []
@@ -117,7 +117,8 @@ workflow {
     validateStartAtParam()
 
     def startAt = params.start_at
-    def referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
+    def referenceFasta = findReferenceFasta(params.reference, params.referenceMap)
+    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta)
     def referenceName = referenceMetadataLocator.referenceName
     def cbrbLabel = makeCbrbLabel(params)
     def cellSelectionLabel = makeCellSelectionLabel(params)
@@ -165,6 +166,7 @@ workflow {
         align_locus_function_workflow(
             unmappedBam,
             params.beadStructure,
+            referenceMetadataLocator,
         )
         alignedBam = align_locus_function_workflow.out.alignedBam
         alignedBai = align_locus_function_workflow.out.alignedBai
@@ -282,6 +284,7 @@ workflow {
             alignedBam,
             chimericTranscripts,
             cbrbCellFeatures,
+            referenceMetadataLocator,
         )
         selectedDge                     = standard_analysis_workflow.out.dge
         selectedDgeSummary              = standard_analysis_workflow.out.dgeSummary
@@ -338,6 +341,7 @@ workflow {
             dgeSummary,
             readsPerCell,
             doubletCalls,
+            referenceMetadataLocator,
         )
         // dropulation outputs
         dropulationProperties = dropulation_workflow.out.dropulationProperties

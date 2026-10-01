@@ -5,7 +5,7 @@ include { GATK4_MERGEBAMALIGNMENT                      } from '../../modules/nf-
 include { GATK4_BASERECALIBRATOR                       } from '../../modules/nf-core/gatk4/baserecalibrator/main'
 include { GATK4_GATHERBQSRREPORTS                      } from '../../modules/nf-core/gatk4/gatherbqsrreports/main'
 include { GATK4_APPLYBQSR                              } from '../../modules/nf-core/gatk4/applybqsr/main'
-include { buildReferenceMetadataLocator ; loadMtSequences } from '../../modules/local/ReferenceMetadataLocator.nf'
+include { loadMtSequences                              } from '../../modules/local/ReferenceMetadataLocator.nf'
 include { TAG_READ_WITH_GENE_FUNCTION                  } from '../../modules/local/tagReadWithGeneFunction.nf'
 include { MARK_CHIMERIC_READS                          } from '../../modules/local/markChimericReads.nf'
 include { VALIDATE_ALIGNED_SAM                         } from '../../modules/local/validateAlignedSam.nf'
@@ -38,6 +38,7 @@ workflow align_locus_function_workflow {
     take:
     unmappedBams
     beadStructure
+    referenceMetadataLocator
 
     main:
     ch_unmapped_bams = unmappedBams.map { bam ->
@@ -64,7 +65,7 @@ workflow align_locus_function_workflow {
     // TODO: Figure out how to get the STAR version in order to get the correct genome index directory.  For now, just hardcode the version.
 
     // STAR is configured to alway run in the cloud, so use cloud reference if provided, for speed.
-    reference = params.cloudReference ?: params.reference
+    reference = params.cloudReference ?: referenceMetadataLocator.referenceFasta
     // TODO: Why do I need to use file() here?  params.reference is defined as a Path.
     genome_index_dir = file(reference).parent + "/STAR_indices/2.7.11a"
     null_file = tuple([], [])
@@ -91,11 +92,10 @@ workflow align_locus_function_workflow {
 
     // Although GATK4_MERGEBAMALIGNMENT process code doesn't use the sequence dictionary explicitly, it is found
     // relative to the reference FASTA file and is required to be present in order for the process to run successfully.  
-    // Thus we need to build a locator for it and pass it in as an argument so that it is localized into the execution environment.
-    referenceMetadataLocator = buildReferenceMetadataLocator(params.reference)
+    // Thus we need to pass it in as an argument so that it is localized into the execution environment.
     GATK4_MERGEBAMALIGNMENT(
         ch_merge_input,
-        tuple([], params.reference),
+        tuple([], referenceMetadataLocator.referenceFasta),
         tuple([], referenceMetadataLocator.sequenceDictionary)
     )
     // Stick the reference name into the metadata so that it can be used downstream for naming output subdirectory.
@@ -119,7 +119,7 @@ workflow align_locus_function_workflow {
             TAG_READ_WITH_GENE_FUNCTION.out.taggedBam.map { meta, file ->
                 tuple(meta, file, [], dbsnpIntervals) // no index
             },
-            tuple([], params.reference),
+            tuple([], referenceMetadataLocator.referenceFasta),
             tuple([], [referenceMetadataLocator.gzi, referenceMetadataLocator.fai]), // Apparently GATK4_BASERECALIBRATOR needs both the fai and gzi
             tuple([], referenceMetadataLocator.sequenceDictionary),
             tuple([], referenceMetadataLocator.dbSnp),
@@ -137,7 +137,7 @@ workflow align_locus_function_workflow {
             }
         GATK4_APPLYBQSR(
             ch_apply_bqsr,
-            params.reference,
+            referenceMetadataLocator.referenceFasta,
             [referenceMetadataLocator.gzi, referenceMetadataLocator.fai],
             referenceMetadataLocator.sequenceDictionary
         )
@@ -149,7 +149,7 @@ workflow align_locus_function_workflow {
         alignedBais = MARK_CHIMERIC_READS.out.bai
     }
     VALIDATE_ALIGNED_SAM(alignedBams)
-    VALIDATE_SAM_FILE(alignedBams, params.reference)
+    VALIDATE_SAM_FILE(alignedBams, referenceMetadataLocator.referenceFasta)
     numReadsPerCellExtension = "numReads_perCell.txt.gz"
     BAM_TAG_HISTOGRAM(
         alignedBams,
@@ -179,7 +179,7 @@ workflow align_locus_function_workflow {
     )
     SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR(
         alignedBams.join(SELECT_CELLS_BY_NUM_TRANSCRIPTS.out.selectedCells),
-        params.reference,
+        referenceMetadataLocator.referenceFasta,
         referenceMetadataLocator.gtf,
         referenceMetadataLocator.ribosomalIntervals,
         params.dgeMinReadMq,
@@ -190,7 +190,7 @@ workflow align_locus_function_workflow {
     PICARD_COLLECTRNASEQMETRICS(
         alignedBams,
         referenceMetadataLocator.refFlat,
-        params.reference,
+        referenceMetadataLocator.referenceFasta,
         referenceMetadataLocator.ribosomalIntervals
     )
 
@@ -262,7 +262,7 @@ workflow align_locus_function_workflow {
     )
     workflowProperties = [
         submitter: getUserName(),
-        reference: params.reference.toUriString(),
+        reference: referenceMetadataLocator.referenceFasta.toUriString(),
         strandStrategy: params.strandStrategy,
         locusFunction: params.locusFunction,
         dgeMinReadMq: params.dgeMinReadMq,
