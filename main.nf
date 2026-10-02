@@ -43,6 +43,7 @@ params {
     useSvmParameterEstimation: Boolean = true
     forceTwoClusterSolution: Boolean = false
     cbrbArgs: String = ''
+    skipCbrb: Boolean = false
 
     // cell selection parameters
     minUMIsPerCell: Integer?
@@ -215,6 +216,7 @@ workflow {
             cellFeatures,
             dge,
             readQualityMetrics,
+            dgeSummary,
         )
 
 

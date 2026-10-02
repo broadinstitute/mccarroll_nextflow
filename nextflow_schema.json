@@ -266,6 +266,10 @@
       "type": "boolean",
       "default": true
     },
+    "skipCbrb": {
+      "type": "boolean",
+      "default": false
+    },
     "forceTwoClusterSolution": {
       "type": "boolean"
     },
@@ -354,12 +358,12 @@
       "type": "string"
     },
     "referenceMap": {
-    "type": "object",
-    "description": "Map of reference name to FASTA path",
-    "additionalProperties": {
+      "type": "object",
+      "description": "Map of reference name to FASTA path",
+      "additionalProperties": {
         "type": "string"
+      }
     }
-}
   },
   "required": ["library", "outdir", "email"]
 }
