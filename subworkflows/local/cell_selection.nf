@@ -33,13 +33,23 @@ workflow cell_selection_workflow {
 
     }
     else {
+        if (params.skipCbrb) {
+            CALL_STAMPS_SVM_NUCLEI(
+                noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
+                noMetaChannelHelper(cellFeatures),
+                cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
+                false,
+                []
+            )
+        } else {
         CALL_STAMPS_SVM_NUCLEI(
             noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
             noMetaChannelHelper(cellFeatures),
-            noMetaChannelHelper(cbrbNonEmpties),
-            cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
-            params.useCBRBInitialization
+            cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
+            params.useCBRBInitialization,
+            noMetaChannelHelper(cbrbNumTranscripts)
         )
+        }
         selectionOutputs = CALL_STAMPS_SVM_NUCLEI.out
     }
     selectedCellBarcodes = selectionOutputs.selectedCellBarcodes

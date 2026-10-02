@@ -126,6 +126,9 @@ def loadSvmEstimatedParameters(svmEstimatedParamsFile) {
 }
 
 def makeCbrbLabel(params) {
+    if (params.skipCbrb) {
+        return "skip"
+    }
     def argDict = makeCbrbArgDict(params.cbrbArgs)
     def label = ""
     if (argDict[CBRB_ARGS().expectedCells] != null) {
