@@ -18,7 +18,7 @@ process MAKE_SPARSE_DGE {
     def javaMemMb = (task.memory.toMega() * 0.8) as int
 
     """
-    MergeDge -m ${javaMemMb} \
+    MergeDge -m ${javaMemMb}m \
         --INPUT ${denseDge} \
         --OUTPUT ${matrix} \
         --OUTPUT_FORMAT MM_SPARSE_10X \
