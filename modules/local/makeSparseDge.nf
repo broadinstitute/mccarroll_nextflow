@@ -1,5 +1,5 @@
 process MAKE_SPARSE_DGE {
-    label 'process_low'
+    label 'process_medium'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
@@ -15,9 +15,10 @@ process MAKE_SPARSE_DGE {
     matrix = "matrix.mtx.gz"
     features = "features.tsv.gz"
     barcodes = "barcodes.tsv.gz"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
 
     """
-    MergeDge \
+    MergeDge -m ${javaMemMb} \
         --INPUT ${denseDge} \
         --OUTPUT ${matrix} \
         --OUTPUT_FORMAT MM_SPARSE_10X \
