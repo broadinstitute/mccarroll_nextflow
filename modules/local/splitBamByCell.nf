@@ -9,7 +9,7 @@ process SPLIT_BAM_BY_CELL {
         //log.info "SPLIT_BAM_BY_CELL: calculated memoryMb=${memoryMb} for taggedBams=${taggedBams*.name} (attempt ${task.attempt})"
         1.MB * Math.max(memoryMb, 8000)
     }
-    time { 4.h * task.attempt }
+    time { 24.h * task.attempt }
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
