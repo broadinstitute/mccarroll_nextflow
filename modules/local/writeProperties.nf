@@ -8,15 +8,10 @@ process WRITE_PROPERTIES {
     val properties
 
     output:
-    path "${output_file}"
+    path "${output_filename}"
 
-    script:
-    output_file = "properties.yaml"
-    def yaml_str = YamlUtils.toBlockYaml(properties)
-
-    """
-    cat > '${output_file}' << EOF
-${yaml_str}
-EOF
-    """
+    exec:
+    output_filename = "properties.yaml"
+    def output_file = task.workDir.resolve(output_filename)
+    output_file.text = YamlUtils.toBlockYaml(properties)
 }
