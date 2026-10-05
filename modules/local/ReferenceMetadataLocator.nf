@@ -112,15 +112,30 @@ def loadNonAutosomes(contigGroupsFile) {
     return getContigsWithLabel(contigGroupsFile, 'non-autosome')
 }
 
-def findReferenceFasta(referenceName, referenceMap) {
-    // if the reference name contains a slash, assume it's a path and return it.
-    // Otherwise, look up the reference in the reference map.
-    if (referenceName.toString().contains('/')) {
-        return file(referenceName)
-    } else if (referenceMap.containsKey(referenceName)) {
-        def path = file(referenceMap[referenceName])
+def findReferenceFasta(reference, referenceMap) {
+    if (reference.toString().contains('/')) {
+        return file(reference)
+    } else if (referenceMap.containsKey(reference)) {
+        def path = file(referenceMap[reference])
         return path
     } else {
-        throw new IllegalArgumentException("Reference fasta not found for: " + referenceName)
+        throw new IllegalArgumentException("Reference fasta not found for: " + reference)
     }
+}
+
+def resolveReference(reference, referenceParents) {
+    // if the reference contains a slash, assume it's a path and return it.
+    // Otherwise, look up the reference in the children of referenceParents
+    if (reference.toString().contains('/')) {
+        return file(reference)
+    }
+        // reference lookup table, populated by scanning referenceParents for
+    // <referenceParent>/<referenceName>/*.fasta.gz
+    def referenceMap = referenceParents.collectEntries { parent ->
+        files("${parent}/*/*.fasta.gz").collectEntries { f ->
+            [(f.parent.name): f.toUriString()]
+        }
+    }
+
+    return findReferenceFasta(reference, referenceMap)
 }

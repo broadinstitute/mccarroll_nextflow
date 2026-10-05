@@ -20,7 +20,7 @@ include { cell_selection_workflow                  } from './subworkflows/local/
 include { standard_analysis_workflow               } from './subworkflows/local/standard_analysis.nf'
 include { dropulation_workflow                     } from './subworkflows/local/dropulation.nf'
 include { MMC_fromSpecifiedMarkers_workflow } from './subworkflows/local/MMC_fromSpecifiedMarkers.nf'
-include { buildReferenceMetadataLocator; findReferenceFasta } from './modules/local/ReferenceMetadataLocator.nf'
+include { buildReferenceMetadataLocator; resolveReference } from './modules/local/ReferenceMetadataLocator.nf'
 include { buildRestartInputPaths ; makeCellSelectionLabel } from './modules/local/WorkflowPathUtil.nf'
 include { makeCbrbLabel                            } from './modules/local/CbrbArgParser.nf'
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
@@ -119,7 +119,7 @@ workflow {
     validateStartAtParam()
 
     def startAt = params.start_at
-    def referenceFasta = findReferenceFasta(params.reference, params.referenceMap)
+    def referenceFasta = resolveReference(params.reference, params.referenceParents)
     def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta)
     def referenceName = referenceMetadataLocator.referenceName
     def cbrbLabel = makeCbrbLabel(params)

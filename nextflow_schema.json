@@ -357,12 +357,14 @@
     "mmcArgs": {
       "type": "string"
     },
-    "referenceMap": {
-      "type": "object",
-      "description": "Map of reference name to FASTA path",
-      "additionalProperties": {
-        "type": "string"
-      }
+    "referenceParents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "directory",
+        "exists": true
+      },
+      "default": []
     }
   },
   "required": ["library", "outdir", "email"]
