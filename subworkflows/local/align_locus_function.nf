@@ -64,14 +64,10 @@ workflow align_locus_function_workflow {
     // as input BAM.
     // TODO: Figure out how to get the STAR version in order to get the correct genome index directory.  For now, just hardcode the version.
 
-    // STAR is configured to alway run in the cloud, so use cloud reference if provided, for speed.
-    reference = params.cloudReference ?: referenceMetadataLocator.referenceFasta
-    // TODO: Why do I need to use file() here?  params.reference is defined as a Path.
-    genome_index_dir = file(reference).parent + "/STAR_indices/2.7.11a"
     null_file = tuple([], [])
     STAR_ALIGN(
         ch_star_input,
-        tuple([], genome_index_dir),
+        tuple([], referenceMetadataLocator.starIndexDirectory),
         null_file, // no GTF
         true // ignore junctions
     )
