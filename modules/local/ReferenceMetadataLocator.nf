@@ -12,7 +12,8 @@ def buildReferenceMetadataLocator(referenceFasta) {
     // -----------------------------
     def FASTA_EXTENSIONS = ["fasta", "fa"]
 
-    def STAR_SUBDIR = "STAR"
+    // TODO: the STAR index should be found based on the version of STAR
+    def STAR_INDEX_SUBDIR = "STAR_indices/2.7.11a"
 
     def CONSENSUS_INTRONS = "consensus_introns.intervals"
     def SEQ_DICT = "dict"
@@ -57,14 +58,13 @@ def buildReferenceMetadataLocator(referenceFasta) {
 
         // core
         referenceFasta: referenceFasta,
-        directory: dir,
-        fastaBase: fastaBase,
         referenceName: fastaBase.name,
 
         // directories
-        starDirectory: subpath(dir, STAR_SUBDIR),
+        starIndexDirectory: subpath(dir, STAR_INDEX_SUBDIR),
         
         // interval + annotation files
+        // some of these are not used yet but there doesn't seem to be any harm in including them
         consensusIntronIntervals: withExtension(fastaBase, CONSENSUS_INTRONS),
         sequenceDictionary: withExtension(fastaBase, SEQ_DICT),
         exonIntervals: withExtension(fastaBase, EXON_INTERVALS),
