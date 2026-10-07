@@ -32,12 +32,12 @@ params {
     library: String
     experimentDate: String?
     reference: String?
-    cloudReference: Path?
     fastq_read1: List<String> = []
     fastq_read2: List<String> = []
     rawBam: List<String> = []
     version10X: String?
     beadStructure: String?
+    referenceOverride: List<String> = []
 
     // cbrb parameters
     useSvmParameterEstimation: Boolean = true
@@ -120,7 +120,7 @@ workflow {
 
     def startAt = params.start_at
     def referenceFasta = resolveReference(params.reference, params.referenceParents)
-    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta)
+    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride)
     def referenceName = referenceMetadataLocator.referenceName
     def cbrbLabel = makeCbrbLabel(params)
     def cellSelectionLabel = makeCellSelectionLabel(params)

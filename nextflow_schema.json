@@ -194,6 +194,14 @@
       "type": "string",
       "format": "file-path"
     },
+    "referenceOverride": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "<slot>:<path> where slot is the reference slot and path is the file/directory path to override the reference bundle.",
+      "default": []
+    },
     "fastq_read1": {
       "type": "array",
       "items": {
@@ -234,10 +242,6 @@
     "targetBamSizeMBytes": {
       "type": "integer",
       "default": 2048
-    },
-    "cloudReference": {
-      "type": "string",
-      "format": "file-path"
     },
     "strandStrategy": {
       "type": "string",
