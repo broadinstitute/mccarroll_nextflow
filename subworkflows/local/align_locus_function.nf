@@ -99,7 +99,7 @@ workflow align_locus_function_workflow {
         GATK4_MERGEBAMALIGNMENT.out.bam.map { meta, file -> tuple(meta + [id: meta.bamBase, referenceName: referenceMetadataLocator.referenceName], file) },
         referenceMetadataLocator.gtf
     )
-    doBQSR = referenceMetadataLocator.dbSnp.exists()
+    doBQSR = referenceMetadataLocator.dbSnp != null &&referenceMetadataLocator.dbSnp.exists()
     MARK_CHIMERIC_READS(
         TAG_READ_WITH_GENE_FUNCTION.out.taggedBam,
         params.strandStrategy,

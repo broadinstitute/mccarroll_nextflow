@@ -91,7 +91,6 @@ def buildReferenceMetadataLocator(referenceFasta, overrides) {
     ]
     // overrides is a list of strings in the format "<slot>:<path>" to override the reference bundle.
     // split each string, validate that the slot exists, and override the corresponding entry in the meta map.
-    log.info("Applying reference overrides: ${overrides} (${overrides.getClass().name})")
     overrides.each { override ->
         def (slot, path) = override.split(':', 2)
         if (!meta.containsKey(slot)) {
