@@ -2,7 +2,7 @@
 
 include { hasExtension ; withoutExtension ; withExtension ; subpath } from './FileUtil.nf'
 
-def buildReferenceMetadataLocator(referenceFasta) {
+def buildReferenceMetadataLocator(referenceFasta, overrides) {
     if (referenceFasta instanceof String) {
         referenceFasta = file(referenceFasta)
     }
@@ -89,6 +89,17 @@ def buildReferenceMetadataLocator(referenceFasta) {
         xipherConfig: withExtension(fastaBase, XIPHER_CONFIG),
 
     ]
+    // overrides is a list of strings in the format "<slot>:<path>" to override the reference bundle.
+    // split each string, validate that the slot exists, and override the corresponding entry in the meta map.
+    log.info("Applying reference overrides: ${overrides} (${overrides.getClass().name})")
+    overrides.each { override ->
+        def (slot, path) = override.split(':', 2)
+        if (!meta.containsKey(slot)) {
+            throw new IllegalArgumentException("Invalid reference override slot: " + slot)
+        }
+        // if path is the string "null", treat it as a request to remove the entry from the meta map.
+        meta[slot] = (path == "null") ? null : file(path)
+    }
     return meta
 }
 
