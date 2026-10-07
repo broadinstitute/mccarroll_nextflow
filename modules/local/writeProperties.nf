@@ -1,8 +1,11 @@
 process WRITE_PROPERTIES {
     label 'process_single'
 
-    // TODO: this should run locally, or at least use a very lightweight container 
-    container 'quay.io/broadinstitute/drop-seq_r:current'
+    // exec: blocks run natively in the Nextflow JVM and cannot be dispatched to
+    // google-batch (or any grid/cloud executor), so pin this process to the
+    // local executor. This also silences the "cannot be executed by
+    // 'google-batch' executor -- Using 'local' executor instead" warning.
+    executor 'local'
 
     input:
     val properties
