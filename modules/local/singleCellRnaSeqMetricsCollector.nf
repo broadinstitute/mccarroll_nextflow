@@ -7,7 +7,6 @@ process SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR {
     path referenceFasta
     path gtf
     path ribosomalIntervals
-    val readQuality
     val mtSequences
     val cellBarcodeTag
 
@@ -26,7 +25,6 @@ process SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR {
         --OUTPUT ${output_file} \
         --RIBOSOMAL_INTERVALS ${ribosomalIntervals} \
         --CELL_BARCODE_TAG ${cellBarcodeTag} \
-        --READ_MQ ${readQuality} \
         --CELL_BC_FILE ${selectedCells} \
         ${mtSequencesArgs.join(' ')} \
         --VALIDATION_STRINGENCY SILENT

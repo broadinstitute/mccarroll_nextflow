@@ -14,6 +14,7 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
     val locusFunction
     val strandStrategy
     val nonAutosomes
+    val readMq
 
     output:
     tuple val(meta), path("${output_file}"), emit: digitalAlleleFrequencies
@@ -35,6 +36,7 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
           --STRAND_STRATEGY ${strandStrategy} \
           ${nonAutosomesString} \
           --SINGLE_VARIANT_READS false \
-          --MULTI_GENES_PER_READ false
+          --MULTI_GENES_PER_READ false \
+          --READ_MQ ${readMq}
     """
 }
