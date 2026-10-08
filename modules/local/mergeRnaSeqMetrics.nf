@@ -12,9 +12,10 @@ process MERGE_RNA_SEQ_METRICS {
 
     script:
     output_file = "${library}.fracIntronicExonic.txt"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeRnaSeqMetrics \
+        -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file}
     """

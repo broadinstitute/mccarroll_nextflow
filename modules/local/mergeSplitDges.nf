@@ -13,8 +13,10 @@ process MERGE_SPLIT_DGES {
     script:
     output_file = "${library}.digital_expression.txt.gz"
     // --HEADER_STRINGENCY NONE because rules that each #LIBRARY in header has a prefix, and a unique UEI, are violated.
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeSplitDges \
+        -m ${javaMemMb}m \
         --INPUT ${dges.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
       --OUTPUT_HEADER true \

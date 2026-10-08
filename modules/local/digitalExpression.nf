@@ -30,8 +30,10 @@ process DIGITAL_EXPRESSION {
     else {
         metagene_args = ""
     }
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     DigitalExpression \
+        -m ${javaMemMb}m \
         --INPUT ${inputBam} \
         --OUTPUT ${output_file} \
         --SUMMARY ${summary_file} \

@@ -13,8 +13,10 @@ process MERGE_DGE_SUMMARIES {
 
     script:
     output_file = "${library}.digital_expression_summary.txt"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeDgeSummaries \
+        -m ${javaMemMb}m \
         --INPUT ${dgeSummaries.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
         ${otherArgs ?: ''}

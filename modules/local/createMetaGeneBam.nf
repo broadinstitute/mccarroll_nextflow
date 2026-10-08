@@ -19,8 +19,10 @@ process CREATE_META_GENE_BAM {
     script:
     output_file = "${meta.id}.metagene.bam"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     DiscoverMetaGenes \
+    -m ${javaMemMb}m \
         --INPUT ${bam} \
         --CELL_BC_FILE ${selectedCells} \
         --WRITE_SINGLE_GENES false \

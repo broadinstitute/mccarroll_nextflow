@@ -13,8 +13,10 @@ process MERGE_DOUBLET_ASSIGNMENTS {
 
     script:
     output_file = "${library}.doublets.txt"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeDoubletAssignments \
+          -m ${javaMemMb}m \
           --INPUT ${doublets.join(' --INPUT ')} \
           --OUTPUT ${output_file}
     """

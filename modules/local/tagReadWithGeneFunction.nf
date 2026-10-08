@@ -13,8 +13,10 @@ process TAG_READ_WITH_GENE_FUNCTION {
 
     script:
     output_file = meta.id + ".mapped_tagged.bam"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     TagReadWithGeneFunction \
+          -m ${javaMemMb}m \
           --I ${inputBam} \
           --O ${output_file} \
           --ANNOTATIONS_FILE ${gtf} \

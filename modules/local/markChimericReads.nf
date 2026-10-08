@@ -30,8 +30,10 @@ process MARK_CHIMERIC_READS {
     output_metrics = meta.id + ".chimeric_read_metrics"
     output_chimeric_transcripts = meta.id + ".chimeric_transcripts.txt.gz"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MarkChimericReads \
+          -m ${javaMemMb}m \
           --I ${inputBam} \
           --O ${output_file} \
           --METRICS ${output_metrics} \

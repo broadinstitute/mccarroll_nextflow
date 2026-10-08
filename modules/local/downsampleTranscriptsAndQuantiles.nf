@@ -13,8 +13,10 @@ process DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES {
 
     script:
     output_file = "${meta.id}.umi_saturation_histogram.txt"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     DownsampleTranscriptsAndQuantiles \
+        -m ${javaMemMb}m \
           --INPUT ${molBc} \
           --CELL_BC_FILE ${selectedCells} \
           --OUTPUT_HISTOGRAM_FILE ${output_file}

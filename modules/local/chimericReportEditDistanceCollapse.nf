@@ -12,9 +12,10 @@ process CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE {
 
     script:
     output_file = meta.id + ".molBC.txt.gz"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     ChimericReportEditDistanceCollapse \
+        -m ${javaMemMb}m \
         --INPUT ${chimericTranscripts} \
         --OUTPUT ${output_file} \
         --CELL_BC_FILE ${selectedCells} \

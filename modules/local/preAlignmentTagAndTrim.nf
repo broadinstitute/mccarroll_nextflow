@@ -24,6 +24,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
     // Convert from zero-based to one-based indexing for Java command line argument
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Molecular) + 1
     def templateRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Template) + 1
+    // TODO: figure out what to do with java heap sizes
     """
     TagBamWithReadSequenceExtended \
           --I ${inputBam} \

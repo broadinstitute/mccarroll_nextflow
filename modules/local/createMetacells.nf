@@ -29,8 +29,11 @@ process CREATE_METACELLS {
     }
     output_file = "${meta.id}.metacells.txt"
     output_metrics = "${meta.id}.metacell_metrics"
+
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     CreateMetaCells \
+        -m ${javaMemMb}m \
         --INPUT ${dgeMatrix} \
         --OUTPUT ${output_file} \
         --METRICS ${output_metrics} \

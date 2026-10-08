@@ -12,9 +12,10 @@ process MERGE_DGE {
 
     script:
     output_file = "${output_prefix}.digital_expression.txt.gz"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeDge \
+        -m ${javaMemMb}m \
         --INPUT ${dges.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
         --HEADER_STRINGENCY LENIENT \

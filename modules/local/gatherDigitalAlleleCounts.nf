@@ -24,9 +24,10 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
     output_file = "${meta.id}.allele_freq.txt"
     nonAutosomesString = nonAutosomes ? nonAutosomes.collect { seq -> "--IGNORED_CHROMOSOMES ${seq}" }.join(' ') : ''
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     GatherDigitalAlleleCounts \
+          -m ${javaMemMb}m \
           --INPUT ${bam} \
           --VCF ${bcf} \
           --CELL_BC_FILE ${selectedCells} \

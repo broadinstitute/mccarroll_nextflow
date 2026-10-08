@@ -16,8 +16,10 @@ process MERGE_CELLS_BY_NUM_TRANSCRIPTS {
     script:
     output_file = "${library}.size_selected_cells.txt.gz"
     output_metrics = "${library}.SelectCellsByNumTranscripts_metrics"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeCellsByNumTranscripts \
+        -m ${javaMemMb}m \
         --INPUT ${selectedCells.join(' --INPUT ')} \
         --INPUT_METRICS ${selectedCellsMetrics.join(' --INPUT_METRICS ')} \
         --OUTPUT ${output_file} \

@@ -15,8 +15,10 @@ process FILTER_DGE {
     script:
     output_file = "${meta.id}.digital_expression.txt.gz"
     output_summary = "${meta.id}.digital_expression_summary.txt"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     FilterDge \
+        -m ${javaMemMb}m \
         --INPUT ${dgeMatrix} \
         --INPUT_SUMMARY ${dgeSummary} \
         --OUTPUT ${output_file} \

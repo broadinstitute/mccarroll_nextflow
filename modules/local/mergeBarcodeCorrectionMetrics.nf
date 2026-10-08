@@ -12,9 +12,10 @@ process MERGE_BARCODE_CORRECTION_METRICS {
 
     script:
     output_file = "${library}.corrected_barcode_metrics"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeBarcodeCorrectionMetrics \
+        -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
         --DELETE_INPUTS false

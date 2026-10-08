@@ -31,9 +31,14 @@ process SPLIT_BAM_BY_CELL {
     bam_list = "${libraryName}.unmapped.bam_list"
     def avail_mem = task.memory ? (task.memory.mega * 0.8).intValue() : 7000
     """
-    SplitBamByCell -m ${avail_mem}M --VALIDATION_STRINGENCY SILENT \
-        --OUTPUT ${libraryName}.__SPLITNUM__.unmapped.bam --INPUT ${taggedBams.join(' --INPUT ')} \
-        --TARGET_BAM_SIZE ${targetBamSizeMBytes}M --REPORT ${report} --OUTPUT_MANIFEST ${manifest} \
+    SplitBamByCell \
+        -m ${avail_mem}M \
+        --VALIDATION_STRINGENCY SILENT \
+        --OUTPUT ${libraryName}.__SPLITNUM__.unmapped.bam \
+        --INPUT ${taggedBams.join(' --INPUT ')} \
+        --TARGET_BAM_SIZE ${targetBamSizeMBytes}M \
+        --REPORT ${report} \
+        --OUTPUT_MANIFEST ${manifest} \
         --OUTPUT_LIST ${bam_list}
     """
 }

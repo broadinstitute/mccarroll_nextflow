@@ -18,9 +18,10 @@ process GATHER_UMI_READ_INTERVALS {
     script:
     output_file = meta.bamBase + ".umi_read_intervals.tsv.gz"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     GatherUMIReadIntervals \
+        -m ${javaMemMb}m \
         --INPUT ${bam} \
         --OUTPUT ${output_file} \
         --CELL_BC_FILE ${selectedCells} \

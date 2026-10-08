@@ -19,9 +19,15 @@ process COUNT_BARCODE_SEQUENCES {
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Cellular)
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1
     // Convert from zero-based to one-based indexing for Java command line argument
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
-    CountBarcodeSequences --VALIDATION_STRINGENCY SILENT --BASE_RANGE '${baseRange}' \
-        --BARCODED_READ '${barcodedRead}' --ALLOWED_BARCODES '${allowedBarcodes}' \
-        --OUTPUT '${output_file}' --INPUT ${bams.join(' --INPUT ')}
+    CountBarcodeSequences \
+        -m ${javaMemMb}m \
+        --VALIDATION_STRINGENCY SILENT \
+        --BASE_RANGE '${baseRange}' \
+        --BARCODED_READ '${barcodedRead}' \
+        --ALLOWED_BARCODES '${allowedBarcodes}' \
+        --OUTPUT '${output_file}' \
+        --INPUT ${bams.join(' --INPUT ')}
     """
 }
