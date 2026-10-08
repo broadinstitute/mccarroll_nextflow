@@ -15,7 +15,12 @@ process PREALIGNMENT_TAG_AND_TRIM {
     output:
     tuple val(meta), path("${output_file}"), emit: taggedAndTrimmedBams
     // TODO: emit metrics
-    // TODO: emit versions -- see STAR_ALIGN for example of multiple s/w version outpus
+        tuple val("${task.process}"), val('TagBamWithReadSequenceExtended'), eval("TagBamWithReadSequenceExtended --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_TagBamWithReadSequenceExtended
+        tuple val("${task.process}"), val('FilterBam'), eval("FilterBam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_FilterBam
+        tuple val("${task.process}"), val('FilterBamByTag'), eval("FilterBamByTag --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_FilterBamByTag
+        tuple val("${task.process}"), val('TrimStartingSequence'), eval("TrimStartingSequence --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_TrimStartingSequence
+        tuple val("${task.process}"), val('PolyATrimmer'), eval("PolyATrimmer --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_PolyATrimmer
+
 
     script:
     output_file = meta.id + "." + outputExtension
