@@ -6,7 +6,6 @@ include { GATHER_UMI_READ_INTERVALS                      } from '../../modules/l
 include { MERGE_UMI_READ_INTERVALS                       } from '../../modules/local/mergeUMIReadIntervals.nf'
 include { CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE         } from '../../modules/local/chimericReportEditDistanceCollapse.nf'
 include { DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES           } from '../../modules/local/downsampleTranscriptsAndQuantiles.nf'
-include { GATHER_DIGITAL_ALLELE_COUNTS                   } from '../../modules/local/gatherDigitalAlleleCounts.nf'
 include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES        } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
 include { withExtension                                  } from '../../modules/local/FileUtil.nf'
 include { CREATE_METACELLS                               } from '../../modules/local/createMetacells.nf'

@@ -6,7 +6,6 @@ process BAM_TAG_HISTOGRAM {
     input:
     tuple val(meta), path(inputBam)
     val tag
-    val readQuality
     val extension
 
     output:
@@ -21,7 +20,6 @@ process BAM_TAG_HISTOGRAM {
           --OUTPUT ${output_file} \
           --TAG ${tag} \
           --FILTER_PCR_DUPLICATES false \
-          --VALIDATION_STRINGENCY SILENT \
-          --READ_MQ ${readQuality}
+          --VALIDATION_STRINGENCY SILENT
     """
 }

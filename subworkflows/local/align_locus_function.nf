@@ -150,7 +150,6 @@ workflow align_locus_function_workflow {
     BAM_TAG_HISTOGRAM(
         alignedBams,
         params.cellBarcodeTag,
-        params.dgeMinReadMq,
         numReadsPerCellExtension
     )
     // BAMs complete! DGE below
@@ -178,7 +177,6 @@ workflow align_locus_function_workflow {
         referenceMetadataLocator.referenceFasta,
         referenceMetadataLocator.gtf,
         referenceMetadataLocator.ribosomalIntervals,
-        params.dgeMinReadMq,
         loadMtSequences(referenceMetadataLocator.contigGroups),
         params.cellBarcodeTag
     )

@@ -53,6 +53,7 @@ workflow dropulation_workflow {
         params.locusFunction,
         params.strandStrategy,
         nonAutosomes,
+        params.dgeMinReadMq,
     )
     MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES(params.library, collectInOrder(GATHER_DIGITAL_ALLELE_COUNTS.out.digitalAlleleFrequencies))
     digitalAlleleFrequencies = combineIntoTupleChannel(meta, MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES.out.digitalAlleleFrequencies)
