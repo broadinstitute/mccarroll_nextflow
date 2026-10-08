@@ -22,8 +22,10 @@ process SELECT_CELLS_BY_NUM_TRANSCRIPTS {
     output_file = "${meta.id}.size_selected_cells.txt.gz"
     metrics_file = "${meta.id}.SelectCellsByNumTranscripts_metrics"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     SelectCellsByNumTranscripts \
+          -m ${javaMemMb}m \
           --INPUT ${inputBam} \
           --OUTPUT ${output_file} \
           --MIN_TRANSCRIPTS_PER_CELL ${minimumTranscriptsPerCell} \

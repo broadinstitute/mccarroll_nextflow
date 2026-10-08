@@ -16,9 +16,10 @@ process MAKE_TRIPLET_DGE {
     matrix = "matrix.mtx.gz"
     features = "features.tsv.gz"
     barcodes = "barcodes.tsv.gz"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MakeTripletDge \
+        -m ${javaMemMb}m \
         --YAML "dges: [{dge: ${denseDge}}]" \
         --OUTPUT ${matrix} \
         --OUTPUT_FEATURES ${features} \

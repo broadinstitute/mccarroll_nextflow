@@ -18,8 +18,10 @@ process SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR {
     output_file = "${meta.id}.fracIntronicExonicPerCell.txt.gz"
     mtSequencesArgs = mtSequences.collect { seq -> "--MT_SEQUENCE ${seq}" }
     //  There is much sloppiness in GTF.  --VALIDATION_STRINGENCY SILENT causes problematic genes to be skipped.
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     SingleCellRnaSeqMetricsCollector \
+        -m ${javaMemMb}m \
         --INPUT ${inputBam} \
         --ANNOTATIONS_FILE ${gtf} \
         --OUTPUT ${output_file} \

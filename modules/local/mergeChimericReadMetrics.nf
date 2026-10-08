@@ -12,9 +12,10 @@ process MERGE_CHIMERIC_READ_METRICS {
 
     script:
     output_file = "${library}.chimeric_read_metrics"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeChimericReadMetrics \
+        -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
         --DELETE_INPUTS false

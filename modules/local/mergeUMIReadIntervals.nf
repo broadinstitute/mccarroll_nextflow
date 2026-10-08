@@ -13,9 +13,10 @@ process MERGE_UMI_READ_INTERVALS {
 
     script:
     output_file = meta.id + ".umi_read_intervals.tsv.gz"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeUMIReadIntervals \
+        -m ${javaMemMb}m \
         --INPUT ${perBamUMIReadIntervals.join(' --INPUT ')} \
         --OUTPUT ${output_file}
     """

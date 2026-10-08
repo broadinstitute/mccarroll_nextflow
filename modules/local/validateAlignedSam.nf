@@ -11,7 +11,10 @@ process VALIDATE_ALIGNED_SAM {
     tuple val("${task.process}"), val('ValidateAlignedSam'), eval("ValidateAlignedSam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_ValidateAlignedSam
 
     script:
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
-     ValidateAlignedSam  --INPUT_BAM ${alignedBam}
+     ValidateAlignedSam  \
+        -m ${javaMemMb}m \
+        --INPUT_BAM ${alignedBam}
     """
 }

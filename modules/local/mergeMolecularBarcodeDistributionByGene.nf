@@ -12,9 +12,10 @@ process MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE {
 
     script:
     output_file = library + ".chimeric_transcripts.txt.gz"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeMolecularBarcodeDistributionByGene \
+        -m ${javaMemMb}m \
         --INPUT ${chimericTranscripts.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
         --COLUMN_FLEXIBILTY  true

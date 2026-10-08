@@ -12,9 +12,10 @@ process MERGE_READ_QUALITY_METRICS {
 
     script:
     output_file = "${library}.ReadQualityMetrics.txt"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeReadQualityMetrics \
+        -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file}
     """

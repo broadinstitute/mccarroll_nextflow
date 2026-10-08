@@ -13,8 +13,10 @@ process MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES {
 
     script:
     output_file = "${library}.allele_freq.txt"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeGatherDigitalAlleleFrequencies \
+          -m ${javaMemMb}m \
           --INPUT ${digitalAlleleCounts.join(' --INPUT ')} \
           --OUTPUT ${output_file}
     """

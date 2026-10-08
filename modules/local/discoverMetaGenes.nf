@@ -18,8 +18,10 @@ process DISCOVER_META_GENES {
     script:
     output_report = "${meta.id}.metagene_report.txt"
     locusFunctionArgs = locusFunctionClpArguments(locusFunction)
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     DiscoverMetaGenes \
+        -m ${javaMemMb}m \
         --INPUT ${bam} \
         --CELL_BC_FILE ${selectedCells} \
         --WRITE_SINGLE_GENES true \

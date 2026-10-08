@@ -12,9 +12,10 @@ process MERGE_SINGLE_CELL_RNA_SEQ_METRICS {
 
     script:
     output_file = "${library}.fracIntronicExonicPerCell.txt.gz"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeSingleCellRnaSeqMetrics \
+        -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file}
     """

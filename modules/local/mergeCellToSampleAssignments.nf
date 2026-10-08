@@ -13,8 +13,10 @@ process MERGE_CELL_TO_SAMPLE_ASSIGNMENTS {
 
     script:
     output_file = "${library}.donor_assignments.txt"
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeCellToSampleAssignments \
+          -m ${javaMemMb}m \
           --INPUT ${donorAssignments.join(' --INPUT ')} \
           --OUTPUT ${output_file}
     """

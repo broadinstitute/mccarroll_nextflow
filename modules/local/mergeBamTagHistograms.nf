@@ -13,9 +13,10 @@ process MERGE_BAM_TAG_HISTOGRAMS {
 
     script:
     output_file = "${library}.${extension}"
-
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
     MergeBamTagHistograms \
+        -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file}
     """

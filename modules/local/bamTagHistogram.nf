@@ -14,8 +14,10 @@ process BAM_TAG_HISTOGRAM {
 
     script:
     output_file = "${meta.id}.${extension}"
-    """
+     def javaMemMb = (task.memory.toMega() * 0.8) as int
+   """
     BamTagHistogram \
+          -m ${javaMemMb}m \
           --I ${inputBam} \
           --OUTPUT ${output_file} \
           --TAG ${tag} \

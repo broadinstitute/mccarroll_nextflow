@@ -50,8 +50,11 @@ process CORRECT_SCRNA_READ_PAIRS {
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Cellular)
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Cellular) + 1
     // Convert from zero-based to one-based indexing for Java command line argument
+    def javaMemMb = (task.memory.toMega() * 0.8) as int
     """
-    CorrectScrnaReadPairs --INPUT ${bams.join(' --INPUT ')}  --BASE_RANGE '${baseRange}' \
+    CorrectScrnaReadPairs -m ${javaMemMb}m \
+        --INPUT ${bams.join(' --INPUT ')}  \
+        --BASE_RANGE '${baseRange}' \
         --BARCODED_READ '${barcodedRead}' \
         --ALLOWED_BARCODE_COUNTS '${allowedBarcodeCounts}' \
         --OUTPUT '${output_file}' \
