@@ -536,10 +536,12 @@ output {
     }
     // alignment, locus function outputs
     alignedBam {
-        path { x -> alignmentDir(x) }
+        // if bam is named <prefix>.chimeric_marked.bam, save it as <prefix>.bam
+        path { x -> x[1] >> (alignmentDir(x) + x[1].name.replaceFirst(/\.chimeric_marked\.bam$/, '.bam')) }
     }
     alignedBai {
-        path { x -> alignmentDir(x) }
+        // if bai is named <prefix>.chimeric_marked.bam.bai, save it as <prefix>.bam.bai
+        path { x -> x[1] >> (alignmentDir(x) + x[1].name.replaceFirst(/\.chimeric_marked\.bai$/, '.bai')) }
     }
     sizeSelectedCells {
         path { x -> alignmentDir(x) }
