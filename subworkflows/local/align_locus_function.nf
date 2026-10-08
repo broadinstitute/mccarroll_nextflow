@@ -259,6 +259,7 @@ workflow align_locus_function_workflow {
     workflowProperties = [
         submitter: getUserName(),
         reference: referenceMetadataLocator.referenceFasta.toUriString(),
+        referenceOverride: params.referenceOverride,
         strandStrategy: params.strandStrategy,
         locusFunction: params.locusFunction,
         dgeMinReadMq: params.dgeMinReadMq,
