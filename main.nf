@@ -120,7 +120,7 @@ workflow {
 
     def startAt = params.start_at
     def referenceFasta = resolveReference(params.reference, params.referenceParents)
-    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride)
+    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride, params.starIndexVersionMap)
     def referenceName = referenceMetadataLocator.referenceName
     def cbrbLabel = makeCbrbLabel(params)
     def cellSelectionLabel = makeCellSelectionLabel(params)

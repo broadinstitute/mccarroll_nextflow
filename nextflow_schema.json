@@ -202,6 +202,19 @@
       "description": "<slot>:<path> where slot is the reference slot and path is the file/directory path to override the reference bundle.",
       "default": []
     },
+    "starIndexVersionMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "description": "Map from a STAR executable version to a list of compatible STAR index versions. The preferred index version is the one built by the executable version.",
+      "default": {
+        "2.7.11b": ["2.7.11a"]
+      }
+    },
     "fastq_read1": {
       "type": "array",
       "items": {
