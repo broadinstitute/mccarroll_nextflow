@@ -2,7 +2,7 @@
 
 include { hasExtension ; withoutExtension ; withExtension ; subpath } from './FileUtil.nf'
 
-def buildReferenceMetadataLocator(referenceFasta, overrides) {
+def buildReferenceMetadataLocator(referenceFasta, overrides, starIndexVersionMap) {
     if (referenceFasta instanceof String) {
         referenceFasta = file(referenceFasta)
     }
@@ -12,8 +12,6 @@ def buildReferenceMetadataLocator(referenceFasta, overrides) {
     // -----------------------------
     def FASTA_EXTENSIONS = ["fasta", "fa"]
 
-    // TODO: the STAR index should be found based on the version of STAR
-    def STAR_INDEX_SUBDIR = "STAR_indices/2.7.11a"
 
     def CONSENSUS_INTRONS = "consensus_introns.intervals"
     def SEQ_DICT = "dict"
@@ -50,6 +48,23 @@ def buildReferenceMetadataLocator(referenceFasta, overrides) {
 
     def fastaBase = withoutExtension(fastaNoGz, matchedExt)
     def dir = referenceFasta.getParent()
+    // Get the STAR version used by STAR_ALIGN process from environment.yml.
+    def STAR_ALIGN_VERSION = getStarAlignVersion()
+    // Try to find a STAR index directory that will work with the STAR version used by STAR_ALIGN
+    def STAR_INDEX_SUBDIR = "STAR_indices/${STAR_ALIGN_VERSION}"
+    def starIndexDirectory = subpath(dir, STAR_INDEX_SUBDIR)
+    if (!starIndexDirectory.exists() && starIndexVersionMap.containsKey(STAR_ALIGN_VERSION)) {
+        def compatibleVersions = starIndexVersionMap[STAR_ALIGN_VERSION]
+        def altStarIndexDirectory = compatibleVersions
+            .collect { version -> subpath(dir, "STAR_indices/${version}") }
+            .find { altDir -> altDir.exists() }
+        if (altStarIndexDirectory != null) {
+            starIndexDirectory = altStarIndexDirectory
+        }
+    }
+    // If none of the compatible STAR index versions exist, the original starIndexDirectory will be used (even if it doesn't exist)
+    // Maybe the user will override the STAR index location manually if none of the compatible versions exist.
+    // Non-existence will be checked after overrides are applied.
 
     // -----------------------------
     // Build map
@@ -61,7 +76,7 @@ def buildReferenceMetadataLocator(referenceFasta, overrides) {
         referenceName: fastaBase.name,
 
         // directories
-        starIndexDirectory: subpath(dir, STAR_INDEX_SUBDIR),
+        starIndexDirectory: starIndexDirectory,
         
         // interval + annotation files
         // some of these are not used yet but there doesn't seem to be any harm in including them
@@ -99,7 +114,32 @@ def buildReferenceMetadataLocator(referenceFasta, overrides) {
         // if path is the string "null", treat it as a request to remove the entry from the meta map.
         meta[slot] = (path == "null") ? null : file(path)
     }
+    // Fail fast if the version-specific STAR index is missing, rather than letting
+    // STAR_ALIGN fail later with a cryptic error.
+    if (meta.starIndexDirectory != null && !meta.starIndexDirectory.exists()) {
+        throw new IllegalStateException(
+            "STAR index directory not found: ${meta.starIndexDirectory}. " +
+            "It must match the STAR version (${getStarAlignVersion()}) specified in " +
+            "modules/nf-core/star/align/environment.yml. Build the index, update params.starIndexVersionMap, or override " +
+            "the 'starIndexDirectory' slot via params.referenceOverride."
+        )
+    }
     return meta
+}
+
+// Parse the STAR version pinned in the nf-core STAR_ALIGN module's environment.yml,
+// e.g. the "bioconda::star=2.7.11b" dependency -> "2.7.11b".  This keeps the STAR
+// genome index directory in sync with the actual aligner version.
+// This is not good nf-core style, but running the docker image merely to get the STAR version would be expensive.
+def getStarAlignVersion() {
+    def envYml = file("${projectDir}/modules/nf-core/star/align/environment.yml")
+    def doc = new org.yaml.snakeyaml.Yaml().load(envYml.text)
+    def deps = (doc.dependencies ?: []) as List
+    def starDep = deps.find { d -> (d as String) =~ /(?:^|::)star=/ }
+    if (!starDep) {
+        throw new IllegalStateException("No 'star=' dependency found in ${envYml}")
+    }
+    return (starDep as String).replaceAll(/.*star=/, '').trim()
 }
 
 def getContigsWithLabel(contigGroupsFile, label) {
