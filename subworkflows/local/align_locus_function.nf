@@ -62,7 +62,8 @@ workflow align_locus_function_workflow {
     // STAR_ALIGN.  Instead, I'll have STAR_ALIGN write BAM files to disk and then invoke SortSam.  It is possible
     // that sorting is unnecessary, because perhaps single-threaded STAR produces BAM that is in the same order
     // as input BAM.
-    // TODO: Figure out how to get the STAR version in order to get the correct genome index directory.  For now, just hardcode the version.
+    // The STAR genome index directory is resolved from the STAR version pinned in
+    // modules/nf-core/star/align/environment.yml (see getStarAlignVersion in ReferenceMetadataLocator.nf).
 
     null_file = tuple([], [])
     STAR_ALIGN(
