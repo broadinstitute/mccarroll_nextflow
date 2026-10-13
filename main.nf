@@ -38,6 +38,7 @@ params {
     version10X: String?
     beadStructure: String?
     referenceOverride: List<String> = []
+    starAlignVersion: String?
 
     // cbrb parameters
     useSvmParameterEstimation: Boolean = true
@@ -120,7 +121,7 @@ workflow {
 
     def startAt = params.start_at
     def referenceFasta = resolveReference(params.reference, params.referenceParents)
-    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride, params.starIndexVersionMap)
+    def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride, params.starIndexVersionMap, params.starAlignVersion)
     def referenceName = referenceMetadataLocator.referenceName
     def cbrbLabel = makeCbrbLabel(params)
     def cellSelectionLabel = makeCellSelectionLabel(params)
