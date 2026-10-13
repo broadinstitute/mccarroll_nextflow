@@ -2,7 +2,7 @@
 
 include { hasExtension ; withoutExtension ; withExtension ; subpath } from './FileUtil.nf'
 
-def buildReferenceMetadataLocator(referenceFasta, overrides, starIndexVersionMap) {
+def buildReferenceMetadataLocator(referenceFasta, overrides, starIndexVersionMap, starAlignVersion) {
     if (referenceFasta instanceof String) {
         referenceFasta = file(referenceFasta)
     }
@@ -49,7 +49,7 @@ def buildReferenceMetadataLocator(referenceFasta, overrides, starIndexVersionMap
     def fastaBase = withoutExtension(fastaNoGz, matchedExt)
     def dir = referenceFasta.getParent()
     // Get the STAR version used by STAR_ALIGN process from environment.yml.
-    def STAR_ALIGN_VERSION = getStarAlignVersion()
+    def STAR_ALIGN_VERSION = starAlignVersion ?: getStarAlignVersion()
     // Try to find a STAR index directory that will work with the STAR version used by STAR_ALIGN
     def STAR_INDEX_SUBDIR = "STAR_indices/${STAR_ALIGN_VERSION}"
     def starIndexDirectory = subpath(dir, STAR_INDEX_SUBDIR)
@@ -131,15 +131,31 @@ def buildReferenceMetadataLocator(referenceFasta, overrides, starIndexVersionMap
 // e.g. the "bioconda::star=2.7.11b" dependency -> "2.7.11b".  This keeps the STAR
 // genome index directory in sync with the actual aligner version.
 // This is not good nf-core style, but running the docker image merely to get the STAR version would be expensive.
+// Never throws: any problem is logged and 'unknown' is returned.
 def getStarAlignVersion() {
-    def envYml = file("${projectDir}/modules/nf-core/star/align/environment.yml")
-    def doc = new org.yaml.snakeyaml.Yaml().load(envYml.text)
-    def deps = (doc.dependencies ?: []) as List
-    def starDep = deps.find { d -> (d as String) =~ /(?:^|::)star=/ }
-    if (!starDep) {
-        throw new IllegalStateException("No 'star=' dependency found in ${envYml}")
+    try {
+        def envYml = file("${projectDir}/modules/nf-core/star/align/environment.yml")
+        def doc = new org.yaml.snakeyaml.Yaml().load(envYml.text)
+        def deps = ((doc?.dependencies) ?: []) as List
+        def starDep = deps.find { d -> (d as String) =~ /(?:^|::)star=/ }
+        if (!starDep) {
+            log.warn("No 'star=' dependency found in ${envYml}; STAR version is unknown")
+            return 'unknown'
+        }
+        def version = (starDep as String).replaceAll(/.*star=/, '').trim()
+        if (!version) {
+            log.warn("Empty STAR version in 'star=' dependency in ${envYml}; STAR version is unknown")
+            return 'unknown'
+        }
+        return version
+    } catch (Throwable e) {
+        try {
+            log.warn("Could not determine STAR version: ${e}")
+        } catch (Throwable _ignored) {
+            // logging must never cause failure either
+        }
+        return 'unknown'
     }
-    return (starDep as String).replaceAll(/.*star=/, '').trim()
 }
 
 def getContigsWithLabel(contigGroupsFile, label) {
