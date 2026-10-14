@@ -13,7 +13,8 @@ process HDF5_10X_TO_TEXT {
     output:
     tuple val(meta), path("${output_file}"), emit: dge
     tuple val(meta), path("${output_sizes}"), emit: numTranscripts
-
+    tuple val("${task.process}"), val('hdf5_10X_to_text'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_hdf5_10X_to_text
+    
     script:
     output_file = "${meta.id}.cbrb.digital_expression.txt.gz"
     output_sizes = "${meta.id}.cbrb.num_transcripts.txt"

@@ -20,6 +20,7 @@ process CALL_STAMPS_MANUAL_THRESHOLDS {
     tuple val(meta), path("${output_pdf}"), emit: cellSelectionAssignmentsPdf
     tuple val(meta), path("${output_summary}"), emit: cellSelectionAssignmentsSummary
     tuple val(meta), path("${output_dropped_non_empty}"), emit: droppedNonEmpty
+    tuple val("${task.process}"), val('callSTAMPsManualThresholds'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_callSTAMPsManualThresholds
 
     script:
     dataset_name = meta.id

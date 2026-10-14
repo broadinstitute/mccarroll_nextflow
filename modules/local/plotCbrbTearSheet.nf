@@ -14,7 +14,8 @@ process PLOT_CBRB_TEAR_SHEET {
     path cellFeatures
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: cbrb_tearsheet_pdf
+    tuple val("${task.process}"), val('plotCbrbTearSheet'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_plotCbrbTearSheet
 
     script:
     output_file = "${library}.cbrb_tearsheet.pdf"

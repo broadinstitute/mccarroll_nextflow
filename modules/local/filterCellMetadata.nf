@@ -9,7 +9,8 @@ process FILTER_CELL_METADATA {
     path selected_cells
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: filteredCellMetadata
+    tuple val("${task.process}"), val('filterCellMetadata'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_filterCellMetadata
 
     script:
     output_file = "${library}.filtered_cmd.tsv"

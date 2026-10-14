@@ -20,7 +20,8 @@ process DONOR_ASSIGNMENT_QC {
     path "${output_summary_stats}", emit: summaryStats
     path "${output_cell_barcodes}", emit: cellBarcodes
     path "${output_tearsheet_pdf}", emit: tearSheetPdf
-
+   tuple val("${task.process}"), val('donorAssignmentQC'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_donorAssignmentQC
+ 
     script:
     output_donor_list = "${library}.donor_list.txt"
     output_donor_cell_map = "${library}.donor_cell_map.txt"

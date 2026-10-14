@@ -8,7 +8,8 @@ process DUMP_ELBO_TABLE {
     path h5
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: elboTable
+   tuple val("${task.process}"), val('dumpElboTable'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_dumpElboTable
 
     script:
     output_file = "${library}.elbo.txt"

@@ -10,7 +10,8 @@ process BUILD_CELL_FEATURES_SIMPLE {
     path numReadsPerCell
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: cell_features
+    tuple val("${task.process}"), val('buildCellFeaturesSimple'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_buildCellFeaturesSimple
 
     script:
     output_file = "${library}.cell_features.txt"

@@ -9,7 +9,8 @@ process JOIN_CBRB_CELL_FEATURES {
 
     output:
     tuple val(meta), path("${output_file}"), emit: cbrbCellFeatures
-
+    tuple val("${task.process}"), val('joinCbrbCellFeatures'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_joinCbrbCellFeatures
+    
     script:
     output_file = "${meta.id}.cbrb.cell_features.txt"
 
