@@ -8,7 +8,8 @@ process PLOT_ALIGNMENT_SUMMARY {
     path rnaSeqMetrics
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: alignment_summary_pdf
+    tuple val("${task.process}"), val('plotAlignmentSummary'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_plotAlignmentSummary
 
     script:
     output_file = "${library}.alignment_summary.pdf"

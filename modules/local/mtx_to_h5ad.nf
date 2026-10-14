@@ -10,7 +10,8 @@ process MTX_TO_H5AD {
     path barcodes_tsv
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: h5ad
+    tuple val("${task.process}"), val('mtx_to_h5ad'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_mtx_to_h5ad
 
     script:
     output_file = "${library}.h5ad"

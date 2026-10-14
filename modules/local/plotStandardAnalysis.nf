@@ -11,6 +11,7 @@ process PLOT_STANDARD_ANALYSIS {
     output:
     path "${output_file}", emit: pdf
     path "${output_umi_saturation_metrics}", emit: umi_saturation_metrics
+    tuple val("${task.process}"), val('plotStandardAnalysis'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_plotStandardAnalysis
 
     script:
     output_file = "${library}.standard_analysis.pdf"

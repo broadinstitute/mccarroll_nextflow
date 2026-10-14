@@ -11,14 +11,17 @@ process SC_DBL_FINDER {
 
     output:
     path "${output_file}", emit: doubletCalls
-
+    tuple val("${task.process}"), val('scDblFinder'), eval("Rscript -e 'cat(as.character(packageVersion(\"scDblFinder\")))'"), topic: versions, emit: versions_scDblFinder
+    
     script:
     output_file = replaceExtension(dge, "digital_expression.txt.gz", "scDblFinder.tsv")
     the_seed = (random_seed.size == 0 ? 1234 : random_seed[0])
 
+    // had to change this from #!/usr/bin/env Rscript
+    // in order to avoid this error in the versions topic:
+    // Process output of type 'eval' is only allowed with Bash process scripts -- Current interpreter: /usr/bin/env Rscript
     """
-    #!/usr/bin/env Rscript
-
+    Rscript - <<'EOF'
     suppressPackageStartupMessages({
         library(Matrix)
         library(SingleCellExperiment)
@@ -48,5 +51,6 @@ process SC_DBL_FINDER {
     )
     write.table(df, file="${output_file}", quote=FALSE, sep='\t', row.names=FALSE, col.names=TRUE)
     message("scDblFinder done")
+EOF
     """
 }

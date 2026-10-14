@@ -20,7 +20,7 @@ workflow MMC_fromSpecifiedMarkers_workflow {
         params.library,
         modelLocator.queryMarkers,
         modelLocator.precomputedStats,
-        MTX_TO_H5AD.out,
+        MTX_TO_H5AD.out.h5ad,
         params.mmcArgs)
     COUNT_MMC_CELL_TYPES(params.library, MMC_FROMSPECIFIEDMARKERS.out.csv_report)
     workflowProperties = [

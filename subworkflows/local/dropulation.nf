@@ -118,13 +118,13 @@ workflow dropulation_workflow {
     FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(donorCellBarcodes).collect())
     JOIN_CELL_METADATA(
         params.library,
-        FILTER_CELL_METADATA.out,
+        FILTER_CELL_METADATA.out.filteredCellMetadata,
         noMetaChannelHelper(donorCellMap).collect(),
         '',
         noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(),
         noMetaChannelHelper(doubletCalls).collect(),
     )
-    cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
+    cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out.joinedCellMetadata)
     if (referenceMetadataLocator.xipherConfig.exists()) {
         CALL_SEX_FROM_METACELLS(
             params.library,

@@ -241,7 +241,7 @@ workflow align_locus_function_workflow {
         "Alignment Summary for ${params.library}",
         "Alignment for library ${params.library} in ${fullAlignmentDir}.",
         params.email,
-        PLOT_ALIGNMENT_SUMMARY.out,
+        PLOT_ALIGNMENT_SUMMARY.out.alignment_summary_pdf,
     )
 
     MAKE_SPARSE_DGE(
@@ -275,7 +275,7 @@ workflow align_locus_function_workflow {
     dgeSummary = addMeta(finalMeta, MERGE_DGE_SUMMARIES.out.mergedDgeSummaries)
     dge = addMeta(finalMeta, MERGE_SPLIT_DGES.out.dge)
     singleCellRnaSeqMetrics = addMeta(finalMeta, MERGE_SINGLE_CELL_RNA_SEQ_METRICS.out.mergedSingleCellRnaSeqMetrics)
-    cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.map { f -> tuple(finalMeta, f) }
+    cellFeatures = BUILD_CELL_FEATURES_SIMPLE.out.cell_features.map { f -> tuple(finalMeta, f) }
     sparseDgeMatrix = MAKE_SPARSE_DGE.out.matrix
     sparseDgeFeatures = MAKE_SPARSE_DGE.out.features
     sparseDgeBarcodes = MAKE_SPARSE_DGE.out.barcodes
@@ -284,7 +284,7 @@ workflow align_locus_function_workflow {
     outputProperties = addMeta(finalMeta, WRITE_PROPERTIES.out)
     readQualityMetrics = addMeta(finalMeta, MERGE_READ_QUALITY_METRICS.out.mergedReadQualityMetrics)
     rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics)
-    alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out)
+    alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out.alignment_summary_pdf)
     readsPerCell = addMeta(finalMeta, MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms)
 
     emit:

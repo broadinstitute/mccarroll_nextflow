@@ -9,7 +9,8 @@ process COUNT_MMC_CELL_TYPES {
 
     output:
     path "$output_file", emit: cellTypeCounts
-
+   tuple val("${task.process}"), val('countMmcCellTypes'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_countMmcCellTypes
+ 
     script:
     output_file = "${library}.cell_type_counts.tsv"
     """

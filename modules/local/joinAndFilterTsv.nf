@@ -20,6 +20,7 @@ process JOIN_AND_FILTER_TSV {
     val noHeader
     output:
     tuple val(meta), path(outputFileName), emit: joinedAndFiltered
+    tuple val("${task.process}"), val('joinAndFilterTsv'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_joinAndFilterTsv
     
 
     script:

@@ -11,7 +11,8 @@ process CALL_SEX_FROM_METACELLS {
     output:
     path "${output_file}", emit: sexCalls
     path "${output_pdf}", emit: pdf
-
+    tuple val("${task.process}"), val('callSexFromMetacells'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_callSexFromMetacells
+    
     script:
     output_file = "${library}.sex.txt"
     output_pdf = "${library}.sex.pdf"

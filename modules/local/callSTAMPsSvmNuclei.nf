@@ -16,7 +16,8 @@ process CALL_STAMPS_SVM_NUCLEI {
     tuple val(meta), path("${output_pdf}"), emit: cellSelectionAssignmentsPdf
     tuple val(meta), path("${output_summary}"), emit: cellSelectionAssignmentsSummary
     tuple val(meta), path("${output_dropped_non_empty}"), emit: droppedNonEmpty
-
+    tuple val("${task.process}"), val('callSTAMPsSvmNuclei'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_callSTAMPsSvmNuclei
+    
     script:
     dataset_name = meta.id
     output_file = "${dataset_name}.selectedCellBarcodes.txt"

@@ -12,7 +12,8 @@ process JOIN_CELL_METADATA {
     path doublet_calls
 
     output:
-    path "${output_file}"
+    path "${output_file}", emit: joinedCellMetadata
+    tuple val("${task.process}"), val('joinCellMetadata'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_joinCellMetadata
 
     script:
     output_file = "${library}.cmd.tsv"

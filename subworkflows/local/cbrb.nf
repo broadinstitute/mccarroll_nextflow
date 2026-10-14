@@ -123,7 +123,7 @@ workflow cbrb_workflow {
         PLOT_CBRB_TEAR_SHEET(
             params.library,
             cbrb_label,
-            DUMP_ELBO_TABLE.out.collect(),
+            DUMP_ELBO_TABLE.out.elboTable.collect(),
             noMetaChannelHelper(HDF5_10X_TO_TEXT.out.numTranscripts).collect(),
             noMetaChannelHelper(readQualityMetrics).collect(),
             noMetaChannelHelper(CELLBENDER_REMOVEBACKGROUND.out.pdf).collect(),
@@ -136,14 +136,14 @@ workflow cbrb_workflow {
             forceTwoClusterSolution: params.forceTwoClusterSolution,
             cbrbArgs: params.cbrbArgs
         ]
-        cbrbTearSheet = combineIntoTupleChannel(metaWithArgs, PLOT_CBRB_TEAR_SHEET.out)
+        cbrbTearSheet = combineIntoTupleChannel(metaWithArgs, PLOT_CBRB_TEAR_SHEET.out.cbrb_tearsheet_pdf)
         // TODO: Is there an easier way?
         fullCbrbDir = meta.map { m -> subpath(params.outdir, cbrbDir(tuple(m, []))) }
         SEND_EMAIL(
             "CBRB summary for ${params.library}",
             fullCbrbDir.map { it -> "CBRB summary for ${params.library} in ${it}" },
             params.email,
-            PLOT_CBRB_TEAR_SHEET.out,
+            PLOT_CBRB_TEAR_SHEET.out.cbrb_tearsheet_pdf,
         )
         h5                            = CELLBENDER_REMOVEBACKGROUND.out.h5
         barcodes                      = CELLBENDER_REMOVEBACKGROUND.out.barcodes

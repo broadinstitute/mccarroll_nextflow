@@ -11,6 +11,7 @@ process FILTER_DGE {
     output:
     tuple val(meta), path("${output_file}"), emit: filteredDge
     tuple val(meta), path("${output_summary}"), emit: filteredDgeSummary
+    tuple val("${task.process}"), val('FilterDge'), eval("FilterDge --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_FilterDge
 
     script:
     output_file = "${meta.id}.digital_expression.txt.gz"

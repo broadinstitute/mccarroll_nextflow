@@ -14,7 +14,8 @@ process SVM_ESTIMATE_CBRB_PARAMETERS {
     output:
     path "${output_file}", emit: cbrbParameters
     path "${output_pdf}", emit: cbrbParameterEstimationPdf
-
+    tuple val("${task.process}"), val('svmEstimateCbrbParameters'), eval("cat /etc/dropseq-version"), topic: versions, emit: versions_svmEstimateCbrbParameters
+    
     script:
     output_file = "${library}.cbrb_parameters.txt"
     output_pdf = "${library}.svm_cbrb_parameter_estimation.pdf"

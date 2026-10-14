@@ -124,13 +124,13 @@ workflow standard_analysis_workflow {
     FILTER_CELL_METADATA(params.library, noMetaChannelHelper(cbrbCellFeatures), noMetaChannelHelper(selectedCells).collect())
     JOIN_CELL_METADATA(
         params.library,
-        FILTER_CELL_METADATA.out,
+        FILTER_CELL_METADATA.out.filteredCellMetadata,
         [],
         params.donor ?: '',
         noMetaChannelHelper(FILTER_DGE.out.filteredDgeSummary).collect(),
         SC_DBL_FINDER.out.doubletCalls.collect(),
     )
-    cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out)
+    cellMetadata = combineIntoTupleChannel(meta, JOIN_CELL_METADATA.out.joinedCellMetadata)
     if ((params.donor) && referenceMetadataLocator.xipherConfig.exists()) {
         CALL_SEX_FROM_METACELLS(
             params.library,
