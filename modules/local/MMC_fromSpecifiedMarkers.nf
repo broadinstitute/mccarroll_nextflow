@@ -14,7 +14,7 @@ process MMC_FROMSPECIFIEDMARKERS {
     output:
     path "${json_report}", emit: json_report
     path "${csv_report}", emit: csv_report
-    tuple val("${task.process}"), val('MMC_fromSpecifiedMarkers'), eval("pip show cell_type_mapper  | awk '/^Version:/{print $2}'"), topic: versions, emit: versions_MMC_fromSpecifiedMarkers
+    tuple val("${task.process}"), val('MMC_fromSpecifiedMarkers'), eval("pip show cell_type_mapper  | sed -n 's/^Version: //p'"), topic: versions, emit: versions_MMC_fromSpecifiedMarkers
     
     script:
     json_report = "${library}.json"
