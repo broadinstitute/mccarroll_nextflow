@@ -82,6 +82,7 @@ params {
 
     // infrastructure parameters
     start_at: String = 'beginning'
+    stop_at: String = 'mmc'
 
     // nf-core infrastructure parameters
     email: String
@@ -117,9 +118,10 @@ workflow {
     )
 
     validateDropulationParams()
-    validateStartAtParam()
-
+    validateStartAndStopStages()
     def startAt = params.start_at
+    def stopAt = params.stop_at
+
     def referenceFasta = resolveReference(params.reference, params.referenceParents)
     def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride, params.starIndexVersionMap, params.starAlignVersion)
     def referenceName = referenceMetadataLocator.referenceName
@@ -143,7 +145,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    if (shouldRunStage(startAt, 'beginning')) {
+    if (shouldRunStage(startAt, stopAt,'beginning')) {
         tag_and_split_bam_workflow(
             params.fastq_read1,
             params.fastq_read2,
@@ -165,7 +167,7 @@ workflow {
         correctedBarcodeMetrics = channel.empty()
         barcodeCounts = channel.empty()
     }
-    if (shouldRunStage(startAt, 'alignment')) {
+    if (shouldRunStage(startAt, stopAt,'alignment')) {
         align_locus_function_workflow(
             unmappedBam,
             params.beadStructure,
@@ -190,26 +192,39 @@ workflow {
         alignmentSummaryPdf = align_locus_function_workflow.out.alignmentSummaryPdf
         alignmentProperties = align_locus_function_workflow.out.properties
     } else {
-        alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, referenceName)
         alignedBai = channel.empty()
         sizeSelectedCells = channel.empty()
         sizeSelectedCellsMetrics = channel.empty()
-        dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
-        chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
         chimericReadMetrics = channel.empty()
-        readsPerCell = restartTupleChannel(restartInputs.readsPerCell, finalMeta)
         singleCellRnaSeqMetrics = channel.empty()
-        dge = restartTupleChannel(restartInputs.dge, finalMeta)
-        sparseDgeMatrix = restartTupleChannel(restartInputs.sparseDgeMatrix, finalMeta)
-        sparseDgeFeatures = restartTupleChannel(restartInputs.sparseDgeFeatures, finalMeta)
-        sparseDgeBarcodes = restartTupleChannel(restartInputs.sparseDgeBarcodes, finalMeta)
-        cellFeatures = restartTupleChannel(restartInputs.cellFeatures, finalMeta)
-        readQualityMetrics = restartTupleChannel(restartInputs.readQualityMetrics, finalMeta)
         rnaSeqMetrics = channel.empty()
         alignmentSummaryPdf = channel.empty()
         alignmentProperties = channel.empty()
+        if (stoppingBefore('alignment', stopAt)) {
+            alignedBam = channel.empty()
+            dgeSummary = channel.empty()
+            chimericTranscripts = channel.empty()
+            readsPerCell = channel.empty()
+            dge = channel.empty()
+            sparseDgeMatrix = channel.empty()
+            sparseDgeFeatures = channel.empty()
+            sparseDgeBarcodes = channel.empty()
+            cellFeatures = channel.empty()
+            readQualityMetrics = channel.empty()
+        } else {
+            alignedBam = restartAlignedBamChannel(restartInputs.alignedBamPattern, referenceName)
+            dgeSummary = restartTupleChannel(restartInputs.dgeSummary, finalMeta)
+            chimericTranscripts = restartTupleChannel(restartInputs.chimericTranscripts, finalMeta)
+            readsPerCell = restartTupleChannel(restartInputs.readsPerCell, finalMeta)
+            dge = restartTupleChannel(restartInputs.dge, finalMeta)
+            sparseDgeMatrix = restartTupleChannel(restartInputs.sparseDgeMatrix, finalMeta)
+            sparseDgeFeatures = restartTupleChannel(restartInputs.sparseDgeFeatures, finalMeta)
+            sparseDgeBarcodes = restartTupleChannel(restartInputs.sparseDgeBarcodes, finalMeta)
+            cellFeatures = restartTupleChannel(restartInputs.cellFeatures, finalMeta)
+            readQualityMetrics = restartTupleChannel(restartInputs.readQualityMetrics, finalMeta)
+        }
     }
-    if (shouldRunStage(startAt, 'cbrb')) {
+    if (shouldRunStage(startAt, stopAt,'cbrb')) {
         cbrb_workflow(
             sparseDgeMatrix,
             sparseDgeFeatures,
@@ -236,10 +251,6 @@ workflow {
         cbrbProperties = cbrb_workflow.out.properties
         cbrbTearSheet = cbrb_workflow.out.cbrbTearSheet
     } else {
-        cbrbBarcodes = restartTupleChannel(restartInputs.cbrbBarcodes, cbrbMeta)
-        cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
-        cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
-        cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
         cbrbH5 = channel.empty()
         cbrbMetrics = channel.empty()
         cbrbReport = channel.empty()
@@ -250,11 +261,22 @@ workflow {
         svmCbrbParameterEstimationPdf = channel.empty()
         cbrbProperties = channel.empty()
         cbrbTearSheet = channel.empty()
+        if (stoppingBefore('cbrb', stopAt)) {
+            cbrbBarcodes = channel.empty()
+            cbrbNumTranscripts = channel.empty()
+            cbrbDge = channel.empty()
+            cbrbCellFeatures = channel.empty()
+        } else {
+            cbrbBarcodes = restartTupleChannel(restartInputs.cbrbBarcodes, cbrbMeta)
+            cbrbNumTranscripts = restartTupleChannel(restartInputs.cbrbNumTranscripts, cbrbMeta)
+            cbrbDge = restartTupleChannel(restartInputs.cbrbDge, cbrbMeta)
+            cbrbCellFeatures = restartTupleChannel(restartInputs.cbrbCellFeatures, cbrbMeta)
+        }
     }
 
     // Stage boundary: prepare cell-selection inputs.
     // Input source is either the canonical upstream channels or reconstructed files.
-    if (shouldRunStage(startAt, 'cell_selection')) {
+    if (shouldRunStage(startAt, stopAt,'cell_selection')) {
         // Stage execution: run cell selection as soon as its inputs are wired.
         cell_selection_workflow(
             sparseDgeMatrix,
@@ -272,15 +294,19 @@ workflow {
         droppedNonEmpty = cell_selection_workflow.out.droppedNonEmpty
         cellSelectionProperties = cell_selection_workflow.out.properties
     } else {
-        selectedCellBarcodes = restartTupleChannel(restartInputs.selectedCellBarcodes, selectedCellsMeta)
         ambientCellBarcodes = channel.empty()
         cellSelectionAssignmentsPdf = channel.empty()
         cellSelectionAssignmentsSummary = channel.empty()
         droppedNonEmpty = channel.empty()
         cellSelectionProperties = channel.empty()
+        if (stoppingBefore('cell_selection', stopAt)) {
+            selectedCellBarcodes = channel.empty()            
+        } else {
+            selectedCellBarcodes = restartTupleChannel(restartInputs.selectedCellBarcodes, selectedCellsMeta)
+        }
     }
 
-    if (shouldRunStage(startAt, 'standard_analysis')) {
+    if (shouldRunStage(startAt, stopAt, 'standard_analysis')) {
         standard_analysis_workflow(
             selectedCellBarcodes,
             cbrbDge,
@@ -313,12 +339,6 @@ workflow {
         sexPdf                          = standard_analysis_workflow.out.sexPdf
 
     } else {
-        selectedDge = restartTupleChannel(restartInputs.selectedDge, selectedCellsMeta)
-        selectedDgeSummary = restartTupleChannel(restartInputs.selectedDgeSummary, selectedCellsMeta)
-        doubletCalls = restartTupleChannel(restartInputs.doubletCalls, selectedCellsMeta)
-        selectedSparseDgeMatrix = restartTupleChannel(restartInputs.selectedSparseDgeMatrix, selectedCellsMeta)
-        selectedSparseDgeFeatures = restartTupleChannel(restartInputs.selectedSparseDgeFeatures, selectedCellsMeta)
-        selectedSparseDgeBarcodes = restartTupleChannel(restartInputs.selectedSparseDgeBarcodes, selectedCellsMeta)
         umiReadIntervals                = channel.empty()
         molBc                           = channel.empty()
         standardAnalysisCellMetadata    = channel.empty()
@@ -334,8 +354,23 @@ workflow {
         umiSaturationMetrics            = channel.empty()
         sexCalls                        = channel.empty()
         sexPdf                          = channel.empty()
+        if (stoppingBefore('standard_analysis', stopAt)) {
+            selectedDge = channel.empty()
+            selectedDgeSummary = channel.empty()
+            doubletCalls = channel.empty()
+            selectedSparseDgeMatrix = channel.empty()
+            selectedSparseDgeFeatures = channel.empty()
+            selectedSparseDgeBarcodes = channel.empty()
+        } else {
+            selectedDge = restartTupleChannel(restartInputs.selectedDge, selectedCellsMeta)
+            selectedDgeSummary = restartTupleChannel(restartInputs.selectedDgeSummary, selectedCellsMeta)
+            doubletCalls = restartTupleChannel(restartInputs.doubletCalls, selectedCellsMeta)
+            selectedSparseDgeMatrix = restartTupleChannel(restartInputs.selectedSparseDgeMatrix, selectedCellsMeta)
+            selectedSparseDgeFeatures = restartTupleChannel(restartInputs.selectedSparseDgeFeatures, selectedCellsMeta)
+            selectedSparseDgeBarcodes = restartTupleChannel(restartInputs.selectedSparseDgeBarcodes, selectedCellsMeta)
+        }
     }
-    if (params.vcf && shouldRunStage(startAt, 'dropulation')) {
+    if (params.vcf && shouldRunStage(startAt, stopAt,'dropulation')) {
         dropulation_workflow(
             selectedCellBarcodes,
             alignedBam,
@@ -385,7 +420,7 @@ workflow {
         donorSexCalls = channel.empty()
         donorSexPdf = channel.empty()
     }
-    if (params.mmcQueryMarkers && shouldRunStage(startAt, 'mmc')) {
+    if (params.mmcQueryMarkers && shouldRunStage(startAt, stopAt,'mmc')) {
         MMC_fromSpecifiedMarkers_workflow(
             selectedSparseDgeMatrix,
             selectedSparseDgeFeatures,
@@ -811,25 +846,38 @@ def validateDropulationParams() {
     }
 }
 
-def validateStartAtParam() {
-    def validStages = validStartAtStages()
+def validateStage(stage, stageName) {
+    def validStages = validStages()
 
-    if (!validStages.contains(params.start_at)) {
-        error("--start_at must be one of: ${validStages.join(', ')}")
+    if (!validStages.contains(stage)) {
+        error("--${stageName} must be one of: ${validStages.join(', ')}")
     }
 }
 
-def validStartAtStages() {
+def validateStartAndStopStages() {
+    validateStage(params.start_at, "start_at")
+    validateStage(params.stop_at, "stop_at")
+    if (stageRank(params.start_at) > stageRank(params.stop_at)) {
+        error("The start stage '${params.start_at}' cannot come after the stop stage '${params.stop_at}'.  Stages in order are: ${validStages().join(', ')}")
+    }
+}
+
+def validStages() {
     ['beginning', 'alignment', 'cbrb', 'cell_selection', 'standard_analysis', 'dropulation', 'mmc']
 }
 
+
 def stageRank(stageName: String) {
-    validStartAtStages().indexOf(stageName)
+    validStages().indexOf(stageName)
 }
 
 // A stage should run when execution starts at that stage or any earlier stage.
-def shouldRunStage(startAt: String, stageName: String) {
-    stageRank(startAt) <= stageRank(stageName)
+def shouldRunStage(startAt: String, stopAt: String, stageName: String) {
+    stageRank(startAt) <= stageRank(stageName) && stageRank(stageName) <= stageRank(stopAt)
+}
+
+def stoppingBefore(stageName: String, stopAt: String) {
+    stageRank(stageName) > stageRank(stopAt)
 }
 
 def restartTupleChannel(pathPattern, meta) {
