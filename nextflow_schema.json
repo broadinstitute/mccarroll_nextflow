@@ -355,8 +355,22 @@
     },
     "start_at": {
       "type": "string",
-      "description": "Pipeline stage where execution should start. Use 'beginning' for a full run, or reconstruct inputs from published results at a later stage.",
+      "description": "Pipeline stage where execution should start. Accept default for a full run, or reconstruct inputs from published results at a later stage.",
       "default": "beginning",
+      "enum": [
+        "beginning",
+        "alignment",
+        "cbrb",
+        "cell_selection",
+        "standard_analysis",
+        "dropulation",
+        "mmc"
+      ]
+    },
+    "stop_at": {
+      "type": "string",
+      "description": "Pipeline stage where execution should stop. Accept default to run through all stages, or stop at an earlier stage if desired.",
+      "default": "mmc",
       "enum": [
         "beginning",
         "alignment",
