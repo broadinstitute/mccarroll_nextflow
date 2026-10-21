@@ -1,24 +1,4 @@
 {
-    "Test Function makeCbrbLabel defaults only": {
-        "content": [
-            "auto_lr-0.00000625"
-        ],
-        "timestamp": "2026-10-01T14:24:52.695316",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.03.4"
-        }
-    },
-    "Test Function makeCbrbLabel with extra args": {
-        "content": [
-            "auto_lr-0.00000625_3bbf0af9"
-        ],
-        "timestamp": "2026-10-01T14:25:12.571496",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.03.4"
-        }
-    },
     "Test Function addSvmEstimatedParameters with override": {
         "content": [
             {
@@ -51,16 +31,6 @@
             "nextflow": "26.03.1"
         }
     },
-    "Test Function makeCbrbLabel with useSvmParameterEstimation false": {
-        "content": [
-            "auto_lr-0.00000625_1bcdbb9"
-        ],
-        "timestamp": "2026-10-01T14:25:07.420418",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.03.4"
-        }
-    },
     "Test Function loadSvmEstimatedParameters": {
         "content": [
             {
@@ -72,16 +42,6 @@
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.03.1"
-        }
-    },
-    "Test Function makeCbrbLabel removing default": {
-        "content": [
-            "auto_lr-null"
-        ],
-        "timestamp": "2026-10-01T14:25:02.663097",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.03.4"
         }
     },
     "Test Function makeCbrbArgDict with null value": {
@@ -1501,16 +1461,6 @@
             "nextflow": "26.03.1"
         }
     },
-    "Test Function makeCbrbLabel expectedCells and totalDropletsIncluded only": {
-        "content": [
-            "ec-1000_tdi-5000_lr-0.00000625"
-        ],
-        "timestamp": "2026-10-01T14:24:57.902347",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.03.4"
-        }
-    },
     "Test Function parseCbrbYamlArgs": {
         "content": [
             {
@@ -1856,16 +1806,6 @@
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.03.1"
-        }
-    },
-    "Test Function makeCbrbLabel": {
-        "content": [
-            "ec-1000_tdi-5000_lr-0.000005"
-        ],
-        "timestamp": "2026-10-01T14:24:47.852668",
-        "meta": {
-            "nf-test": "0.9.5",
-            "nextflow": "26.03.4"
         }
     }
 }

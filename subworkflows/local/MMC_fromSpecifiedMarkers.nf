@@ -26,12 +26,12 @@ workflow MMC_fromSpecifiedMarkers_workflow {
     workflowProperties = [
         submitter: getUserName(),
         mmcQueryMarkers: params.mmcQueryMarkers.toUriString(),
-        mmcModel: modelLocator.modelName,
+        mmc_label: params.mmc_label,
         mmcArgs: params.mmcArgs,
         stage: 'mmc'
     ]
     WRITE_PROPERTIES(workflowProperties)
-    outMeta = metaOnlyChannelHelper(matrix_mtx).map { m -> m + [mmcModel: modelLocator.modelName] }
+    outMeta = metaOnlyChannelHelper(matrix_mtx).map { m -> m + [mmc_label: params.mmc_label] }
     json_report = combineIntoTupleChannel(outMeta, MMC_FROMSPECIFIEDMARKERS.out.json_report)
     csv_report = combineIntoTupleChannel(outMeta, MMC_FROMSPECIFIEDMARKERS.out.csv_report)
     mmcProperties = combineIntoTupleChannel(outMeta, WRITE_PROPERTIES.out)

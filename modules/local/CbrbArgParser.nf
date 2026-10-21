@@ -13,6 +13,7 @@ def CBRB_ARGS() {
 
 // The defaults for these arguments, while --expected-cells and --total-droplets-included are 
 // determined using DropSift.
+// Must match CBRB_DEFAULTS in mccarroll_tw_clp src/util/output_label_util.py, which uses these to compute cbrb_label.
 def CBRB_DEFAULTS() { [
     (CBRB_ARGS().numTrainingTries)      : 3,
     (CBRB_ARGS().finalElboFailFraction) : 0.1,
@@ -123,45 +124,4 @@ def addSvmEstimatedParameters(parsedYamlArgs, svmEstimatedParamsMap) {
 def loadSvmEstimatedParameters(svmEstimatedParamsFile) {
     def paramLines = readSingleRowTsv(svmEstimatedParamsFile)
     return paramLines.collectEntries { k, v -> [("--" + k.replaceAll("_", "-")): v] }
-}
-
-def makeCbrbLabel(params) {
-    if (params.skipCbrb) {
-        return "skip"
-    }
-    def argDict = makeCbrbArgDict(params.cbrbArgs)
-    def label = ""
-    if (argDict[CBRB_ARGS().expectedCells] != null) {
-        label += "ec-${argDict[CBRB_ARGS().expectedCells]}_"
-    }
-    if (argDict[CBRB_ARGS().totalDropletsIncluded] != null) {
-        label += "tdi-${argDict[CBRB_ARGS().totalDropletsIncluded]}_"
-    }
-    if (!label.endsWith("_")) {
-        label += "auto_"
-    }
-    label += "lr-${argDict[CBRB_ARGS().learningRate]}"
-
-    // figure out if there are any other parameters that should be included in the label
-
-    // delete expectedCells, totalDropletsIncluded, and learningRate from the argDict
-    argDict.remove(CBRB_ARGS().expectedCells)
-    argDict.remove(CBRB_ARGS().totalDropletsIncluded)
-    argDict.remove(CBRB_ARGS().learningRate)
-
-    // delete from argDict anything that is the same as in CBRB_DEFAULTS
-    CBRB_DEFAULTS().each { k, v ->
-        if (argDict[k] == v) {
-            argDict.remove(k)
-        }
-    }
-    if (!params.useSvmParameterEstimation) {
-        argDict += [disableSvmParameterEstimation: true]
-    }
-    // if argDict is not empty, create a string from the remaining argDict entries, and make a hash of it.
-    if (!argDict.isEmpty()) {
-        def remainingArgsString = argDict.collect { k, v -> "${k}=${v}" }.join("&")
-        label += "_${String.format('%04x', remainingArgsString.hashCode())}"
-    }
-    return label
 }

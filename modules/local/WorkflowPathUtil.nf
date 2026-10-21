@@ -1,42 +1,8 @@
 def hasManualCellSelectionThresholds(params) {
-    return params.minUMIsPerCell != null ||
-        params.maxUMIsPerCell != null ||
+    return params.minUmisPerCell != null ||
+        params.maxUmisPerCell != null ||
         params.minIntronicPerCell != null ||
         params.maxIntronicPerCell != null
-}
-
-/**
- * Create label for manual-threshold cell selection.
- */
-def makeManualCellSelectionLabel(params) {
-    def labelComponents = []
-
-    if (params.minUMIsPerCell != null || params.maxUMIsPerCell != null) {
-
-        def minUmi = params.minUMIsPerCell ?: 1
-        def maxUmi = params.maxUMIsPerCell != null
-            ? params.maxUMIsPerCell.toString()
-            : 'Inf'
-
-        labelComponents << "umi_${minUmi}-${maxUmi}"
-    }
-
-    if (params.minIntronicPerCell != null || params.maxIntronicPerCell != null) {
-
-        def minIntronic = params.minIntronicPerCell ?: 0.0
-        def maxIntronic = params.maxIntronicPerCell ?: 1.0
-        labelComponents << String.format(
-            'intronic_%.3f-%.3f',
-            minIntronic as Float,
-            maxIntronic as Float,
-        )
-    }
-
-    return labelComponents.join('_')
-}
-
-def makeCellSelectionLabel(params) {
-    return hasManualCellSelectionThresholds(params) ? makeManualCellSelectionLabel(params) : 'auto'
 }
 
 /**
