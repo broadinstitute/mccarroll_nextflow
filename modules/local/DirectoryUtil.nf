@@ -30,5 +30,5 @@ def dropulationDir(tuple) {
 
 def mmcDir(tuple) {
     def (meta, _file) = tuple
-    return standardAnalysisDir(tuple) + "mmc/" + meta.mmcModel + "/"
+    return standardAnalysisDir(tuple) + "mmc/" + meta.mmc_label + "/"
 }

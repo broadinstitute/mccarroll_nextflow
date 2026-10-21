@@ -297,11 +297,11 @@
     "cbrbArgs": {
       "type": "string"
     },
-    "minUMIsPerCell": {
+    "minUmisPerCell": {
       "type": "integer",
       "description": "For manual cell selection"
     },
-    "maxUMIsPerCell": {
+    "maxUmisPerCell": {
       "type": "integer",
       "description": "For manual cell selection"
     },
@@ -380,6 +380,22 @@
         "dropulation",
         "mmc"
       ]
+    },
+    "cbrb_label": {
+      "type": "string",
+      "description": "Label for the cbrb output subdirectory.  Normally computed by the launcher."
+    },
+    "cell_selection_label": {
+      "type": "string",
+      "description": "Label for the cell_selection output subdirectory.  Normally computed by the launcher."
+    },
+    "dropulation_label": {
+      "type": "string",
+      "description": "Label for the dropulation output subdirectory.  Normally computed by the launcher."
+    },
+    "mmc_label": {
+      "type": "string",
+      "description": "Label for the mmc output subdirectory.  Normally computed by the launcher."
     },
     "cloudVcf": {
       "type": "string",

@@ -1,4 +1,4 @@
-include { parseCbrbYamlArgs ; addSvmEstimatedParameters ; loadSvmEstimatedParameters ; makeCbrbLabel } from '../../modules/local/CbrbArgParser.nf'
+include { parseCbrbYamlArgs ; addSvmEstimatedParameters ; loadSvmEstimatedParameters } from '../../modules/local/CbrbArgParser.nf'
 include { noMetaChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
 include { SVM_ESTIMATE_CBRB_PARAMETERS } from '../../modules/local/svmEstimateCbrbParameters.nf'
 include { CELLBENDER_REMOVEBACKGROUND  } from '../../modules/nf-core/cellbender/removebackground'
@@ -26,9 +26,10 @@ workflow cbrb_workflow {
     workflowProperties = [
         submitter: getUserName(),
         skipCbrb: params.skipCbrb,
+        cbrb_label: params.cbrb_label,
         stage: 'cbrb'
     ]
-    cbrb_label = makeCbrbLabel(params)
+    cbrb_label = params.cbrb_label
     meta = sparseDgeMatrix.map { meta, _file -> meta + [cbrb_label: cbrb_label] }
 
     if (params.skipCbrb) {

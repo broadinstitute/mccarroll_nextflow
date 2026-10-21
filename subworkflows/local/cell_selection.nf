@@ -1,7 +1,7 @@
 include { CALL_STAMPS_SVM_NUCLEI           } from '../../modules/local/callSTAMPsSvmNuclei.nf'
 include { CALL_STAMPS_MANUAL_THRESHOLDS    } from '../../modules/local/callSTAMPsManualThresholds.nf'
 include { sparseMatrixChannelHelper ; noMetaChannelHelper ; metaOnlyChannelHelper ; combineIntoTupleChannel ; naIfNull ; getUserName } from '../../modules/local/workflowUtil.nf'
-include { hasManualCellSelectionThresholds ; makeManualCellSelectionLabel } from '../../modules/local/WorkflowPathUtil.nf'
+include { hasManualCellSelectionThresholds } from '../../modules/local/WorkflowPathUtil.nf'
 include { WRITE_PROPERTIES                 } from '../../modules/local/writeProperties.nf'
 include { SEND_EMAIL                       } from '../../modules/local/sendEmail.nf'
 include { cellSelectionDir                 } from '../../modules/local/DirectoryUtil.nf'
@@ -17,15 +17,15 @@ workflow cell_selection_workflow {
     cbrbNumTranscripts
 
     main:
+    cell_selection_label = params.cell_selection_label
     if (hasManualCellSelectionThresholds(params)) {
-        cell_selection_label = makeManualCellSelectionLabel(params)
         CALL_STAMPS_MANUAL_THRESHOLDS(
             noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
             noMetaChannelHelper(cellFeatures),
             noMetaChannelHelper(cbrbNonEmpties),
             cbrbNumTranscripts.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
-            naIfNull(params.minUMIsPerCell),
-            naIfNull(params.maxUMIsPerCell),
+            naIfNull(params.minUmisPerCell),
+            naIfNull(params.maxUmisPerCell),
             naIfNull(params.minIntronicPerCell),
             naIfNull(params.maxIntronicPerCell),
         )
@@ -37,7 +37,7 @@ workflow cell_selection_workflow {
             CALL_STAMPS_SVM_NUCLEI(
                 noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
                 noMetaChannelHelper(cellFeatures),
-                cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
+                cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
                 false,
                 []
             )
@@ -45,7 +45,7 @@ workflow cell_selection_workflow {
         CALL_STAMPS_SVM_NUCLEI(
             noMetaChannelHelper(sparseMatrixChannelHelper(sparseDgeMatrix, sparseDgeFeatures, sparseDgeBarcodes)),
             noMetaChannelHelper(cellFeatures),
-            cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: "auto"], f) },
+            cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
             params.useCBRBInitialization,
             noMetaChannelHelper(cbrbNumTranscripts)
         )
@@ -60,11 +60,12 @@ workflow cell_selection_workflow {
 
     workflowProperties = [
         submitter: getUserName(),
-        minUMIsPerCell: params.minUMIsPerCell,
-        maxUMIsPerCell: params.maxUMIsPerCell,
+        minUmisPerCell: params.minUmisPerCell,
+        maxUmisPerCell: params.maxUmisPerCell,
         minIntronicPerCell: params.minIntronicPerCell,
         maxIntronicPerCell: params.maxIntronicPerCell,
         useCBRBInitialization: params.useCBRBInitialization,
+        cell_selection_label: params.cell_selection_label,
         stage: 'cell_selection'
     ]
     WRITE_PROPERTIES(workflowProperties)

@@ -21,8 +21,7 @@ include { standard_analysis_workflow               } from './subworkflows/local/
 include { dropulation_workflow                     } from './subworkflows/local/dropulation.nf'
 include { MMC_fromSpecifiedMarkers_workflow } from './subworkflows/local/MMC_fromSpecifiedMarkers.nf'
 include { buildReferenceMetadataLocator; resolveReference } from './modules/local/ReferenceMetadataLocator.nf'
-include { buildRestartInputPaths ; makeCellSelectionLabel } from './modules/local/WorkflowPathUtil.nf'
-include { makeCbrbLabel                            } from './modules/local/CbrbArgParser.nf'
+include { buildRestartInputPaths                   } from './modules/local/WorkflowPathUtil.nf'
 include { PIPELINE_INITIALISATION                  } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { PIPELINE_COMPLETION                      } from './subworkflows/local/utils_nfcore_nextflow_pipeline'
 include { alignmentDir ; cbrbDir ; cellSelectionDir ; standardAnalysisDir ; dropulationDir ; mmcDir } from './modules/local/DirectoryUtil.nf'
@@ -47,8 +46,8 @@ params {
     skipCbrb: Boolean = false
 
     // cell selection parameters
-    minUMIsPerCell: Integer?
-    maxUMIsPerCell: Integer?
+    minUmisPerCell: Integer?
+    maxUmisPerCell: Integer?
     minIntronicPerCell: Float?
     maxIntronicPerCell: Float?
     useCBRBInitialization: Boolean = false
@@ -83,6 +82,13 @@ params {
     // infrastructure parameters
     start_at: String = 'beginning'
     stop_at: String = 'mmc'
+
+    // Labels used to name output subdirectories.  These are computed by the launcher (mccarroll_tw_clp)
+    // from the other params, and are required for the stages that use them.
+    cbrb_label: String?
+    cell_selection_label: String?
+    dropulation_label: String?
+    mmc_label: String?
 
     // nf-core infrastructure parameters
     email: String
@@ -119,14 +125,15 @@ workflow {
 
     validateDropulationParams()
     validateStartAndStopStages()
+    validateLabelParams()
     def startAt = params.start_at
     def stopAt = params.stop_at
 
     def referenceFasta = resolveReference(params.reference, params.referenceParents)
     def referenceMetadataLocator = buildReferenceMetadataLocator(referenceFasta, params.referenceOverride, params.starIndexVersionMap, params.starAlignVersion)
     def referenceName = referenceMetadataLocator.referenceName
-    def cbrbLabel = makeCbrbLabel(params)
-    def cellSelectionLabel = makeCellSelectionLabel(params)
+    def cbrbLabel = params.cbrb_label
+    def cellSelectionLabel = params.cell_selection_label
     def finalMeta = [id: params.library, library: params.library, referenceName: referenceName]
     def cbrbMeta = finalMeta + [cbrb_label: cbrbLabel]
     def selectedCellsMeta = cbrbMeta + [cell_selection_label: cellSelectionLabel]
@@ -859,6 +866,24 @@ def validateStartAndStopStages() {
     validateStage(params.stop_at, "stop_at")
     if (stageRank(params.start_at) > stageRank(params.stop_at)) {
         error("The start stage '${params.start_at}' cannot come after the stop stage '${params.stop_at}'.  Stages in order are: ${validStages().join(', ')}")
+    }
+}
+
+// Output directory labels are computed by the launcher, so make sure they were passed for the stages that need them.
+def validateLabelParams() {
+    requireLabelParam('cbrb_label', 'cbrb')
+    requireLabelParam('cell_selection_label', 'cell_selection')
+    if (params.vcf) {
+        requireLabelParam('dropulation_label', 'dropulation')
+    }
+    if (params.mmcQueryMarkers) {
+        requireLabelParam('mmc_label', 'mmc')
+    }
+}
+
+def requireLabelParam(labelName: String, stageName: String) {
+    if (params[labelName] == null && !stoppingBefore(stageName, params.stop_at)) {
+        error("--${labelName} is required when running through stage '${stageName}'.  It is normally set by the launcher.")
     }
 }
 

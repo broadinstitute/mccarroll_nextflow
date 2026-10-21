@@ -9,8 +9,8 @@ process CALL_STAMPS_MANUAL_THRESHOLDS {
     path cbrbNonEmpties
     tuple val(meta), path(cbrbNumTranscripts)
     // CBRB output will have the most fulsome meta, so take it from there.
-    val minUMIsPerCell
-    val maxUMIsPerCell
+    val minUmisPerCell
+    val maxUmisPerCell
     val minIntronicPerCell
     val maxIntronicPerCell
 
@@ -33,7 +33,7 @@ process CALL_STAMPS_MANUAL_THRESHOLDS {
     """
     Rscript -e 'message(date(), " Start ", "CallSTAMPs")' \
     -e 'suppressPackageStartupMessages(library(Dropseq.cellselection))' \
-    -e 'CallSTAMPs(dataset_name="${dataset_name}",cellFeaturesFile="${cellFeatures}",outCellFile="${output_file}",outPDF="${output_pdf}",outAmbientCellFile="${output_ambient}",outSummaryFile="${output_summary}",is_10x=TRUE,outDroppedNonEmptiesFile="${output_dropped_non_empty}",cbrbNonEmptiesFile="${cbrbNonEmpties}",cbrbRetainedUMIsFile="${cbrbNumTranscripts}",method_selected="manual_selection",minUMIsPerCell=${minUMIsPerCell},maxUMIsPerCell=${maxUMIsPerCell},minIntronicPerCell=${minIntronicPerCell},maxIntronicPerCell=${maxIntronicPerCell},sparseDgeDir=".")' \
+    -e 'CallSTAMPs(dataset_name="${dataset_name}",cellFeaturesFile="${cellFeatures}",outCellFile="${output_file}",outPDF="${output_pdf}",outAmbientCellFile="${output_ambient}",outSummaryFile="${output_summary}",is_10x=TRUE,outDroppedNonEmptiesFile="${output_dropped_non_empty}",cbrbNonEmptiesFile="${cbrbNonEmpties}",cbrbRetainedUMIsFile="${cbrbNumTranscripts}",method_selected="manual_selection",minUMIsPerCell=${minUmisPerCell},maxUMIsPerCell=${maxUmisPerCell},minIntronicPerCell=${minIntronicPerCell},maxIntronicPerCell=${maxIntronicPerCell},sparseDgeDir=".")' \
     -e 'message(date(), " Done ", "CallSTAMPs")'
     """
 }

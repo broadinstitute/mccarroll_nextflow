@@ -1,7 +1,6 @@
 include { noMetaChannelHelper ; collectInOrder ; metaOnlyChannelHelper ; combineIntoTupleChannel ; getUserName } from '../../modules/local/workflowUtil.nf'
 include { loadNonAutosomes                        } from '../../modules/local/ReferenceMetadataLocator.nf'
 include { withExtension                           } from '../../modules/local/FileUtil.nf'
-include { makeDropulationlabel                    } from '../../modules/local/workflowUtil.nf'
 
 include { GATHER_DIGITAL_ALLELE_COUNTS            } from '../../modules/local/gatherDigitalAlleleCounts.nf'
 include { MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES } from '../../modules/local/mergeGatherDigitalAlleleFrequencies.nf'
@@ -36,7 +35,7 @@ workflow dropulation_workflow {
         submitter: getUserName(),
         vcf: params.vcf.toUriString(),
         donorFile: params.donorFile.toUriString(),
-        dropulation_label: makeDropulationlabel(file(params.vcf), file(params.donorFile)),
+        dropulation_label: params.dropulation_label,
         stage: 'dropulation'
     ]
     bcf = params.cloudVcf ?: params.vcf
