@@ -1,4 +1,5 @@
 process MERGE_DOUBLET_ASSIGNMENTS {
+    tag "${library}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

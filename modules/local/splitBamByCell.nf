@@ -1,4 +1,5 @@
 process SPLIT_BAM_BY_CELL {
+    tag "${libraryName}"
     errorStrategy 'retry'
     maxRetries 3
     cpus { 1 }

@@ -1,6 +1,7 @@
 include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf'
 
 process GATHER_DIGITAL_ALLELE_COUNTS {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

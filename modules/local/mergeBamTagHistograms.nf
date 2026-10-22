@@ -1,4 +1,5 @@
 process MERGE_BAM_TAG_HISTOGRAMS {
+    tag "${library}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

@@ -1,6 +1,7 @@
 include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf'
 
 process DIGITAL_EXPRESSION {
+    tag "${meta.id}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

@@ -1,6 +1,7 @@
 include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf'
 
 process DETECT_DOUBLETS {
+    tag "${meta.id}"
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

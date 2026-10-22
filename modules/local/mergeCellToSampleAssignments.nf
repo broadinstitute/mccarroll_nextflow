@@ -1,4 +1,5 @@
 process MERGE_CELL_TO_SAMPLE_ASSIGNMENTS {
+    tag "${library}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

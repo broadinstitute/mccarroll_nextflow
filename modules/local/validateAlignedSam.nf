@@ -1,4 +1,5 @@
 process VALIDATE_ALIGNED_SAM {
+    tag "${meta.id}"
     label 'process_single'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

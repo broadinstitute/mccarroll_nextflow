@@ -1,6 +1,7 @@
 // This CLP has many more options.  Add as needed.
 
 process CREATE_METACELLS {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

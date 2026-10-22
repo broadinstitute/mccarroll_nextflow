@@ -1,4 +1,5 @@
 process SVM_ESTIMATE_CBRB_PARAMETERS {
+    tag "${library}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/dropsift:current'

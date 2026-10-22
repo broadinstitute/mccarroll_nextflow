@@ -1,4 +1,5 @@
 process CALL_STAMPS_SVM_NUCLEI {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_r:current'

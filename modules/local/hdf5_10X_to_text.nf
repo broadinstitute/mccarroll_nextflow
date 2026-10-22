@@ -1,4 +1,5 @@
 process HDF5_10X_TO_TEXT {
+    tag "${meta.id}"
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_python:current'

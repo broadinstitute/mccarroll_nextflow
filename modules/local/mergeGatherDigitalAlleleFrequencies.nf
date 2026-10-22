@@ -1,4 +1,5 @@
 process MERGE_GATHER_DIGITAL_ALLELE_FREQUENCIES {
+    tag "${library}"
     label 'process_low'
 
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_java:current'

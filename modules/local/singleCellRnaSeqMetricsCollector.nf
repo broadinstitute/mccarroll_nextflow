@@ -1,4 +1,5 @@
 process SINGLE_CELL_RNA_SEQ_METRICS_COLLECTOR {
+    tag "${meta.id}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

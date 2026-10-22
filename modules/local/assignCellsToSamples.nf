@@ -1,6 +1,7 @@
 include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf'
 
 process ASSIGN_CELLS_TO_SAMPLES {
+    tag "${meta.id}"
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

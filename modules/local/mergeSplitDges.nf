@@ -1,4 +1,5 @@
 process MERGE_SPLIT_DGES {
+    tag "${library}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

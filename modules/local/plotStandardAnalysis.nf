@@ -1,4 +1,5 @@
 process PLOT_STANDARD_ANALYSIS {
+    tag "${library}"
     label 'process_low'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_r:current'
 

@@ -1,4 +1,5 @@
 process CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE {
+    tag "${meta.id}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

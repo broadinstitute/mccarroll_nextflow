@@ -1,4 +1,5 @@
 process MERGE_READ_QUALITY_METRICS {
+    tag "${library}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

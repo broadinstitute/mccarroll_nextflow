@@ -1,4 +1,5 @@
 process MERGE_META_GENE_REPORTS {
+    tag "${library}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

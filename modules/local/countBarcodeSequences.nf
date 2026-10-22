@@ -1,4 +1,5 @@
 process COUNT_BARCODE_SEQUENCES {
+    tag "${libraryName}"
     label 'process_single'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

@@ -1,4 +1,5 @@
 process MERGE_DGE {
+    tag "${output_prefix}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

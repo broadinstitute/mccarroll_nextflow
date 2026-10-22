@@ -1,4 +1,5 @@
 process JOIN_AND_FILTER_TSV {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_python:current'
