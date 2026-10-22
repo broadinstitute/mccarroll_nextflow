@@ -1,4 +1,5 @@
 process MERGE_DGE_SUMMARIES {
+    tag "${library}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

@@ -2,6 +2,7 @@ include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf
 include { replaceExtension          } from '../../modules/local/FileUtil.nf'
 
 process MARK_CHIMERIC_READS {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

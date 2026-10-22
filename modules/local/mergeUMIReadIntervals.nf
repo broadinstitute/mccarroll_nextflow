@@ -1,4 +1,5 @@
 process MERGE_UMI_READ_INTERVALS {
+    tag "${meta.id}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

@@ -1,4 +1,5 @@
 process COUNT_MMC_CELL_TYPES {
+    tag "${library}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_python:current'

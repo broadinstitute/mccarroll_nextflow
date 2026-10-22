@@ -1,4 +1,5 @@
 process MERGE_RNA_SEQ_METRICS {
+    tag "${library}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

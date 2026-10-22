@@ -1,4 +1,5 @@
 process BAM_TAG_HISTOGRAM {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

@@ -1,4 +1,5 @@
 process MMC_FROMSPECIFIEDMARKERS {
+    tag "${library}"
     label 'process_single_medium'
     label 'error_retry'
 

@@ -1,4 +1,5 @@
 process DUMP_ELBO_TABLE {
+    tag "${library}"
     label 'process_low'
 
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_python:current'

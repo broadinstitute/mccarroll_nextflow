@@ -1,4 +1,5 @@
 process VALIDATE_SAM_FILE {
+    tag "${meta.id}"
     label 'process_single'
 
     container 'docker.io/broadinstitute/picard:latest'

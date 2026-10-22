@@ -1,4 +1,5 @@
 process DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

@@ -2,6 +2,7 @@ include { hasExtension ; replaceExtension } from './FileUtil.nf'
 
 
 process CORRECT_SCRNA_READ_PAIRS {
+    tag "${meta.id}"
     label 'process_single'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

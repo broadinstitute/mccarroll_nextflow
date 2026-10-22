@@ -1,4 +1,5 @@
 process MAKE_SPARSE_DGE {
+    tag "${meta.id}"
     label 'process_medium'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

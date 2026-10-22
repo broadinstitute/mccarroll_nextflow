@@ -1,4 +1,5 @@
 process GATHER_READ_QUALITY_METRICS {
+    tag "${meta.id}"
     label 'process_low'
     container 'quay.io/broadinstitute/drop-seq_java:current'
 

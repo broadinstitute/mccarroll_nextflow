@@ -1,4 +1,5 @@
 process TAG_READ_WITH_GENE_FUNCTION {
+    tag "${meta.id}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'

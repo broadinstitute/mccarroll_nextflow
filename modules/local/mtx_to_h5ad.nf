@@ -1,4 +1,5 @@
 process MTX_TO_H5AD {
+    tag "${library}"
     label 'process_medium'
 
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_python:current'

@@ -1,4 +1,5 @@
 process MERGE_MOLECULAR_BARCODE_DISTRIBUTION_BY_GENE {
+    tag "${library}"
     label 'process_low'
     container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_java:current'
 

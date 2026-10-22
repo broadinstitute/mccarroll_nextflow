@@ -1,4 +1,5 @@
 process DONOR_ASSIGNMENT_QC {
+    tag "${library}"
     label 'process_low'
 
     container 'quay.io/broadinstitute/drop-seq_r:current'

@@ -1,4 +1,5 @@
 process PREALIGNMENT_TAG_AND_TRIM {
+    tag "${meta.id}"
     label 'process_medium'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
