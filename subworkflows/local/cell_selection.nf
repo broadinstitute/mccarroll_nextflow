@@ -39,6 +39,7 @@ workflow cell_selection_workflow {
                 noMetaChannelHelper(cellFeatures),
                 cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
                 false,
+                false,
                 []
             )
         } else {
@@ -47,6 +48,7 @@ workflow cell_selection_workflow {
             noMetaChannelHelper(cellFeatures),
             cbrbNonEmpties.map { m, f -> tuple(m + [cell_selection_label: cell_selection_label], f) },
             params.useCBRBInitialization,
+            params.useCBRBFeatures,
             noMetaChannelHelper(cbrbNumTranscripts)
         )
         }
@@ -65,6 +67,7 @@ workflow cell_selection_workflow {
         minIntronicPerCell: params.minIntronicPerCell,
         maxIntronicPerCell: params.maxIntronicPerCell,
         useCBRBInitialization: params.useCBRBInitialization,
+        useCBRBFeatures: params.useCBRBFeatures,
         cell_selection_label: params.cell_selection_label,
         stage: 'cell_selection'
     ]

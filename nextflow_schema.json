@@ -318,6 +318,11 @@
       "description": "DropSift cell selection option",
       "default": false
     },
+    "useCBRBFeatures": {
+      "type": "boolean",
+      "description": "DropSift cell selection option",
+      "default": false
+    },
     "vcf": {
       "type": "string",
       "format": "file-path",

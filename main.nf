@@ -51,6 +51,7 @@ params {
     minIntronicPerCell: Float?
     maxIntronicPerCell: Float?
     useCBRBInitialization: Boolean = false
+    useCBRBFeatures: Boolean = false
 
     // standard analysis parameters
     vcf: Path?
