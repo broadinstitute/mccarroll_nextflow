@@ -24,6 +24,7 @@ workflow tag_and_split_bam_workflow {
         allowedBarcodes: allowedBarcodes.toUriString(),
         fivePrimeAdapter: params.fivePrimeAdapter,
         cellBarcodeTag: params.cellBarcodeTag,
+        sampleType: params.sampleType,
         stage: 'beginning'
         ]
     if (fastq_read1 != null && fastq_read1.size() > 0) {

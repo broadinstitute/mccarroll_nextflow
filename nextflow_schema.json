@@ -260,6 +260,11 @@
       "type": "integer",
       "default": 2048
     },
+    "sampleType": {
+      "type": "string",
+      "default": "nuclei",
+      "enum": ["nuclei", "whole_cells"]
+    },
     "strandStrategy": {
       "type": "string",
       "default": "SENSE",

@@ -78,6 +78,7 @@ params {
     minimumTranscriptsPerCell: Integer = 20
     dgeMinReadMq: Integer = 10
     dgeFunctionalStrategy: String = 'DROPSEQ'
+    sampleType: String = 'nuclei' // currently this does not affect the workflow but is reserved for future use
 
     // infrastructure parameters
     start_at: String = 'beginning'
