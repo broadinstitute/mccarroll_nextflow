@@ -420,7 +420,7 @@
         "format": "directory",
         "exists": true
       },
-      "default": []
+      "default": ["gs://mccarroll_scrnaseq_standard/metadata/reference"]
     }
   },
   "required": ["library", "outdir", "email"]
