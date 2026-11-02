@@ -38,6 +38,7 @@ params {
     beadStructure: String?
     referenceOverride: List<String> = []
     starAlignVersion: String?
+    minAllowedBarcodesFraction: Float = 0.1
 
     // cbrb parameters
     useSvmParameterEstimation: Boolean = true
@@ -199,6 +200,7 @@ workflow {
         rnaSeqMetrics = align_locus_function_workflow.out.rnaSeqMetrics
         alignmentSummaryPdf = align_locus_function_workflow.out.alignmentSummaryPdf
         alignmentProperties = align_locus_function_workflow.out.properties
+        allowListMetrics = align_locus_function_workflow.out.allowListMetrics
     } else {
         alignedBai = channel.empty()
         sizeSelectedCells = channel.empty()
@@ -208,6 +210,7 @@ workflow {
         rnaSeqMetrics = channel.empty()
         alignmentSummaryPdf = channel.empty()
         alignmentProperties = channel.empty()
+        allowListMetrics = channel.empty()
         if (stoppingBefore('alignment', stopAt)) {
             alignedBam = channel.empty()
             dgeSummary = channel.empty()
@@ -494,6 +497,9 @@ workflow {
     readQualityMetrics              = readQualityMetrics
     rnaSeqMetrics                   = rnaSeqMetrics
     alignmentSummaryPdf             = alignmentSummaryPdf
+    allowListMetrics                = allowListMetrics
+
+    // CBRB outputs
     cbrbH5                          = cbrbH5
     cbrbBarcodes                    = cbrbBarcodes
     cbrbMetrics                     = cbrbMetrics
@@ -508,6 +514,8 @@ workflow {
     cbrbCellFeatures                = cbrbCellFeatures
     cbrbTearSheet                   = cbrbTearSheet
     cbrbProperties                  = cbrbProperties
+
+    // cell selection outputs
     selectedCellBarcodes            = selectedCellBarcodes
     ambientCellBarcodes             = ambientCellBarcodes
     cellSelectionAssignmentsPdf     = cellSelectionAssignmentsPdf
@@ -600,6 +608,9 @@ output {
         path { x -> alignmentDir(x) }
     }
     chimericReadMetrics {
+        path { x -> alignmentDir(x) }
+    }
+    allowListMetrics {
         path { x -> alignmentDir(x) }
     }
     /*

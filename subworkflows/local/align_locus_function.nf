@@ -30,6 +30,8 @@ include { MERGE_RNA_SEQ_METRICS                        } from '../../modules/loc
 include { PLOT_ALIGNMENT_SUMMARY                       } from '../../modules/local/plotAlignmentSummary.nf'
 include { PICARD_COLLECTRNASEQMETRICS                  } from '../../modules/nf-core/picard/collectrnaseqmetrics/main'
 include { MERGE_CHIMERIC_READ_METRICS                  } from '../../modules/local/mergeChimericReadMetrics.nf'
+include { MERGE_FILTERED_READ_METRICS                  } from '../../modules/local/mergeFilteredReadMetrics.nf'
+include { CHECK_BARCODE_ACCEPTANCE_RATE                } from '../../modules/local/checkBarcodeAcceptanceRate.nf'
 include { SEND_EMAIL                                   } from '../../modules/local/sendEmail.nf'
 include { alignmentDir                                 } from '../../modules/local/DirectoryUtil.nf'
 include { subpath                                      } from '../../modules/local/FileUtil.nf'
@@ -219,6 +221,15 @@ workflow align_locus_function_workflow {
         params.library,
         collectInOrder(MARK_CHIMERIC_READS.out.chimericReadMetrics),
     )
+    MERGE_FILTERED_READ_METRICS(
+        params.library,
+        collectInOrder(PREALIGNMENT_TAG_AND_TRIM.out.allowListMetric),
+    )
+    MERGE_FILTERED_READ_METRICS.out.mergedFilteredReadMetrics.view( )
+    CHECK_BARCODE_ACCEPTANCE_RATE(
+        MERGE_FILTERED_READ_METRICS.out.mergedFilteredReadMetrics,
+        params.minAllowedBarcodesFraction,
+    )
 
     MERGE_READ_QUALITY_METRICS(
         params.library,
@@ -287,6 +298,7 @@ workflow align_locus_function_workflow {
     rnaSeqMetrics = addMeta(finalMeta, MERGE_RNA_SEQ_METRICS.out.mergedRnaSeqMetrics)
     alignmentSummaryPdf = addMeta(finalMeta, PLOT_ALIGNMENT_SUMMARY.out.alignment_summary_pdf)
     readsPerCell = addMeta(finalMeta, MERGE_BAM_TAG_HISTOGRAMS.out.mergedBamTagHistograms)
+    allowListMetrics = addMeta(finalMeta, MERGE_FILTERED_READ_METRICS.out.mergedFilteredReadMetrics)
 
     emit:
     properties               = outputProperties
@@ -307,4 +319,5 @@ workflow align_locus_function_workflow {
     rnaSeqMetrics            = rnaSeqMetrics
     alignmentSummaryPdf      = alignmentSummaryPdf
     readsPerCell             = readsPerCell
+    allowListMetrics         = allowListMetrics
 }
