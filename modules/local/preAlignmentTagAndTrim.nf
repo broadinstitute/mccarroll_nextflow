@@ -15,6 +15,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
 
     output:
     tuple val(meta), path("${output_file}"), emit: taggedAndTrimmedBams
+    tuple val(meta), path("${allow_list_metric_file}"), emit: allowListMetric
     // TODO: emit metrics
         tuple val("${task.process}"), val('TagBamWithReadSequenceExtended'), eval("TagBamWithReadSequenceExtended --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_TagBamWithReadSequenceExtended
         tuple val("${task.process}"), val('FilterBam'), eval("FilterBam --version 2>&1 | sed -n 's/.*Version://p'"), topic: versions, emit: versions_FilterBam
@@ -25,6 +26,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
 
     script:
     output_file = meta.id + "." + outputExtension
+    allow_list_metric_file = "${output_file}.${cellularBarcodeTag}_bam_summary.txt"
     def parsedBeadStructure = new BeadStructure(beadStructure)
     def baseRange = parsedBeadStructure.getBaseRangeForElementType(BeadStructure.ElementType.Molecular)
     // Convert from zero-based to one-based indexing for Java command line argument
@@ -58,9 +60,9 @@ process PREALIGNMENT_TAG_AND_TRIM {
             --TAG_VALUES_FILE ${allowedBarcodes} \
             --TAG ${cellularBarcodeTag} \
             --ACCEPT_TAG true \
-            --SUMMARY ${output_file}.${cellularBarcodeTag}_bam_summary.txt \
-            --PASSING_READ_THRESHOLD 0.1 \
-          --COMPRESSION_LEVEL 0 \
+            --SUMMARY ${allow_list_metric_file} \
+            --PASSING_READ_THRESHOLD 0 \
+            --COMPRESSION_LEVEL 0 \
           --VALIDATION_STRINGENCY SILENT | \
     TrimStartingSequence \
             --I /dev/stdin \

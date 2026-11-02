@@ -421,6 +421,10 @@
         "exists": true
       },
       "default": ["gs://mccarroll_scrnaseq_standard/metadata/reference"]
+    },
+    "minAllowedBarcodesFraction": {
+      "type": "number",
+      "default": 0.1
     }
   },
   "required": ["library", "outdir", "email"]
