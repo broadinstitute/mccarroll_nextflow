@@ -2,9 +2,9 @@ include { locusFunctionClpArguments } from '../../modules/local/locusFunction.nf
 
 process GATHER_DIGITAL_ALLELE_COUNTS {
     tag "${meta.id}"
-    label 'process_low'
+    label 'process_medium'
 
-    container 'quay.io/broadinstitute/drop-seq_java:current'
+    container 'quay.io/broadinstitute/drop-seq_java:2026-11-02_8cc9623'
 
     input:
     // Although the BAM doesn't have the most complete meta, it's used here because this is run on split BAMs so the output files need to be named appropriately.
@@ -39,6 +39,7 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
           ${nonAutosomesString} \
           --SINGLE_VARIANT_READS false \
           --MULTI_GENES_PER_READ false \
-          --READ_MQ ${readMq}
+          --READ_MQ ${readMq} \
+          --NUM_THREADS ${task.cpus}
     """
 }
