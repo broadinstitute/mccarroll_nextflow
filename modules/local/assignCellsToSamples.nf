@@ -4,7 +4,7 @@ process ASSIGN_CELLS_TO_SAMPLES {
     tag "${meta.id}"
     label 'process_medium'
 
-    container 'quay.io/broadinstitute/drop-seq_java:current'
+    container 'quay.io/broadinstitute/drop-seq_java:2026-11-02_8cc9623'
 
     input:
     tuple val(meta), path(inputBam)
@@ -47,6 +47,7 @@ process ASSIGN_CELLS_TO_SAMPLES {
           --CELL_CONTAMINATION_ESTIMATE_FILE ${cbrbCellSelectionReport} \
           --ALLELE_FREQUENCY_ESTIMATE_FILE ${alleleFrequency} \
           --FUNCTIONAL_STRATEGY ${functionalStrategy} \
+          --NUM_THREADS ${task.cpus} \
           ${locusFunctionArgs} \
           ${nonAutosomesString}
     """
