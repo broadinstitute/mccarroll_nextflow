@@ -4,7 +4,7 @@ process ASSIGN_CELLS_TO_SAMPLES {
     tag "${meta.id}"
     label 'process_medium'
 
-    container 'quay.io/broadinstitute/drop-seq_java:2026-11-02_8cc9623'
+    container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
     tuple val(meta), path(inputBam)

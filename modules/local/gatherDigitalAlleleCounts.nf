@@ -4,7 +4,7 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
     tag "${meta.id}"
     label 'process_medium'
 
-    container 'quay.io/broadinstitute/drop-seq_java:2026-11-02_8cc9623'
+    container 'quay.io/broadinstitute/drop-seq_java:current'
 
     input:
     // Although the BAM doesn't have the most complete meta, it's used here because this is run on split BAMs so the output files need to be named appropriately.
