@@ -12,7 +12,12 @@ process CHECK_BARCODE_ACCEPTANCE_RATE {
     val metricsFile 
     val minFraction
 
+    output:
+    path resultFileName
+
     exec:
+    // Intentionally no 'def' so the variable is bound in the task context and visible to output:
+    resultFileName = 'barcode_acceptance_rate.txt'
     def lines = metricsFile.readLines()
         .findAll { line -> !line.isEmpty() && !line.startsWith('#') }
     if (lines.size() < 2) {
@@ -25,10 +30,15 @@ process CHECK_BARCODE_ACCEPTANCE_RATE {
     def readsAccepted = row['READS_ACCEPTED'].toLong()
     def total = readsAccepted + readsRejected
     def fraction = total > 0 ? (readsAccepted / total.doubleValue()) : 0.0
+    def summary = "${String.format('%.4f', fraction)} " +
+                  "(${readsAccepted} accepted out of ${total} total)"
+    def resultFile = task.workDir.resolve(resultFileName)
     if (fraction < minFraction) {
-        error "Barcode acceptance rate ${String.format('%.4f', fraction)} is below minimum allowed " +
-              "${minFraction} (${readsAccepted} accepted out of ${total} total reads in ${metricsFile.name})"
+        def msg = "Barcode acceptance rate ${String.format('%.4f', fraction)} is below minimum allowed " +
+                  "${minFraction} (${readsAccepted} accepted out of ${total} total reads in ${metricsFile.name})"
+        resultFile.text = "FAILURE: ${msg}\n"
+        error msg
     }
-    log.info "Barcode acceptance rate: ${String.format('%.4f', fraction)} " +
-             "(${readsAccepted} accepted out of ${total} total)"
+    resultFile.text = "SUCCESS: Barcode acceptance rate: ${summary}\n"
+    log.info "Barcode acceptance rate: ${summary}"
 }
