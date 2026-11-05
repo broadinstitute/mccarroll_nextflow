@@ -1,6 +1,11 @@
 process PREALIGNMENT_TAG_AND_TRIM {
     tag "${meta.id}"
-    label 'process_medium'
+      cpus  { 6     * task.attempt }
+      memory { 
+        def numOtherProcesses = 4
+        8.GB * task.attempt + AllowListUtils.memoryForAllowList(allowedBarcodes) + 5.GB * numOtherProcesses
+        }
+      time  { 8.h   * task.attempt }
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
@@ -32,7 +37,9 @@ process PREALIGNMENT_TAG_AND_TRIM {
     // Convert from zero-based to one-based indexing for Java command line argument
     def barcodedRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Molecular) + 1
     def templateRead = parsedBeadStructure.getReadIndexForElementType(BeadStructure.ElementType.Template) + 1
-    // TODO: figure out what to do with java heap sizes
+    // Assume that standard 4GB heap is fine for all invocations except FilterBamByTag, because they don't load anything big into RAM.
+    def filterBamByTagJavaMemMb = (((8.GB * task.attempt).toMega() + AllowListUtils.memoryForAllowList(allowedBarcodes).toMega()) * 0.8) as int
+
     """
     TagBamWithReadSequenceExtended \
           --I ${inputBam} \
@@ -55,6 +62,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
           --COMPRESSION_LEVEL 0 \
           --VALIDATION_STRINGENCY SILENT | \
     FilterBamByTag \
+        -m ${filterBamByTagJavaMemMb}m \
             --I /dev/stdin \
             --O /dev/stdout \
             --TAG_VALUES_FILE ${allowedBarcodes} \
