@@ -1,6 +1,8 @@
 process COUNT_BARCODE_SEQUENCES {
     tag "${libraryName}"
-    label 'process_single'
+    cpus  { 1                   }
+    memory  { 8.GB * task.attempt + AllowListUtils.memoryForAllowList(allowedBarcodes) }
+    time  { 4.h  * task.attempt }
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
