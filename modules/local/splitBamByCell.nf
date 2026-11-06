@@ -16,7 +16,7 @@ process SPLIT_BAM_BY_CELL {
 
     input:
     val libraryName
-    path taggedBams
+    path taggedBams, arity: '1..*'
     val targetBamSizeMBytes
 
     output:
