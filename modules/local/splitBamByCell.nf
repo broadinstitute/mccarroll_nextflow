@@ -6,7 +6,9 @@ process SPLIT_BAM_BY_CELL {
     memory {
         //taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
         // A little more than 7e-8 used by Zamboni
-        def memoryMb: int = (taggedBams*.size().sum() * 9e-8 * task.attempt).intValue()
+        // With a single file, taggedBams is a lone Path (itself iterable over its name elements), not a list.
+        def bamList = taggedBams instanceof Collection ? taggedBams : [taggedBams]
+        def memoryMb: int = (bamList*.size().sum() * 9e-8 * task.attempt).intValue()
         //log.info "SPLIT_BAM_BY_CELL: calculated memoryMb=${memoryMb} for taggedBams=${taggedBams*.name} (attempt ${task.attempt})"
         1.MB * Math.max(memoryMb, 8000)
     }
