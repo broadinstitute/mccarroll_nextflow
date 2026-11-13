@@ -247,7 +247,7 @@
       "default": []
     },
     "version10X": {
-      "type": ["number", "string"]
+      "type": ["string", "number"]
     },
     "beadStructure": {
       "type": "string"
@@ -303,19 +303,19 @@
       "type": "string"
     },
     "minUmisPerCell": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "description": "For manual cell selection"
     },
     "maxUmisPerCell": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "description": "For manual cell selection"
     },
     "minIntronicPerCell": {
-      "type": "number",
+      "type": ["number", "null"],
       "description": "For manual cell selection"
     },
     "maxIntronicPerCell": {
-      "type": "number",
+      "type": ["number", "null"],
       "description": "For manual cell selection"
     },
     "useCBRBInitialization": {

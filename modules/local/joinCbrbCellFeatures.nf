@@ -2,7 +2,7 @@ process JOIN_CBRB_CELL_FEATURES {
     tag "${meta.id}"
     label 'process_low'
 
-    container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_r:current'
+    container 'us.gcr.io/mccarroll-scrna-seq/drop-seq_private_r:current'
 
     input:
     tuple val(meta), path(cellFeatures)

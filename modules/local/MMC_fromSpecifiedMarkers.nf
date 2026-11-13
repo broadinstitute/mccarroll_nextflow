@@ -3,7 +3,7 @@ process MMC_FROMSPECIFIEDMARKERS {
     label 'process_single_medium'
     label 'error_retry'
 
-    container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/mapmycells:current'
+    container 'us.gcr.io/mccarroll-scrna-seq/mapmycells:current'
 
     input:
     val library
