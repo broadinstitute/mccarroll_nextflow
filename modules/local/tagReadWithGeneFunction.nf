@@ -22,6 +22,7 @@ process TAG_READ_WITH_GENE_FUNCTION {
           --O ${output_file} \
           --ANNOTATIONS_FILE ${gtf} \
           --COMPRESSION_LEVEL 0 \
-          --VALIDATION_STRINGENCY SILENT
+          --VALIDATION_STRINGENCY SILENT \
+          --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

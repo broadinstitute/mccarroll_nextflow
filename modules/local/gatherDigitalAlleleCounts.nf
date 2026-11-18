@@ -40,6 +40,6 @@ process GATHER_DIGITAL_ALLELE_COUNTS {
           --SINGLE_VARIANT_READS false \
           --MULTI_GENES_PER_READ false \
           --READ_MQ ${readMq} \
-          --NUM_THREADS ${task.cpus}
+          --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

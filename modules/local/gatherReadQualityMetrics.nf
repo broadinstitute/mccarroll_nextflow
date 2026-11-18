@@ -17,6 +17,7 @@ process GATHER_READ_QUALITY_METRICS {
     GatherReadQualityMetrics \
         -m ${javaMemMb}m \
         --INPUT ${bam} \
-        --OUTPUT ${output_file}
+        --OUTPUT ${output_file} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

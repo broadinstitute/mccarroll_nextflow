@@ -39,6 +39,8 @@ params {
     referenceOverride: List<String> = []
     starAlignVersion: String?
     minAllowedBarcodesFraction: Float = 0.1
+    // Use htsjdk's libdeflate (--USE_JDK_DEFLATER/INFLATER) in Drop-seq Java programs.  For A/B testing.
+    useLibdeflate: Boolean = false
 
     // cbrb parameters
     useSvmParameterEstimation: Boolean = true

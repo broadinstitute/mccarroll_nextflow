@@ -172,6 +172,16 @@ Whilst the default requirements set within the pipeline will hopefully work for 
 
 To change the resource requests, please see the [max resources](https://nf-co.re/docs/usage/configuration#max-resources) and [tuning workflow resources](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources) section of the nf-core website.
 
+### Threading and the (de)flater codec
+
+Drop-seq Java programs that support `--NUM_THREADS` are run with `--NUM_THREADS ${task.cpus}`, so the number of threads follows the CPUs
+requested by the process label (`process_dual` is 2 CPUs / 6 GB, `process_low` is 2 CPUs / 12 GB, and so on). To change the thread count for a process,
+change its CPU request in your config rather than editing the module.
+
+Set the boolean parameter `useLibdeflate` (default `false`) to add `--USE_JDK_DEFLATER true --USE_JDK_INFLATER true` to every Drop-seq Java program.
+Despite the names, these flags select htsjdk's libdeflate instead of the Intel GKL (de)flater. It is provided for A/B performance testing: libdeflate is
+faster at compression level 5 but slower at level 1, and the inflater only helps on compressed input. Picard, GATK and STAR modules are not affected.
+
 ### Custom Containers
 
 In some cases, you may wish to change the container or conda environment used by a pipeline steps for a particular tool. By default, nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However, in some cases the pipeline specified version maybe out of date.

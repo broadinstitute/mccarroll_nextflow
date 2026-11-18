@@ -28,6 +28,7 @@ process GATHER_UMI_READ_INTERVALS {
         --CELL_BC_FILE ${selectedCells} \
         --FUNCTIONAL_STRATEGY ${functionalStrategy} \
         --STRAND_STRATEGY ${strandStrategy} \
-        ${locusFunctionArgs}
+        ${locusFunctionArgs} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

@@ -21,6 +21,6 @@ process MERGE_DGE {
         --OUTPUT ${output_file} \
         --HEADER_STRINGENCY LENIENT \
         --OUTPUT_HEADER true \
-        --INTEGER_FORMAT true
+        --INTEGER_FORMAT true ${task.ext.libdeflateArgs ?: ''}
     """
 }

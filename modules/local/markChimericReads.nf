@@ -43,6 +43,7 @@ process MARK_CHIMERIC_READS {
           ${locusFunctionArgs} \
           --COMPRESSION_LEVEL 0 \
           --CREATE_INDEX ${createIndex} \
-          --VALIDATION_STRINGENCY SILENT
+          --VALIDATION_STRINGENCY SILENT \
+          --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

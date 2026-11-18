@@ -34,6 +34,7 @@ process SELECT_CELLS_BY_NUM_TRANSCRIPTS {
           --FUNCTIONAL_STRATEGY ${functionalStrategy} \
           --METRICS ${metrics_file} \
           ${locusFunctionArgs} \
-          --STRAND_STRATEGY ${strandStrategy}
+          --STRAND_STRATEGY ${strandStrategy} \
+          --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

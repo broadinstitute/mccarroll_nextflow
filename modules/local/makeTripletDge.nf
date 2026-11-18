@@ -25,6 +25,6 @@ process MAKE_TRIPLET_DGE {
         --OUTPUT ${matrix} \
         --OUTPUT_FEATURES ${features} \
         --OUTPUT_CELLS ${barcodes} \
-        --REDUCED_GTF ${reducedGtf}
+        --REDUCED_GTF ${reducedGtf} ${task.ext.libdeflateArgs ?: ''}
     """
 }

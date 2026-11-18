@@ -20,6 +20,7 @@ process DOWNSAMPLE_TRANSCRIPTS_AND_QUANTILES {
         -m ${javaMemMb}m \
           --INPUT ${molBc} \
           --CELL_BC_FILE ${selectedCells} \
-          --OUTPUT_HISTOGRAM_FILE ${output_file}
+          --OUTPUT_HISTOGRAM_FILE ${output_file} \
+          --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

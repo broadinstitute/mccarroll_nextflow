@@ -19,6 +19,6 @@ process MERGE_UMI_READ_INTERVALS {
     MergeUMIReadIntervals \
         -m ${javaMemMb}m \
         --INPUT ${perBamUMIReadIntervals.join(' --INPUT ')} \
-        --OUTPUT ${output_file}
+        --OUTPUT ${output_file} ${task.ext.libdeflateArgs ?: ''}
     """
 }

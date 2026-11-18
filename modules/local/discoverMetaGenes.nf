@@ -28,6 +28,7 @@ process DISCOVER_META_GENES {
         --WRITE_SINGLE_GENES true \
         --FUNCTIONAL_STRATEGY ${functionalStrategy} \
         ${locusFunctionArgs} \
-        --REPORT ${output_report}
+        --REPORT ${output_report} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

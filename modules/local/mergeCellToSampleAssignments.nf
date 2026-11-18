@@ -19,6 +19,6 @@ process MERGE_CELL_TO_SAMPLE_ASSIGNMENTS {
     MergeCellToSampleAssignments \
           -m ${javaMemMb}m \
           --INPUT ${donorAssignments.join(' --INPUT ')} \
-          --OUTPUT ${output_file}
+          --OUTPUT ${output_file} ${task.ext.libdeflateArgs ?: ''}
     """
 }

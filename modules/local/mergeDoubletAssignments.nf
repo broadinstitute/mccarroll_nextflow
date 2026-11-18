@@ -19,6 +19,6 @@ process MERGE_DOUBLET_ASSIGNMENTS {
     MergeDoubletAssignments \
           -m ${javaMemMb}m \
           --INPUT ${doublets.join(' --INPUT ')} \
-          --OUTPUT ${output_file}
+          --OUTPUT ${output_file} ${task.ext.libdeflateArgs ?: ''}
     """
 }

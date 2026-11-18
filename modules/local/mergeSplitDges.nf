@@ -21,6 +21,6 @@ process MERGE_SPLIT_DGES {
         --INPUT ${dges.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
       --OUTPUT_HEADER true \
-      --HEADER_STRINGENCY NONE
+      --HEADER_STRINGENCY NONE ${task.ext.libdeflateArgs ?: ''}
     """
 }

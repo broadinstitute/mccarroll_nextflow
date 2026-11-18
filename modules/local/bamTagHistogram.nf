@@ -23,6 +23,7 @@ process BAM_TAG_HISTOGRAM {
           --OUTPUT ${output_file} \
           --TAG ${tag} \
           --FILTER_PCR_DUPLICATES false \
-          --VALIDATION_STRINGENCY SILENT
+          --VALIDATION_STRINGENCY SILENT \
+          --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

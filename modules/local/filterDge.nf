@@ -26,6 +26,6 @@ process FILTER_DGE {
         --OUTPUT ${output_file} \
         --OUTPUT_SUMMARY ${output_summary} \
         --CELLS_RETAIN ${selectedCells} \
-        --OUTPUT_HEADER true
+        --OUTPUT_HEADER true ${task.ext.libdeflateArgs ?: ''}
     """
 }

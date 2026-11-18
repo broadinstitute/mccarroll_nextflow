@@ -20,6 +20,6 @@ process MERGE_DGE_SUMMARIES {
         -m ${javaMemMb}m \
         --INPUT ${dgeSummaries.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
-        ${otherArgs ?: ''}
+        ${otherArgs ?: ''} ${task.ext.libdeflateArgs ?: ''}
     """
 }

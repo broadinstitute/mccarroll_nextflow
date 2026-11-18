@@ -55,14 +55,14 @@ process PREALIGNMENT_TAG_AND_TRIM {
           --TAG_NAME ${molecularBarcodeTag} \
           --NUM_BASES_BELOW_QUALITY 1 \
           --COMPRESSION_LEVEL 0 \
-          --VALIDATION_STRINGENCY SILENT | \
+          --VALIDATION_STRINGENCY SILENT ${task.ext.libdeflateArgs ?: ''} | \
     FilterBam \
             --I /dev/stdin \
             --O /dev/stdout \
             --TAG_REJECT XQ \
             --PASSING_READ_THRESHOLD 0.1 \
           --COMPRESSION_LEVEL 0 \
-          --VALIDATION_STRINGENCY SILENT | \
+          --VALIDATION_STRINGENCY SILENT ${task.ext.libdeflateArgs ?: ''} | \
     FilterBamByTag \
         -m ${filterBamByTagJavaMemMb}m \
             --I /dev/stdin \
@@ -73,7 +73,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
             --SUMMARY ${allow_list_metric_file} \
             --PASSING_READ_THRESHOLD 0 \
             --COMPRESSION_LEVEL 0 \
-          --VALIDATION_STRINGENCY SILENT | \
+          --VALIDATION_STRINGENCY SILENT ${task.ext.libdeflateArgs ?: ''} | \
     TrimStartingSequence \
             --I /dev/stdin \
             --O /dev/stdout \
@@ -84,7 +84,7 @@ process PREALIGNMENT_TAG_AND_TRIM {
           --LENGTH_TAG Zl \
           --WHICH_READ ${templateRead} \
           --COMPRESSION_LEVEL 0 \
-          --VALIDATION_STRINGENCY SILENT | \
+          --VALIDATION_STRINGENCY SILENT ${task.ext.libdeflateArgs ?: ''} | \
           PolyATrimmer \
             --I /dev/stdin \
             --O ${output_file} \
@@ -95,6 +95,6 @@ process PREALIGNMENT_TAG_AND_TRIM {
           --ADAPTER_TAG ZA \
           --WHICH_READ ${templateRead} \
           --NEW true \
-          --VALIDATION_STRINGENCY SILENT
+          --VALIDATION_STRINGENCY SILENT ${task.ext.libdeflateArgs ?: ''}
     """
 }

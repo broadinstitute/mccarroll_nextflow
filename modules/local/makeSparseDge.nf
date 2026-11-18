@@ -26,6 +26,6 @@ process MAKE_SPARSE_DGE {
         --OUTPUT_FORMAT MM_SPARSE_10X \
         --OUTPUT_HEADER false \
         --OUTPUT_FEATURES ${features} \
-        --OUTPUT_CELLS ${barcodes}
+        --OUTPUT_CELLS ${barcodes} ${task.ext.libdeflateArgs ?: ''}
     """
 }

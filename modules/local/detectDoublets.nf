@@ -40,6 +40,6 @@ process DETECT_DOUBLETS {
         --FUNCTIONAL_STRATEGY ${functionalStrategy} \
         ${nonAutosomesString} \
           --CELL_CONTAMINATION_ESTIMATE_FILE ${cbrbCellSelectionReport} \
-          --ALLELE_FREQUENCY_ESTIMATE_FILE ${alleleFrequency} 
+          --ALLELE_FREQUENCY_ESTIMATE_FILE ${alleleFrequency} ${task.ext.libdeflateArgs ?: ''}
     """
 }

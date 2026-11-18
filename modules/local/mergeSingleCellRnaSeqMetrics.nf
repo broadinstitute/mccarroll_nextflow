@@ -18,6 +18,6 @@ process MERGE_SINGLE_CELL_RNA_SEQ_METRICS {
     MergeSingleCellRnaSeqMetrics \
         -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
-        --OUTPUT ${output_file}
+        --OUTPUT ${output_file} ${task.ext.libdeflateArgs ?: ''}
     """
 }

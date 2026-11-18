@@ -18,6 +18,6 @@ process MERGE_READ_QUALITY_METRICS {
     MergeReadQualityMetrics \
         -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
-        --OUTPUT ${output_file}
+        --OUTPUT ${output_file} ${task.ext.libdeflateArgs ?: ''}
     """
 }

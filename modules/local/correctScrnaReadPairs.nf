@@ -3,12 +3,12 @@ include { hasExtension ; replaceExtension } from './FileUtil.nf'
 
 process CORRECT_SCRNA_READ_PAIRS {
     tag "${meta.id}"
-    label 'process_single'
+    label 'process_dual'
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
     memory {
-        // TODO: This code is not doing anthing because of process_single label,
+        // TODO: This code is not doing anything because the process_dual label overrides it,
         // but leaving it here so that when we tune memory we'll have an idea of what Zamboni did.
         // 7e-8 is the MemoryReservationMbPerByte used by Zamboni
         def totalInputSizeBytes: long = bams.collect { bam -> bam.size() }.sum()
@@ -61,6 +61,7 @@ process CORRECT_SCRNA_READ_PAIRS {
         --OUTPUT '${output_file}' \
         --BARCODE_TAG '${cellBarcodeTag}' \
         --TAG_BOTH_READS ${tagBothReads} \
-        --METRICS '${metrics_file}'
+        --METRICS '${metrics_file}' \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

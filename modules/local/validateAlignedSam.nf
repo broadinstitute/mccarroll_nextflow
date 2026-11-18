@@ -16,6 +16,6 @@ process VALIDATE_ALIGNED_SAM {
     """
      ValidateAlignedSam  \
         -m ${javaMemMb}m \
-        --INPUT_BAM ${alignedBam}
+        --INPUT_BAM ${alignedBam} ${task.ext.libdeflateArgs ?: ''}
     """
 }

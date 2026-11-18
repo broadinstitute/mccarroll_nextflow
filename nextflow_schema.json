@@ -318,6 +318,11 @@
       "type": "number",
       "description": "For manual cell selection"
     },
+    "useLibdeflate": {
+      "type": "boolean",
+      "description": "Add --USE_JDK_DEFLATER true --USE_JDK_INFLATER true to Drop-seq Java programs so they use htsjdk's libdeflate instead of the Intel GKL (de)flater. Intended for A/B performance testing.",
+      "default": false
+    },
     "useCBRBInitialization": {
       "type": "boolean",
       "description": "DropSift cell selection option",

@@ -38,6 +38,6 @@ process CREATE_METACELLS {
         --INPUT ${dgeMatrix} \
         --OUTPUT ${output_file} \
         --METRICS ${output_metrics} \
-        ${donor_arg}
+        ${donor_arg} ${task.ext.libdeflateArgs ?: ''}
     """
 }

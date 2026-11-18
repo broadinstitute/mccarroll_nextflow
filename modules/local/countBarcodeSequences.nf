@@ -1,8 +1,8 @@
 process COUNT_BARCODE_SEQUENCES {
     tag "${libraryName}"
-    cpus  { 1                   }
-    memory  { 8.GB * task.attempt + AllowListUtils.memoryForAllowList(allowedBarcodes) }
-    time  { 4.h  * task.attempt }
+    label 'process_low'
+    // CPUs come from the label.  Memory is set in conf/modules.config (withName: COUNT_BARCODE_SEQUENCES)
+    // because a label's memory would otherwise override a directive here.
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
@@ -31,6 +31,7 @@ process COUNT_BARCODE_SEQUENCES {
         --BARCODED_READ '${barcodedRead}' \
         --ALLOWED_BARCODES '${allowedBarcodes}' \
         --OUTPUT '${output_file}' \
-        --INPUT ${bams.join(' --INPUT ')}
+        --INPUT ${bams.join(' --INPUT ')} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

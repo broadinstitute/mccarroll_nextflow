@@ -30,6 +30,7 @@ process CREATE_META_GENE_BAM {
         --FUNCTIONAL_STRATEGY ${functionalStrategy} \
         --KNOWN_META_GENE_FILE ${metaGeneReport} \
         ${locusFunctionArgs} \
-        --OUTPUT ${output_file}
+        --OUTPUT ${output_file} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

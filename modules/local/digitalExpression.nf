@@ -49,6 +49,7 @@ process DIGITAL_EXPRESSION {
         --MOLECULAR_BARCODE_TAG ${molecularBarcodeTag} \
         --STRAND_STRATEGY ${strandStrategy} \
         ${locusFunctionArgs} \
-        ${metagene_args}
+        ${metagene_args} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

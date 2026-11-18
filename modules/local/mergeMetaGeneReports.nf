@@ -17,6 +17,6 @@ process MERGE_META_GENE_REPORTS {
     """
     MergeMetaGeneReports \
           --INPUT ${metaGeneReports.join(' --INPUT ')} \
-          --OUTPUT ${output_file}
+          --OUTPUT ${output_file} ${task.ext.libdeflateArgs ?: ''}
     """
 }

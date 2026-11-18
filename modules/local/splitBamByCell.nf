@@ -1,16 +1,10 @@
 process SPLIT_BAM_BY_CELL {
     tag "${libraryName}"
+    label 'process_medium'
     errorStrategy 'retry'
     maxRetries 3
-    cpus { 1 }
-    memory {
-        //taggedBams.each { bam -> log.info "taggedBam size: ${bam.size()} bytes (${bam})" }
-        // A little more than 7e-8 used by Zamboni
-        def memoryMb: int = (taggedBams*.size().sum() * 9e-8 * task.attempt).intValue()
-        //log.info "SPLIT_BAM_BY_CELL: calculated memoryMb=${memoryMb} for taggedBams=${taggedBams*.name} (attempt ${task.attempt})"
-        1.MB * Math.max(memoryMb, 8000)
-    }
-    time { 24.h * task.attempt }
+    // CPUs come from the label.  Memory and time are set in conf/modules.config (withName: SPLIT_BAM_BY_CELL)
+    // because a label's memory/time would otherwise override a directive here.
 
     container 'quay.io/broadinstitute/drop-seq_java:current'
 
@@ -40,6 +34,7 @@ process SPLIT_BAM_BY_CELL {
         --TARGET_BAM_SIZE ${targetBamSizeMBytes}M \
         --REPORT ${report} \
         --OUTPUT_MANIFEST ${manifest} \
-        --OUTPUT_LIST ${bam_list}
+        --OUTPUT_LIST ${bam_list} \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

@@ -49,6 +49,6 @@ process ASSIGN_CELLS_TO_SAMPLES {
           --FUNCTIONAL_STRATEGY ${functionalStrategy} \
           --NUM_THREADS ${task.cpus} \
           ${locusFunctionArgs} \
-          ${nonAutosomesString}
+          ${nonAutosomesString} ${task.ext.libdeflateArgs ?: ''}
     """
 }

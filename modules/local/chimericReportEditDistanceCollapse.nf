@@ -20,6 +20,7 @@ process CHIMERIC_REPORT_EDIT_DISTANCE_COLLAPSE {
         --INPUT ${chimericTranscripts} \
         --OUTPUT ${output_file} \
         --CELL_BC_FILE ${selectedCells} \
-        --IGNORE_CHIMERIC true
+        --IGNORE_CHIMERIC true \
+        --NUM_THREADS ${task.cpus} ${task.ext.libdeflateArgs ?: ''}
     """
 }

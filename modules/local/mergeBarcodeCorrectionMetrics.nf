@@ -19,6 +19,6 @@ process MERGE_BARCODE_CORRECTION_METRICS {
         -m ${javaMemMb}m \
         --INPUT ${metrics.join(' --INPUT ')} \
         --OUTPUT ${output_file} \
-        --DELETE_INPUTS false
+        --DELETE_INPUTS false ${task.ext.libdeflateArgs ?: ''}
     """
 }
