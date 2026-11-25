@@ -2,7 +2,7 @@ process DUMP_ELBO_TABLE {
     tag "${library}"
     label 'process_low'
 
-    container 'us-docker.pkg.dev/mccarroll-scrna-seq/us.gcr.io/drop-seq_private_python:current'
+    container 'us.gcr.io/mccarroll-scrna-seq/drop-seq_private_python:current'
 
     input:
     val library
