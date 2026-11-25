@@ -61,7 +61,8 @@ workflow PIPELINE_INITIALISATION {
         show_hidden,
         "",
         "",
-        command
+        command,
+        false
     )
 
     //
@@ -88,7 +89,7 @@ workflow PIPELINE_COMPLETION {
     monochrome_logs // boolean: Disable ANSI colour codes in log output
 
     main:
-    summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
+    summary_params = paramsSummaryMap(parameters_schema: "nextflow_schema.json")
 
     //
     // Completion email and summary
